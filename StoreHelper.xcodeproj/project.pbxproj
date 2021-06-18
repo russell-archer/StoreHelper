@@ -15,6 +15,24 @@
 		68F7739E267A43C400C3C670 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7737A267A43C300C3C670 /* ContentView.swift */; };
 		68F7739F267A43C400C3C670 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68F7737B267A43C400C3C670 /* Assets.xcassets */; };
 		68F773A0267A43C400C3C670 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68F7737B267A43C400C3C670 /* Assets.xcassets */; };
+		68F773B9267A451E00C3C670 /* Products.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68F773B8267A451E00C3C670 /* Products.plist */; };
+		68F773BA267A451E00C3C670 /* Products.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68F773B8267A451E00C3C670 /* Products.plist */; };
+		68F773BC267A454700C3C670 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773BB267A454700C3C670 /* Configuration.swift */; };
+		68F773BD267A454700C3C670 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773BB267A454700C3C670 /* Configuration.swift */; };
+		68F773BF267A462500C3C670 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 68F773BE267A462500C3C670 /* Products.storekit */; };
+		68F773C0267A462500C3C670 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 68F773BE267A462500C3C670 /* Products.storekit */; };
+		68F773C6267A47E400C3C670 /* StoreConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773C5267A47E400C3C670 /* StoreConstants.swift */; };
+		68F773C7267A47E400C3C670 /* StoreConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773C5267A47E400C3C670 /* StoreConstants.swift */; };
+		68F773C9267A481900C3C670 /* StoreLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773C8267A481900C3C670 /* StoreLog.swift */; };
+		68F773CA267A481900C3C670 /* StoreLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773C8267A481900C3C670 /* StoreLog.swift */; };
+		68F773CC267A48AF00C3C670 /* StoreNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773CB267A48AF00C3C670 /* StoreNotification.swift */; };
+		68F773CD267A48AF00C3C670 /* StoreNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773CB267A48AF00C3C670 /* StoreNotification.swift */; };
+		68F773CF267A494500C3C670 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773CE267A494500C3C670 /* Utils.swift */; };
+		68F773D0267A494500C3C670 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773CE267A494500C3C670 /* Utils.swift */; };
+		68F773D2267A497000C3C670 /* StoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773D1267A497000C3C670 /* StoreHelper.swift */; };
+		68F773D3267A497000C3C670 /* StoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F773D1267A497000C3C670 /* StoreHelper.swift */; };
+		68F773D6267A4A3200C3C670 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F773D5267A4A3200C3C670 /* StoreKit.framework */; };
+		68F773D8267A4A4400C3C670 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F773D7267A4A4400C3C670 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +53,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		680B0CAE267CFE79007F7518 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		68F77379267A43C300C3C670 /* StoreHelperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHelperApp.swift; sourceTree = "<group>"; };
 		68F7737A267A43C300C3C670 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		68F7737B267A43C400C3C670 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -44,6 +63,16 @@
 		68F7738F267A43C400C3C670 /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
 		68F77395267A43C400C3C670 /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		68F77399267A43C400C3C670 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
+		68F773B8267A451E00C3C670 /* Products.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Products.plist; sourceTree = "<group>"; };
+		68F773BB267A454700C3C670 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		68F773BE267A462500C3C670 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
+		68F773C5267A47E400C3C670 /* StoreConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreConstants.swift; sourceTree = "<group>"; };
+		68F773C8267A481900C3C670 /* StoreLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreLog.swift; sourceTree = "<group>"; };
+		68F773CB267A48AF00C3C670 /* StoreNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreNotification.swift; sourceTree = "<group>"; };
+		68F773CE267A494500C3C670 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		68F773D1267A497000C3C670 /* StoreHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHelper.swift; sourceTree = "<group>"; };
+		68F773D5267A4A3200C3C670 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.0.sdk/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
+		68F773D7267A4A4400C3C670 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68F773D6267A4A3200C3C670 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,6 +88,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68F773D8267A4A4400C3C670 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,22 +109,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		680B0CAF267CFE7E007F7518 /* readme-assets */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "readme-assets";
+			sourceTree = "<group>";
+		};
 		68F77373267A43C300C3C670 = {
 			isa = PBXGroup;
 			children = (
+				680B0CAE267CFE79007F7518 /* README.md */,
+				680B0CAF267CFE7E007F7518 /* readme-assets */,
+				68F773AF267A43E400C3C670 /* iOS */,
+				68F773B0267A43EB00C3C670 /* macOS */,
 				68F77378267A43C300C3C670 /* Shared */,
+				68F77381267A43C400C3C670 /* Products */,
 				68F7738E267A43C400C3C670 /* Tests iOS */,
 				68F77398267A43C400C3C670 /* Tests macOS */,
-				68F77381267A43C400C3C670 /* Products */,
+				68F773D4267A4A3200C3C670 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		68F77378267A43C300C3C670 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				68F77379267A43C300C3C670 /* StoreHelperApp.swift */,
-				68F7737A267A43C300C3C670 /* ContentView.swift */,
-				68F7737B267A43C400C3C670 /* Assets.xcassets */,
+				68F773C4267A47B300C3C670 /* StoreHelper */,
+				68F773B7267A44D000C3C670 /* Configuration */,
+				68F773B6267A444000C3C670 /* Views */,
+				68F773B5267A442700C3C670 /* Support */,
+				68F773B2267A440C00C3C670 /* Model */,
+				68F773B1267A43FC00C3C670 /* ViewModels */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -123,6 +169,98 @@
 				68F77399267A43C400C3C670 /* Tests_macOS.swift */,
 			);
 			path = "Tests macOS";
+			sourceTree = "<group>";
+		};
+		68F773AF267A43E400C3C670 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				68F773B4267A442100C3C670 /* Views */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		68F773B0267A43EB00C3C670 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				68F773B3267A441A00C3C670 /* Views */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		68F773B1267A43FC00C3C670 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		68F773B2267A440C00C3C670 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		68F773B3267A441A00C3C670 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		68F773B4267A442100C3C670 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		68F773B5267A442700C3C670 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				68F77379267A43C300C3C670 /* StoreHelperApp.swift */,
+				68F773CE267A494500C3C670 /* Utils.swift */,
+				68F7737B267A43C400C3C670 /* Assets.xcassets */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		68F773B6267A444000C3C670 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				68F7737A267A43C300C3C670 /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		68F773B7267A44D000C3C670 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				68F773B8267A451E00C3C670 /* Products.plist */,
+				68F773BE267A462500C3C670 /* Products.storekit */,
+				68F773BB267A454700C3C670 /* Configuration.swift */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		68F773C4267A47B300C3C670 /* StoreHelper */ = {
+			isa = PBXGroup;
+			children = (
+				68F773C5267A47E400C3C670 /* StoreConstants.swift */,
+				68F773D1267A497000C3C670 /* StoreHelper.swift */,
+				68F773C8267A481900C3C670 /* StoreLog.swift */,
+				68F773CB267A48AF00C3C670 /* StoreNotification.swift */,
+			);
+			path = StoreHelper;
+			sourceTree = "<group>";
+		};
+		68F773D4267A4A3200C3C670 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				68F773D7267A4A4400C3C670 /* StoreKit.framework */,
+				68F773D5267A4A3200C3C670 /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,6 +388,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68F773B9267A451E00C3C670 /* Products.plist in Resources */,
+				68F773BF267A462500C3C670 /* Products.storekit in Resources */,
 				68F7739F267A43C400C3C670 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -258,6 +398,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68F773BA267A451E00C3C670 /* Products.plist in Resources */,
+				68F773C0267A462500C3C670 /* Products.storekit in Resources */,
 				68F773A0267A43C400C3C670 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -283,8 +425,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68F773BC267A454700C3C670 /* Configuration.swift in Sources */,
+				68F773C9267A481900C3C670 /* StoreLog.swift in Sources */,
+				68F773CC267A48AF00C3C670 /* StoreNotification.swift in Sources */,
+				68F773D2267A497000C3C670 /* StoreHelper.swift in Sources */,
 				68F7739D267A43C400C3C670 /* ContentView.swift in Sources */,
+				68F773C6267A47E400C3C670 /* StoreConstants.swift in Sources */,
 				68F7739B267A43C400C3C670 /* StoreHelperApp.swift in Sources */,
+				68F773CF267A494500C3C670 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,8 +440,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68F773BD267A454700C3C670 /* Configuration.swift in Sources */,
+				68F773CA267A481900C3C670 /* StoreLog.swift in Sources */,
+				68F773CD267A48AF00C3C670 /* StoreNotification.swift in Sources */,
+				68F773D3267A497000C3C670 /* StoreHelper.swift in Sources */,
 				68F7739E267A43C400C3C670 /* ContentView.swift in Sources */,
+				68F773C7267A47E400C3C670 /* StoreConstants.swift in Sources */,
 				68F7739C267A43C400C3C670 /* StoreHelperApp.swift in Sources */,
+				68F773D0267A494500C3C670 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,7 +609,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -485,7 +639,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -520,7 +674,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rarcher.StoreHelper;
 				PRODUCT_NAME = StoreHelper;
@@ -549,7 +703,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rarcher.StoreHelper;
 				PRODUCT_NAME = StoreHelper;
