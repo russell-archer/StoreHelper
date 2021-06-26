@@ -11,27 +11,22 @@ public typealias ProductId = String
 
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-class StoreHelper: ObservableObject {
+public class StoreHelper: ObservableObject {
     
     // MARK: - Public properties
     
-    /// List of `Product` retrieved from the App Store and available for purchase.
+    /// Array of `Product` retrieved from the App Store and available for purchase.
     @Published private(set) var products: [Product]?
     
     /// List of `ProductId` for products that have been purchased.
     @Published private(set) var purchasedProducts = Set<ProductId>()
     
-    /// The state of a purchase. See `purchase(_:)`.
-    public enum PurchaseState { case complete, pending, cancelled, failed, unknown }
+    /// The state of a purchase. See `purchase(_:)` and `purchaseState`.
+    public enum PurchaseState { case notStarted, inProgress, complete, pending, cancelled, failed, failedVerification, unknown }
     
-    /// List of `ProductId` read from the Products.plist configuration file.
-    public var configuredProductIdentifiers: Set<ProductId>?
-    
-    /// True if we have a list of `ProductId` read from Products.plist.
-    public var hasConfiguredProductIdentifiers: Bool {
-        guard configuredProductIdentifiers != nil else { return false }
-        return configuredProductIdentifiers!.count > 0 ? true : false
-    }
+    /// The current internal state of StoreHelper. If `purchaseState == inprogress` then an attempt to start
+    /// a new purchase will result in a `purchaseInProgressException` being thrown by `purchase(_:)`.
+    public private(set) var purchaseState: PurchaseState = .notStarted
     
     /// True if we have a list of `Product` returned to us by the App Store.
     public var hasProducts: Bool {
@@ -54,9 +49,23 @@ class StoreHelper: ObservableObject {
     /// - Request localized product info from the App Store.
     init() {
         
-        readConfigFile()                                // Read our list of product ids
-        transactionListener = handleTransactions()      // Listen for App Store transactions
-        async { await requestProductsFromAppStore() }   // Get localized product info from the App Store
+        // Listen for App Store transactions
+        transactionListener = handleTransactions()
+        
+        // Read our list of product ids
+        if let productIds = Configuration.readConfigFile() {
+            
+            // Get localized product info from the App Store
+            StoreLog.event(.requestProductsStarted)
+            async {
+                
+                products = await requestProductsFromAppStore(productIds: productIds)
+                
+                if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } else {
+                    StoreLog.event(.requestProductsSuccess)
+                }
+            }
+        }
     }
     
     deinit {
@@ -65,37 +74,41 @@ class StoreHelper: ObservableObject {
     }
     
     // MARK: - Public methods
-    
-    /// Request localized product info from the App Store using the set of `ProductID` defined in Products.plist.
-    /// When the request is complete the `products` property will contain an array of `Product`, or nil if there's an error.
+
+    /// Request localized product info from the App Store for a set of ProductId.
     ///
-    /// This function runs on the main thread.
-    @MainActor
-    public func requestProductsFromAppStore() async {
+    /// This method runs on the main thread because it will result in updates to the UI.
+    /// - Parameter productIds: The product ids that you want localized information for.
+    /// - Returns: Returns an array of `Product`, or nil if no product information is
+    /// returned by the App Store.
+    @MainActor public func requestProductsFromAppStore(productIds: Set<ProductId>) async -> [Product]? {
         
-        StoreLog.event(.requestProductsStarted)
-        products = try? await Product.request(with: configuredProductIdentifiers!)
-        
-        if let p = products, p.count > 0 { StoreLog.event(.requestProductsSuccess) }
-        else { StoreLog.event(.requestProductsFailure) }
+        try? await Product.request(with: productIds)
     }
     
     /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
     ///
-    /// May throw an exception of type StoreException.transactionException.
+    /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
-    public func isPurchased(productId: ProductId) async throws -> Bool {
-        
-        guard let mostRecentTransaction = await Transaction.latest(for: productId) else {
+    public func isPurchased(product: Product) async throws -> Bool {
+
+        guard let mostRecentTransaction = await product.latestTransaction else {
             return false  // There's no transaction for the product, so it hasn't been purchased
         }
         
         // See if the transaction passed StoreKit's automatic verification
-        guard let validatedTransaction = checkTransactionVerificationResult(transactionVerificationResult: mostRecentTransaction) else {
-            throw StoreException.transactionException
+        let checkResult = checkTransactionVerificationResult(result: mostRecentTransaction)
+        if !checkResult.verified {
+            StoreLog.event(.transactionValidationFailure, productId: checkResult.transaction.productID)
+            throw StoreException.transactionVerificationFailed
         }
+
+        let validatedTransaction = checkResult.transaction
         
+        // Make sure our internal set of purchase pids is in-sync with the App Store
+        await updatePurchasedIdentifiers(validatedTransaction)
+
         // See if the App Store has revoked the users access to the product (e.g. because of a refund).
         // If this transaction represents a subscription, see if the user upgraded to a higher-level subscription.
         // To determine the service that the user is entitled to, we would need to check for another transaction
@@ -105,63 +118,55 @@ class StoreHelper: ObservableObject {
     
     /// Purchase a `Product` previously returned from the App Store following a call to `requestProductsFromAppStore()`.
     ///
-    /// May throw an exception of type `PurchaseError`, `StoreKitError` or `StoreException.transactionException`.
+    /// May throw an exception of type:
+    /// - `StoreException.purchaseException` if the App Store itself throws an exception
+    /// - `StoreException.purchaseInProgressException` if a purchase is already in progress
+    /// - `StoreException.transactionVerificationFailed` if the purchase transaction failed verification
+    ///
     /// - Parameter product: The `Product` to purchase.
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
     public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
-        
-        StoreLog.event(.purchaseInProgress(productId: product.id))
+
+        guard purchaseState != .inProgress else {
+            StoreLog.exception(.purchaseInProgressException, productId: product.id)
+            throw StoreException.purchaseInProgressException
+        }
         
         // Start a purchase transaction
-        let result = try await product.purchase()
+        purchaseState = .inProgress
+        StoreLog.event(.purchaseInProgress, productId: product.id)
+
+        guard let result = try? await product.purchase() else {
+            purchaseState = .failed
+            StoreLog.event(.purchaseFailure, productId: product.id)
+            throw StoreException.purchaseException
+        }
         
         // Every time an app receives a transaction from StoreKit 2, the transaction has already passed through a
         // verification process to confirm whether the payload is signed by the App Store for my app for this device.
-        // That is, Storekit2 does transaction (receipt) verification for you! No more OpenSSL or needing to send
-        // a receipt to an Apple server for verification!
-        //
-        // You can also associate a purchase with a particular account/user in your system.
-        // When you set the app account token in the purchase options, the App Store returns the same app account
-        // token value in the resulting transaction, in appAccountToken. This allows you to keep track of a user's
-        // purchases.
-        //
-        // let myId = UUID()
-        // let result = try await product.purchase(options: [.appAccountToken(myId)])
+        // That is, Storekit2 does transaction (receipt) verification for you (no more OpenSSL or needing to send
+        // a receipt to an Apple server for verification).
         
         // We now have a PurchaseResult value. See if the purchase suceeded, failed, was cancelled or is pending.
         switch result {
             case .success(let verificationResult):
                 
-                // The purchase succeeded. We now need to check the VerificationResult<Transaction>
-                // to see if the transaction passed the App Store's validation process (equivalent to
-                // receipt validation).
-                //
-                /*
-                 verificationResult: (VerificationResult<Transaction>)
-                 A type that describes the result of a StoreKit verification.
-                 StoreKit automatically verifies the Transaction and Product.SubscriptionInfo.RenewalInfo values.
-                 To access the wrapped values, check whether the values are verified or unverified.
-                 */
-                
-                // The verification describes the result of StoreKit's verification process.
-                // StoreKit verifys a transaction for you.
-                // A transaction represents a successful in-app purchase.
-                /*
-                 
-                 StoreKit automatically validates the transaction information, returning it wrapped in a VerificationResult.
-                 If you get a transaction through VerificationResult.verified(_:), the information passed validation.
-                 If you get it through VerificationResult.unverified(_:), the transaction information didn’t pass StoreKit’s
-                 automatic validation.
-                 
-                 If required, you can perform your own validation directly on the transaction’s jws string, or use the
-                 provided convenience properties such as headerData, payloadData, signatureData.
-                 */
+                // The purchase seems to have succeeded. StoreKit has already automatically attempted to validate
+                // the transaction, returning the result of this validation wrapped in a `VerificationResult`.
+                // We now need to check the `VerificationResult<Transaction>` to see if the transaction passed the
+                // App Store's validation process. This is equivalent to receipt validation in StoreKit1.
                 
                 // Did the transaction pass StoreKit’s automatic validation?
-                guard let validatedTransaction = checkTransactionVerificationResult(transactionVerificationResult: verificationResult) else {
-                    throw StoreException.transactionException
+                let checkResult = checkTransactionVerificationResult(result: verificationResult)
+                if !checkResult.verified {
+                    purchaseState = .failedVerification
+                    StoreLog.event(.transactionValidationFailure, productId: checkResult.transaction.productID)
+                    throw StoreException.transactionVerificationFailed
                 }
+                
+                // The transaction was successfully validated.
+                let validatedTransaction = checkResult.transaction
                 
                 // Update the list of purchased ids. Because it's is a @Published var this will cause the UI
                 // showing the list of products to update
@@ -170,20 +175,24 @@ class StoreHelper: ObservableObject {
                 // Tell the App Store we delivered the purchased content to the user
                 await validatedTransaction.finish()
                 
-                // Let the caller know the purchase succeeded
-                StoreLog.event(.purchaseSuccess(productId: product.id))
+                // Let the caller know the purchase succeeded and that the user should be given access to the product
+                purchaseState = .complete
+                StoreLog.event(.purchaseSuccess, productId: product.id)
                 return (transaction: validatedTransaction, purchaseState: .complete)
                 
             case .userCancelled:
-                StoreLog.event(.purchaseCancelled(productId: product.id))
+                purchaseState = .cancelled
+                StoreLog.event(.purchaseCancelled, productId: product.id)
                 return (transaction: nil, .cancelled)
                 
             case .pending:
-                StoreLog.event(.purchasePending(productId: product.id))
+                purchaseState = .pending
+                StoreLog.event(.purchasePending, productId: product.id)
                 return (transaction: nil, .pending)
                 
             default:
-                StoreLog.event(.purchaseFailure(productId: product.id))
+                purchaseState = .unknown
+                StoreLog.event(.purchaseFailure, productId: product.id)
                 return (transaction: nil, .unknown)
         }
     }
@@ -202,35 +211,6 @@ class StoreHelper: ObservableObject {
     
     // MARK: - Internal methods
     
-    /// Read the contents of the ProductId property list and updates `configuredProductIdentifiers`.
-    /// - Returns: Returns true if list was read and `configuredProductIdentifiers` updated, false otherwise.
-    internal func readConfigFile() {
-        
-        // Read our configuration file that contains the list of ProductIds that are available on the App Store.
-        configuredProductIdentifiers = nil
-        
-        guard let result = Configuration.readPropertyFile(filename: StoreConstants.ConfigFile) else {
-            StoreLog.event(.configurationNotFound)
-            StoreLog.event(.configurationFailure)
-            return
-        }
-        
-        guard result.count > 0 else {
-            StoreLog.event(.configurationEmpty)
-            StoreLog.event(.configurationFailure)
-            return
-        }
-        
-        guard let values = result[StoreConstants.ConfigFile] as? [String] else {
-            StoreLog.event(.configurationEmpty)
-            StoreLog.event(.configurationFailure)
-            return
-        }
-        
-        configuredProductIdentifiers = Set<ProductId>(values.compactMap { $0 })
-        StoreLog.event(.configurationSuccess)
-    }
-    
     /// This is an infinite async sequence (loop). It will continue waiting for transactions until it is explicitly
     /// canceled by calling the Task.Handle.cancel() method. See `transactionListener`.
     /// - Returns: Returns a handle for the transaction handling loop task.
@@ -239,57 +219,64 @@ class StoreHelper: ObservableObject {
         return detach {
             
             for await verificationResult in Transaction.listener {
-                
-                // Did StoreKit validate the transaction?
-                if let validatedTransaction = self.checkTransactionVerificationResult(transactionVerificationResult: verificationResult) {
+                                
+                // See if StoreKit validated the transaction
+                let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
+//                StoreLog.event(.transactionReceived, productId: checkResult.transaction.productID)
 
-                    // The transaction was validated so updated the list of products the user has access to
+                if checkResult.verified {
+
+                    let validatedTransaction = checkResult.transaction
+                    
+                    // The transaction was validated so update the list of products the user has access to
                     await self.updatePurchasedIdentifiers(validatedTransaction)
                     await validatedTransaction.finish()
-                    
-                    StoreLog.event(.transactionSuccess(productId: validatedTransaction.productID))
                     
                 } else {
                     
                     // StoreKit's attempts to validate the transaction failed. Don't deliver content to the user.
-                    StoreLog.event(.transactionFailure)
+                    StoreLog.event(.transactionFailure, productId: checkResult.transaction.productID)
                 }
             }
         }
     }
     
-    @MainActor
     /// Update our list of purchase product identifiers (see `purchasedProducts`).
     ///
-    /// This function runs on the main thread because it will result in updates to the UI.
+    /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
-    internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
+    @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
         
         if transaction.revocationDate == nil {
             
-            // The transaction hasn't been revoked by the App Store so add the ProductId to the list of `purchasedProducts`
+            // The transaction has NOT been revoked by the App Store so this product has been purchase.
+            // Add the ProductId to the list of `purchasedProducts` (it's a Set so it won't add if already there).
             purchasedProducts.insert(transaction.productID)
             
         } else {
             
             // The App Store revoked this transaction (e.g. a refund), meaning the user should not have access to it.
-            // Remove the product from the list of `purchasedProducts`
-            purchasedProducts.remove(transaction.productID)
+            // Remove the product from the list of `purchasedProducts`.
+            if purchasedProducts.remove(transaction.productID) != nil {
+                
+                // TODO - ******** add the web..id unique transaction id to all logs to with purchase, validation, revoked transaction
+                StoreLog.event(.transactionRevoked, productId: transaction.productID)
+            }
         }
     }
     
-    /// Check if StoreKit was able to automatically verify a transaction.
-    /// - Parameter transactionVerificationResult: The transaction VerificationResult to check.
+    /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.
+    ///
+    /// - Parameter result: The transaction VerificationResult to check.
     /// - Returns: The verified `Transaction`, or nil if the transaction result was unverified.
-    internal func checkTransactionVerificationResult(transactionVerificationResult: VerificationResult<Transaction>) -> Transaction? {
-        switch transactionVerificationResult {
+    internal func checkTransactionVerificationResult(result: VerificationResult<Transaction>) -> (transaction: Transaction, verified: Bool) {
+        
+        switch result {
             case .unverified(let unverifiedTransaction):
-                StoreLog.event(.transactionValidationFailure(productId: unverifiedTransaction.productID))
-                return nil
+                return (transaction: unverifiedTransaction, verified: false)  // StoreKit failed to automatically validate the transaction
                 
             case .verified(let verifiedTransaction):
-                StoreLog.event(.transactionValidationSuccess(productId: verifiedTransaction.productID))
-                return verifiedTransaction
+                return (transaction: verifiedTransaction, verified: true)  // StoreKit successfully automatically validated the transaction
         }
     }
 }

@@ -51,6 +51,19 @@ public struct StoreLog {
         #endif
     }
     
+    /// Logs a StoreException. Note that the text (shortDescription) and the productId for the
+    /// log entry will be publically available in the Console app.
+    /// - Parameters:
+    ///   - exception:  A StoreException.
+    ///   - productId:  A ProductId associated with the event.
+    public static func exception(_ exception: StoreException, productId: ProductId) {
+        #if DEBUG
+        print("\(exception.shortDescription()). For product \(productId)")
+        #else
+        os_log("%{public}s for product %{public}s", log: storeLog, type: .default, exception.shortDescription(), productId)
+        #endif
+    }
+    
     /// Logs a message.
     /// - Parameter message: The message to log.
     public static func event(_ message: String) {

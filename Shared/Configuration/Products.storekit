@@ -66,7 +66,12 @@
     }
   ],
   "settings" : {
-    "_askToBuyEnabled" : true
+    "_askToBuyEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitError" : 0
   },
   "subscriptionGroups" : [
 
