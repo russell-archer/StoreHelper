@@ -100,7 +100,7 @@ public class StoreHelper: ObservableObject {
         // See if the transaction passed StoreKit's automatic verification
         let checkResult = checkTransactionVerificationResult(result: mostRecentTransaction)
         if !checkResult.verified {
-            StoreLog.event(.transactionValidationFailure, productId: checkResult.transaction.productID)
+            StoreLog.transaction(.transactionValidationFailure, productId: checkResult.transaction.productID)
             throw StoreException.transactionVerificationFailed
         }
 
@@ -161,7 +161,7 @@ public class StoreHelper: ObservableObject {
                 let checkResult = checkTransactionVerificationResult(result: verificationResult)
                 if !checkResult.verified {
                     purchaseState = .failedVerification
-                    StoreLog.event(.transactionValidationFailure, productId: checkResult.transaction.productID)
+                    StoreLog.transaction(.transactionValidationFailure, productId: checkResult.transaction.productID)
                     throw StoreException.transactionVerificationFailed
                 }
                 
@@ -219,10 +219,10 @@ public class StoreHelper: ObservableObject {
         return detach {
             
             for await verificationResult in Transaction.listener {
-                                
+
                 // See if StoreKit validated the transaction
                 let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
-//                StoreLog.event(.transactionReceived, productId: checkResult.transaction.productID)
+                StoreLog.transaction(.transactionReceived, productId: checkResult.transaction.productID)
 
                 if checkResult.verified {
 
@@ -235,7 +235,7 @@ public class StoreHelper: ObservableObject {
                 } else {
                     
                     // StoreKit's attempts to validate the transaction failed. Don't deliver content to the user.
-                    StoreLog.event(.transactionFailure, productId: checkResult.transaction.productID)
+                    StoreLog.transaction(.transactionFailure, productId: checkResult.transaction.productID)
                 }
             }
         }
@@ -259,8 +259,7 @@ public class StoreHelper: ObservableObject {
             // Remove the product from the list of `purchasedProducts`.
             if purchasedProducts.remove(transaction.productID) != nil {
                 
-                // TODO - ******** add the web..id unique transaction id to all logs to with purchase, validation, revoked transaction
-                StoreLog.event(.transactionRevoked, productId: transaction.productID)
+                StoreLog.transaction(.transactionRevoked, productId: transaction.productID)
             }
         }
     }

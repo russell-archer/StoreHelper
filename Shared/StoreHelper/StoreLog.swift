@@ -51,6 +51,45 @@ public struct StoreLog {
         #endif
     }
     
+    /// Logs an StoreNotification. Note that the text (shortDescription) and the productId for the
+    /// log entry will be publically available in the Console app.
+    /// - Parameters:
+    ///   - event:      A StoreNotification.
+    ///   - productId:  A ProductId associated with the event.
+    ///   - webOrderLineItemId: A unique ID that identifies subscription purchase events across devices, including subscription renewals
+    public static func event(_ event: StoreNotification, productId: ProductId, webOrderLineItemId: String?) {
+        #if DEBUG
+        print("\(event.shortDescription()) for product \(productId) with webOrderLineItemId \(webOrderLineItemId ?? "none")")
+        #else
+        os_log("%{public}s for product %{public}s with webOrderLineItemId %{public}s",
+               log: storeLog,
+               type: .default,
+               event.shortDescription(),
+               productId,
+               webOrderLineItemId ?? "none")
+        #endif
+    }
+    
+    public static var transactionLog: Set<TransactionLog> = []
+    
+    /// Logs a StoreNotification as a transaction. Multiple transactions for the same event and product id will only be logged once.
+    /// Note that the text (shortDescription) and the productId for the log entry will be publically available in the Console app.
+    /// - Parameters:
+    ///   - event:      A StoreNotification.
+    ///   - productId:  A ProductId associated with the event.
+    public static func transaction(_ event: StoreNotification, productId: ProductId) {
+        
+        let t = TransactionLog(notification: event, productId: productId)
+        if transactionLog.contains(t) { return }
+        transactionLog.insert(t)
+        
+        #if DEBUG
+        print("\(event.shortDescription()) for product \(productId)")
+        #else
+        os_log("%{public}s for product %{public}s", log: storeLog, type: .default, event.shortDescription(), productId)
+        #endif
+    }
+    
     /// Logs a StoreException. Note that the text (shortDescription) and the productId for the
     /// log entry will be publically available in the Console app.
     /// - Parameters:
@@ -72,6 +111,16 @@ public struct StoreLog {
         #else
         os_log("%s", log: storeLog, type: .info, message)
         #endif
+    }
+}
+
+public struct TransactionLog: Hashable {
+    
+    let notification: StoreNotification
+    let productId: ProductId
+    
+    public static func == (lhs: TransactionLog, rhs: TransactionLog) -> Bool {
+        return (lhs.productId == rhs.productId) && (lhs.notification == rhs.notification)
     }
 }
 

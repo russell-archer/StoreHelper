@@ -72,6 +72,30 @@
 		68ACE6822680D92700AA9895 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		68ACE6852680D94300AA9895 /* PriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceView.swift; sourceTree = "<group>"; };
 		68ACE6882680D95D00AA9895 /* BadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
+		68C7C6F02688F06A0062F9EC /* StoreHelperDemo10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo10.png; sourceTree = "<group>"; };
+		68C7C6F12688F06B0062F9EC /* StoreHelperDemo15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo15.png; sourceTree = "<group>"; };
+		68C7C6F22688F06B0062F9EC /* StoreHelperDemo1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo1.png; sourceTree = "<group>"; };
+		68C7C6F32688F06B0062F9EC /* StoreHelperDemo16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo16.png; sourceTree = "<group>"; };
+		68C7C6F42688F06B0062F9EC /* StoreHelperDemo12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo12.png; sourceTree = "<group>"; };
+		68C7C6F52688F06B0062F9EC /* StoreHelperDemo8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo8.png; sourceTree = "<group>"; };
+		68C7C6F62688F06B0062F9EC /* StoreHelperDemo2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo2.png; sourceTree = "<group>"; };
+		68C7C6F72688F06B0062F9EC /* StoreHelperDemo3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo3.png; sourceTree = "<group>"; };
+		68C7C6F82688F06B0062F9EC /* StoreHelperDemo11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo11.png; sourceTree = "<group>"; };
+		68C7C6F92688F06B0062F9EC /* StoreHelperDemo23.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo23.png; sourceTree = "<group>"; };
+		68C7C6FA2688F06B0062F9EC /* StoreHelperDemo4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo4.png; sourceTree = "<group>"; };
+		68C7C6FB2688F06B0062F9EC /* StoreHelperDemo18.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo18.png; sourceTree = "<group>"; };
+		68C7C6FC2688F06B0062F9EC /* StoreHelperDemo5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo5.png; sourceTree = "<group>"; };
+		68C7C6FD2688F06B0062F9EC /* StoreHelperDemo14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo14.png; sourceTree = "<group>"; };
+		68C7C6FE2688F06B0062F9EC /* StoreHelperDemo19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo19.png; sourceTree = "<group>"; };
+		68C7C6FF2688F06B0062F9EC /* StoreHelperDemo17.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo17.png; sourceTree = "<group>"; };
+		68C7C7002688F06B0062F9EC /* StoreHelperDemo20.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo20.gif; sourceTree = "<group>"; };
+		68C7C7012688F06B0062F9EC /* StoreHelperDemo21.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo21.png; sourceTree = "<group>"; };
+		68C7C7022688F06B0062F9EC /* StoreHelperDemo0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo0.png; sourceTree = "<group>"; };
+		68C7C7032688F06B0062F9EC /* StoreHelperDemo6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo6.png; sourceTree = "<group>"; };
+		68C7C7042688F06B0062F9EC /* StoreHelperDemo9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo9.png; sourceTree = "<group>"; };
+		68C7C7052688F06B0062F9EC /* StoreHelperDemo22.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo22.gif; sourceTree = "<group>"; };
+		68C7C7062688F06B0062F9EC /* StoreHelperDemo7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo7.png; sourceTree = "<group>"; };
+		68C7C7072688F06B0062F9EC /* StoreHelperDemo13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo13.png; sourceTree = "<group>"; };
 		68F77379267A43C300C3C670 /* StoreHelperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHelperApp.swift; sourceTree = "<group>"; };
 		68F7737A267A43C300C3C670 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		68F7737B267A43C400C3C670 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -130,6 +154,30 @@
 		680B0CAF267CFE7E007F7518 /* readme-assets */ = {
 			isa = PBXGroup;
 			children = (
+				68C7C7022688F06B0062F9EC /* StoreHelperDemo0.png */,
+				68C7C6F22688F06B0062F9EC /* StoreHelperDemo1.png */,
+				68C7C6F62688F06B0062F9EC /* StoreHelperDemo2.png */,
+				68C7C6F72688F06B0062F9EC /* StoreHelperDemo3.png */,
+				68C7C6FA2688F06B0062F9EC /* StoreHelperDemo4.png */,
+				68C7C6FC2688F06B0062F9EC /* StoreHelperDemo5.png */,
+				68C7C7032688F06B0062F9EC /* StoreHelperDemo6.png */,
+				68C7C7062688F06B0062F9EC /* StoreHelperDemo7.png */,
+				68C7C6F52688F06B0062F9EC /* StoreHelperDemo8.png */,
+				68C7C7042688F06B0062F9EC /* StoreHelperDemo9.png */,
+				68C7C6F02688F06A0062F9EC /* StoreHelperDemo10.png */,
+				68C7C6F82688F06B0062F9EC /* StoreHelperDemo11.png */,
+				68C7C6F42688F06B0062F9EC /* StoreHelperDemo12.png */,
+				68C7C7072688F06B0062F9EC /* StoreHelperDemo13.png */,
+				68C7C6FD2688F06B0062F9EC /* StoreHelperDemo14.png */,
+				68C7C6F12688F06B0062F9EC /* StoreHelperDemo15.png */,
+				68C7C6F32688F06B0062F9EC /* StoreHelperDemo16.png */,
+				68C7C6FF2688F06B0062F9EC /* StoreHelperDemo17.png */,
+				68C7C6FB2688F06B0062F9EC /* StoreHelperDemo18.png */,
+				68C7C6FE2688F06B0062F9EC /* StoreHelperDemo19.png */,
+				68C7C7002688F06B0062F9EC /* StoreHelperDemo20.gif */,
+				68C7C7012688F06B0062F9EC /* StoreHelperDemo21.png */,
+				68C7C7052688F06B0062F9EC /* StoreHelperDemo22.gif */,
+				68C7C6F92688F06B0062F9EC /* StoreHelperDemo23.png */,
 			);
 			path = "readme-assets";
 			sourceTree = "<group>";
