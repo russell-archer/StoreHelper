@@ -5,6 +5,7 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 ![](./readme-assets/StoreHelperDemo0.png)
 
 Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in Xcode 13, Swift 5.5, iOS 15, macOS 12, tvOS 15 and watchOS 8.
+
 See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the StoreKit1 in iOS 14 and lower.
 
 > This app requires StoreKit2, Swift 5.5, Xcode 13 and iOS 15.
