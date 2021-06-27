@@ -10,34 +10,34 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 > See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original StoreKit1 in iOS 14 and lower.
 
 # Source Code
-See [StoreHelperDemo on GitHub](https://github.com/russell-archer/IAPDemo) for source code. 
+See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) for source code. 
 
 > **Disclaimer**. The source code presented here is for educational purposes. 
 > You may freely reuse and amend this code for use in your own apps. However, you do so entirely at your own risk.
 
 # Contents
-* [Overview](#Overview)
 - [References](#References)
-- [Overview]](#)
-- [What's changed from the original StoreKit]](#)
-	- [Receipt validation](#)
-	- [Async Await support](#)
-	- [Should I use StoreKit1 or StoreKit2](#)
-- [[#StoreHelperDemo App](#)
-	- [Get Started](#)
-	- [Defining our Products](#)
-	- [Create the StoreKit configuration file](#)
-	- [Enable StoreKit Testing via the Project Scheme](#)
-	- [Creating a Production Product List](#)
-	- [StoreHelper](#)
-	- [Displaying Products](#)
-	- [The Product type](#)
-	- [Purchasing Products](#)
-	- [Designing the UI](#)
-	- [Adding support to StoreHelper](#)
-	- [Validating Transactions](#)
-	- [Ask-to-buy support](#)
-	- [What Products has the user purchased](#)   
+- [Overview](#Overview)
+- [What's changed from the original StoreKit?](#What's-changed-from-the-original-StoreKit)
+	- [Receipt validation](#Receipt-validation)
+	- [Async Await support](#Async-Await-support)
+	- [Should I use StoreKit1 or StoreKit2?](#Should-I-use-StoreKit1-or-StoreKit2)
+- [StoreHelperDemo App](#StoreHelperDemo-App)
+	- [Get Started](#Get-Started)
+	- [Defining our Products](#Defining-our-Products)
+	- [Create the StoreKit configuration file](#Create-the-StoreKit-configuration-file)
+	- [Enable StoreKit Testing via the Project Scheme](#Enable-StoreKit-Testing-via-the-Project-Scheme)
+	- [Creating a Production Product List](#Creating-a-Production-Product-List)
+	- [StoreHelper](#StoreHelper)
+	- [Displaying Products](#Displaying-Products)
+	- [The Product type](#The-Product-type)
+	- [Purchasing Products](#Purchasing-Products)
+        - [Designing the UI](#Designing-the-UI)
+        - [Adding support to StoreHelper](#Adding-support-to-StoreHelper)
+	- [Validating Transactions](#Validating-Transactions)
+	- [Ask-to-buy support](#Ask-to-buy-support)
+	- [What Products has the user purchased](#What-Products-has-the-user-purchased)   
+ - [What Next](#What-Next)   
 
 # References
 - https://developer.apple.com/documentation/storekit/in-app_purchase
@@ -165,39 +165,39 @@ You can now define your products in the StoreKit configuration file. For now we'
 ![](./readme-assets/StoreHelperDemo8.png)
 
 ```stylus
-Type				: NonConsumable
+Type			: NonConsumable
 ReferenceName 		: flowers-large
-ProductID 			: com.rarcher.nonconsumable.flowers-large
-Price 				: 1.99
+ProductID 		: com.rarcher.nonconsumable.flowers-large
+Price 			: 1.99
 FamilyShareable 	: true
-Locale 				: en_US
+Locale 			: en_US
 DisplayName 		: Flowers Large
 Description 		: A cool bunch of mixed flowers
 
-Type				: NonConsumable
+Type			: NonConsumable
 ReferenceName 		: flowers-small
-ProductID 			: com.rarcher.nonconsumable.flowers-small
-Price 				: 0.99
+ProductID 		: com.rarcher.nonconsumable.flowers-small
+Price 			: 0.99
 FamilyShareable 	: false
-Locale 				: en_US
+Locale 			: en_US
 DisplayName 		: Flowers Small
 Description 		: A cool small bunch of flowers
 
-Type				: NonConsumable
+Type			: NonConsumable
 ReferenceName 		: roses-large
 ProductID 			: com.rarcher.nonconsumable.roses-large
-Price 				: 2.99
+Price 			: 2.99
 FamilyShareable 	: false
-Locale 				: en_US
+Locale 			: en_US
 DisplayName 		: Roses Large
 Description 		: A large bunch of red roses
 
-Type				: NonConsumable
+Type			: NonConsumable
 ReferenceName 		: chocolates-small
 ProductID 			: com.rarcher.nonconsumable.chocolates-small
-Price 				: 3.99
+Price 			: 3.99
 FamilyShareable 	: true
-Locale 				: en_US
+Locale 			: en_US
 Description 		: A small box of chocolates
 DisplayName 		: Chocolates Small
 ```
@@ -888,4 +888,4 @@ I'll be updating this demo shortly to add support for:
 - **Caching** user purchase information, for cases when the network is unavailable and the App Store can't be reached
 - Automatically handling customer **refunds**
 - Exploring detailed **transaction information and history**
-
+- Multi-platform issues
