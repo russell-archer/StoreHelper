@@ -96,6 +96,7 @@
 		68C7C7052688F06B0062F9EC /* StoreHelperDemo22.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo22.gif; sourceTree = "<group>"; };
 		68C7C7062688F06B0062F9EC /* StoreHelperDemo7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo7.png; sourceTree = "<group>"; };
 		68C7C7072688F06B0062F9EC /* StoreHelperDemo13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo13.png; sourceTree = "<group>"; };
+		68E713C7268CE58F00776A08 /* StoreHelperDemo24.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo24.gif; sourceTree = "<group>"; };
 		68F77379267A43C300C3C670 /* StoreHelperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHelperApp.swift; sourceTree = "<group>"; };
 		68F7737A267A43C300C3C670 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		68F7737B267A43C400C3C670 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -178,6 +179,7 @@
 				68C7C7012688F06B0062F9EC /* StoreHelperDemo21.png */,
 				68C7C7052688F06B0062F9EC /* StoreHelperDemo22.gif */,
 				68C7C6F92688F06B0062F9EC /* StoreHelperDemo23.png */,
+				68E713C7268CE58F00776A08 /* StoreHelperDemo24.gif */,
 			);
 			path = "readme-assets";
 			sourceTree = "<group>";

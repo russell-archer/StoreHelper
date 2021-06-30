@@ -830,6 +830,8 @@ The simplified purchase process flow (showing mainly the "success" path) is as f
 
 12. `StoreHelper` tells `StoreKit` the `Transaction` is finished and returns the `Transaction` object to `PriceViewModel`. It sets `@State` variables to show the purchase was a success and the UI is re-rendered
 
+![](./readme-assets/StoreHelperDemo24.gif)
+
 If we run the app we can now make purchases:
 
 ![](./readme-assets/StoreHelperDemo20.gif)
