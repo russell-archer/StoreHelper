@@ -9,8 +9,8 @@ import StoreKit
 
 public typealias ProductId = String
 
-/// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+/// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 public class StoreHelper: ObservableObject {
     
     // MARK: - Public properties
@@ -34,10 +34,16 @@ public class StoreHelper: ObservableObject {
         return products!.count > 0 ? true : false
     }
     
-    // MARK: - Internal properties
+    // MARK: - Private properties
     
     /// Handle for App Store transactions.
-    internal var transactionListener: Task.Handle<Void, Error>? = nil
+    private var transactionListener: Task.Handle<Void, Error>? = nil
+    
+    /// KeychainHelper is used to save/load purchased product ids to/from the keychain.
+    private var keychainHelper = KeychainHelper()
+    
+    /// Fallback set of `ProductId` for products that have been purchased. Used when the App Store's not contactable to confirm purchases.
+    private var fallbackPurchasedProducts = Set<ProductId>()
     
     // MARK: - Initialization
     
@@ -55,6 +61,14 @@ public class StoreHelper: ObservableObject {
         // Read our list of product ids
         if let productIds = Configuration.readConfigFile() {
             
+            // Get our fallback set of purchased product ids from the keychain in case the App Store's not contactable
+//            fallbackPurchasedProducts = keychainHelper.all(productIds: productIds)!
+            
+            async {
+                let pid = await currentEntitlements()
+                print("Found \(pid.count) purchases")
+            }
+            
             // Get localized product info from the App Store
             StoreLog.event(.requestProductsStarted)
             async {
@@ -68,10 +82,7 @@ public class StoreHelper: ObservableObject {
         }
     }
     
-    deinit {
-        
-        transactionListener?.cancel()
-    }
+    deinit { transactionListener?.cancel() }
     
     // MARK: - Public methods
 
@@ -79,11 +90,10 @@ public class StoreHelper: ObservableObject {
     ///
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter productIds: The product ids that you want localized information for.
-    /// - Returns: Returns an array of `Product`, or nil if no product information is
-    /// returned by the App Store.
+    /// - Returns: Returns an array of `Product`, or nil if no product information is returned by the App Store.
     @MainActor public func requestProductsFromAppStore(productIds: Set<ProductId>) async -> [Product]? {
         
-        try? await Product.request(with: productIds)
+        return try? await Product.products(for: productIds)
     }
     
     /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
@@ -96,6 +106,31 @@ public class StoreHelper: ObservableObject {
         guard let mostRecentTransaction = await product.latestTransaction else {
             return false  // There's no transaction for the product, so it hasn't been purchased
         }
+        
+        // Other ways to get entitlements if the App Store's not available (i.e. to get a list
+        // of Product requestProductsFromAppStore() must have worked...
+        //
+        // I think storekit2 transactions are probably cached on the device.
+        // With storekit1 the receipt was stored in the app's bundle at: Bundle.main.appStoreReceiptURL
+        //
+        // Create an overloaded isPurchase() method that uses one of the following methods
+        // that probably doesn't require a connection to the app store:
+        
+        // Returns all transactions for products the user is currently entitled to
+        // i.e. all currently-subscribed transactions, and all purchased (and not refunded) non-consumables
+        //let x = Transaction.currentEntitlements
+        
+        // or,
+        /// Get the transaction that entitles the user to a product.
+        /// - Parameter productID: Identifies the product to check entitlements for.
+        /// - Returns: A transaction if the user is entitled to the product, or `nil` if they are not.
+        //public static func currentEntitlement(for productID: String) async -> VerificationResult<Transaction>?
+        
+        // or,
+        /// The user's latest transaction for a product.
+        /// - Parameter productID: Identifies the product to check entitlements for.
+        /// - Returns: A verified transaction, or `nil` if the user has never purchased this product.
+        //public static func latest(for productID: String) async -> VerificationResult<Transaction>?
         
         // See if the transaction passed StoreKit's automatic verification
         let checkResult = checkTransactionVerificationResult(result: mostRecentTransaction)
@@ -114,6 +149,37 @@ public class StoreHelper: ObservableObject {
         // To determine the service that the user is entitled to, we would need to check for another transaction
         // that has a subscription with a higher level of service.
         return validatedTransaction.revocationDate == nil && !validatedTransaction.isUpgraded
+    }
+    
+    /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
+    ///
+    /// May throw an exception of type `StoreException.transactionVerificationFailed`.
+    /// - Parameter productId: The `ProductId` of the product.
+    /// - Returns: Returns true if the product has been purchased, false otherwise.
+    public func isPurchased(productId: ProductId) async throws -> Bool {
+        return false
+    }
+    
+    /// Uses StoreKit's `Transaction.currentEntitlements` property to iterate over the sequence of `VerificationResult<Transaction>`
+    /// representing all transactions for products the user is currently entitled to. That is, all currently-subscribed
+    /// transactions and all purchased (and not refunded) non-consumables.
+    /// - Returns: A verified `Set<ProductId>` for all products the user is entitled to have access to. The set will be empty if the
+    /// user has not purchased anything previously.
+    public func currentEntitlements() async -> Set<ProductId> {
+        
+        var entitledProductIds = Set<ProductId>()
+
+        print("allPurchases()...")
+        for await result in Transaction.currentEntitlements {
+
+            if case .verified(let transaction) = result {
+                // Ignore unverified transactions
+                print("  Found \(transaction.productID)")
+                entitledProductIds.insert(transaction.productID)
+            }
+        }
+        
+        return entitledProductIds
     }
     
     /// Purchase a `Product` previously returned from the App Store following a call to `requestProductsFromAppStore()`.
@@ -209,16 +275,16 @@ public class StoreHelper: ObservableObject {
         return matchingProduct.first
     }
     
-    // MARK: - Internal methods
+    // MARK: - Private methods
     
     /// This is an infinite async sequence (loop). It will continue waiting for transactions until it is explicitly
     /// canceled by calling the Task.Handle.cancel() method. See `transactionListener`.
     /// - Returns: Returns a handle for the transaction handling loop task.
-    internal func handleTransactions() -> Task.Handle<Void, Error> {
+    private func handleTransactions() -> Task.Handle<Void, Error> {
         
         return detach {
             
-            for await verificationResult in Transaction.listener {
+            for await verificationResult in Transaction.updates {
 
                 // See if StoreKit validated the transaction
                 let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
@@ -245,13 +311,23 @@ public class StoreHelper: ObservableObject {
     ///
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
-    @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
+    @MainActor private func updatePurchasedIdentifiers(_ transaction: Transaction) async {
         
         if transaction.revocationDate == nil {
             
             // The transaction has NOT been revoked by the App Store so this product has been purchase.
             // Add the ProductId to the list of `purchasedProducts` (it's a Set so it won't add if already there).
-            purchasedProducts.insert(transaction.productID)
+            let result = purchasedProducts.insert(transaction.productID)
+            if result.inserted {
+            
+                do {
+                    
+                    // Save the purchase in the keychain
+                    try keychainHelper.add(transaction.productID)
+                }
+                catch KeychainException.purchaseNotAdded { StoreLog.exception(.purchaseNotAdded) }
+                catch { StoreLog.exception(.keychainError) }
+            }
             
         } else {
             
@@ -259,7 +335,14 @@ public class StoreHelper: ObservableObject {
             // Remove the product from the list of `purchasedProducts`.
             if purchasedProducts.remove(transaction.productID) != nil {
                 
-                StoreLog.transaction(.transactionRevoked, productId: transaction.productID)
+                do {
+                    
+                    // Remove the purchase from the keychain
+                    try keychainHelper.remove(transaction.productID)
+                    StoreLog.transaction(.transactionRevoked, productId: transaction.productID)
+                }
+                catch KeychainException.purchaseNotRemoved { StoreLog.exception(.purchaseNotRemoved) }
+                catch { StoreLog.exception(.keychainError) }
             }
         }
     }
@@ -268,7 +351,7 @@ public class StoreHelper: ObservableObject {
     ///
     /// - Parameter result: The transaction VerificationResult to check.
     /// - Returns: The verified `Transaction`, or nil if the transaction result was unverified.
-    internal func checkTransactionVerificationResult(result: VerificationResult<Transaction>) -> (transaction: Transaction, verified: Bool) {
+    private func checkTransactionVerificationResult(result: VerificationResult<Transaction>) -> (transaction: Transaction, verified: Bool) {
         
         switch result {
             case .unverified(let unverifiedTransaction):

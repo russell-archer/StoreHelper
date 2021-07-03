@@ -35,7 +35,8 @@ See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) f
         - [Adding support to StoreHelper](#Adding-support-to-StoreHelper)
 	- [Validating Transactions](#Validating-Transactions)
 	- [Ask-to-buy support](#Ask-to-buy-support)
-	- [What Products has the user purchased](#What-Products-has-the-user-purchased)   
+	- [What Products has the user purchased](#What-Products-has-the-user-purchased)
+    - [Caching purchase information](#Caching-purchase-information)
  - [What Next](#What-Next)   
 
 # References
@@ -882,11 +883,13 @@ You can also use `Transaction.currentEntitlements` to get a list of transactions
 There is a potential problem here: what happens when the network is unavailable and the App Store can't be reached to confirm a user's transactions 
 and entitlements? In a real-world app you will need to have some kind of "fall-back" list of purchases (product ids) that gets persisted.
 
+## Caching purchase information
+
 # What Next?
 I'll be updating this demo shortly to add support for:
 
-- Handling **subscriptions**
 - **Caching** user purchase information, for cases when the network is unavailable and the App Store can't be reached
 - Automatically handling customer **refunds**
+- Handling **subscriptions**
 - Exploring detailed **transaction information and history**
 - Multi-platform issues
