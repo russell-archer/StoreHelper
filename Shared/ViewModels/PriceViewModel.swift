@@ -18,6 +18,8 @@ struct PriceViewModel {
     @Binding var failed: Bool
     @Binding var purchased: Bool
     
+    /// Purchase a product using StoreHelper and StoreKit2.
+    /// - Parameter product: The `Product` to purchase
     func purchase(product: Product) async {
 
         do {
@@ -25,16 +27,11 @@ struct PriceViewModel {
             let purchaseResult = try await storeHelper.purchase(product)
             if purchaseResult.transaction != nil {
                 updatePurchaseState(newState: purchaseResult.purchaseState)
-                
             } else {
-                
                 updatePurchaseState(newState: purchaseResult.purchaseState)  // The user cancelled, or it's pending approval
             }
             
-        } catch {
-            
-            updatePurchaseState(newState: .failed)  // The purchase or validation failed
-        }
+        } catch { updatePurchaseState(newState: .failed) } // The purchase or validation failed
     }
     
     private func updatePurchaseState(newState: StoreHelper.PurchaseState) {

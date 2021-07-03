@@ -103,6 +103,17 @@ public struct StoreLog {
         #endif
     }
     
+    /// Logs a KeychainException. Note that the text (shortDescription) will be publically available in the Console app.
+    /// - Parameters:
+    ///   - exception:  A KeychainException.
+    public static func exception(_ exception: KeychainException) {
+        #if DEBUG
+        print(exception.shortDescription())
+        #else
+        os_log("%{public}s", log: storeLog, type: .default, exception.shortDescription())
+        #endif
+    }
+    
     /// Logs a message.
     /// - Parameter message: The message to log.
     public static func event(_ message: String) {

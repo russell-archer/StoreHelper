@@ -14,7 +14,6 @@ struct ContentView: View {
     var body: some View {
         
         if storeHelper.hasProducts {
-            
             List(storeHelper.products!) { product in
                 ProductView(storeHelper: storeHelper,
                             productId: product.id,
