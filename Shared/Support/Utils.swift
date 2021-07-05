@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Various utility methods.
 struct Utils {
     
     /// Detects if the app is running as a preview

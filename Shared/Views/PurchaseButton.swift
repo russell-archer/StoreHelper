@@ -8,6 +8,8 @@
 import SwiftUI
 import StoreKit
 
+/// Provides a button that enables the user to purchase a product.
+/// The product's price is also displayed in the localized currency.
 struct PurchaseButton: View {
     
     @ObservedObject var storeHelper: StoreHelper

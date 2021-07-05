@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// The main app View.
 struct ContentView: View {
     
     @StateObject var storeHelper = StoreHelper()

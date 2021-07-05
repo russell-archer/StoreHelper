@@ -8,6 +8,7 @@
 import SwiftUI
 import StoreKit
 
+/// Displays a product price and a button that enables purchasing.
 struct PriceView: View {
     
     @ObservedObject var storeHelper: StoreHelper

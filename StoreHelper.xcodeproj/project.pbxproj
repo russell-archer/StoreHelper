@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6834DE44268E2BD000F0BF95 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6834DE43268E2BD000F0BF95 /* KeychainHelper.swift */; };
-		6834DE45268E2BD000F0BF95 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6834DE43268E2BD000F0BF95 /* KeychainHelper.swift */; };
 		687273A92683749300C37D94 /* PriceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687273A82683749300C37D94 /* PriceViewModel.swift */; };
 		687273AA2683749300C37D94 /* PriceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687273A82683749300C37D94 /* PriceViewModel.swift */; };
 		68ACE67D2680D8DA00AA9895 /* StoreErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */; };
@@ -68,8 +66,11 @@
 
 /* Begin PBXFileReference section */
 		680B0CAE267CFE79007F7518 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		6834DE43268E2BD000F0BF95 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		687273A82683749300C37D94 /* PriceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceViewModel.swift; sourceTree = "<group>"; };
+		687BC36326933B9F00D156EE /* StoreHelperDemo28.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo28.png; sourceTree = "<group>"; };
+		687BC36426933B9F00D156EE /* StoreHelperDemo25.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo25.png; sourceTree = "<group>"; };
+		687BC36526933B9F00D156EE /* StoreHelperDemo26.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo26.png; sourceTree = "<group>"; };
+		687BC36626933B9F00D156EE /* StoreHelperDemo27.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo27.png; sourceTree = "<group>"; };
 		68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreErrorView.swift; sourceTree = "<group>"; };
 		68ACE67F2680D90800AA9895 /* PurchaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseButton.swift; sourceTree = "<group>"; };
 		68ACE6822680D92700AA9895 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
@@ -183,6 +184,10 @@
 				68C7C7052688F06B0062F9EC /* StoreHelperDemo22.gif */,
 				68C7C6F92688F06B0062F9EC /* StoreHelperDemo23.png */,
 				68E713C7268CE58F00776A08 /* StoreHelperDemo24.gif */,
+				687BC36426933B9F00D156EE /* StoreHelperDemo25.png */,
+				687BC36526933B9F00D156EE /* StoreHelperDemo26.png */,
+				687BC36626933B9F00D156EE /* StoreHelperDemo27.png */,
+				687BC36326933B9F00D156EE /* StoreHelperDemo28.png */,
 			);
 			path = "readme-assets";
 			sourceTree = "<group>";
@@ -283,7 +288,6 @@
 			isa = PBXGroup;
 			children = (
 				68F7737B267A43C400C3C670 /* Assets.xcassets */,
-				6834DE43268E2BD000F0BF95 /* KeychainHelper.swift */,
 				68F77379267A43C300C3C670 /* StoreHelperApp.swift */,
 				68F773CE267A494500C3C670 /* Utils.swift */,
 			);
@@ -508,7 +512,6 @@
 				68F773CF267A494500C3C670 /* Utils.swift in Sources */,
 				68ACE6802680D90800AA9895 /* PurchaseButton.swift in Sources */,
 				68ACE6892680D95D00AA9895 /* BadgeView.swift in Sources */,
-				6834DE44268E2BD000F0BF95 /* KeychainHelper.swift in Sources */,
 				68ACE67D2680D8DA00AA9895 /* StoreErrorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -530,7 +533,6 @@
 				68F773D0267A494500C3C670 /* Utils.swift in Sources */,
 				68ACE6812680D90800AA9895 /* PurchaseButton.swift in Sources */,
 				68ACE68A2680D95D00AA9895 /* BadgeView.swift in Sources */,
-				6834DE45268E2BD000F0BF95 /* KeychainHelper.swift in Sources */,
 				68ACE67E2680D8DA00AA9895 /* StoreErrorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

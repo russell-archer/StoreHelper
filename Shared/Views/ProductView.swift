@@ -8,6 +8,7 @@
 import SwiftUI
 import StoreKit
 
+/// Displays a single row of product information for the main content List.
 struct ProductView: View {
     
     @ObservedObject var storeHelper: StoreHelper

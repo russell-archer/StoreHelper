@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Displays an error.
 struct StoreErrorView: View {
     
     var body: some View {

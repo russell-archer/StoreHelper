@@ -8,6 +8,7 @@
 import StoreKit
 import SwiftUI
 
+/// ViewModel for `PriceView`. Enables purchasing.
 struct PriceViewModel {
     
     @ObservedObject var storeHelper: StoreHelper
@@ -25,11 +26,8 @@ struct PriceViewModel {
         do {
             
             let purchaseResult = try await storeHelper.purchase(product)
-            if purchaseResult.transaction != nil {
-                updatePurchaseState(newState: purchaseResult.purchaseState)
-            } else {
-                updatePurchaseState(newState: purchaseResult.purchaseState)  // The user cancelled, or it's pending approval
-            }
+            if purchaseResult.transaction != nil { updatePurchaseState(newState: purchaseResult.purchaseState) }
+            else { updatePurchaseState(newState: purchaseResult.purchaseState) }  // The user cancelled, or it's pending approval
             
         } catch { updatePurchaseState(newState: .failed) } // The purchase or validation failed
     }

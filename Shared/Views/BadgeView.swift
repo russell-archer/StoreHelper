@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Displays a small image that gives a visual clue to the product's purchase state.
 struct BadgeView: View {
     
     var purchaseState: StoreHelper.PurchaseState

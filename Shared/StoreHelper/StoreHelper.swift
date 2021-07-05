@@ -39,12 +39,6 @@ public class StoreHelper: ObservableObject {
     /// Handle for App Store transactions.
     private var transactionListener: Task.Handle<Void, Error>? = nil
     
-    /// KeychainHelper is used to save/load purchased product ids to/from the keychain.
-    private var keychainHelper = KeychainHelper()
-    
-    /// Fallback set of `ProductId` for products that have been purchased. Used when the App Store's not contactable to confirm purchases.
-    private var fallbackPurchasedProducts = Set<ProductId>()
-    
     // MARK: - Initialization
     
     /// StoreHelper enables support for working with in-app purchases and StoreKit2 using the async/await pattern.
@@ -60,14 +54,6 @@ public class StoreHelper: ObservableObject {
         
         // Read our list of product ids
         if let productIds = Configuration.readConfigFile() {
-            
-            // Get our fallback set of purchased product ids from the keychain in case the App Store's not contactable
-//            fallbackPurchasedProducts = keychainHelper.all(productIds: productIds)!
-            
-            async {
-                let pid = await currentEntitlements()
-                print("Found \(pid.count) purchases")
-            }
             
             // Get localized product info from the App Store
             StoreLog.event(.requestProductsStarted)
@@ -101,54 +87,27 @@ public class StoreHelper: ObservableObject {
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
-    public func isPurchased(product: Product) async throws -> Bool {
-
-        guard let mostRecentTransaction = await product.latestTransaction else {
+    public func isPurchased(productId: ProductId) async throws -> Bool {
+        
+        guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
             return false  // There's no transaction for the product, so it hasn't been purchased
         }
         
-        // Other ways to get entitlements if the App Store's not available (i.e. to get a list
-        // of Product requestProductsFromAppStore() must have worked...
-        //
-        // I think storekit2 transactions are probably cached on the device.
-        // With storekit1 the receipt was stored in the app's bundle at: Bundle.main.appStoreReceiptURL
-        //
-        // Create an overloaded isPurchase() method that uses one of the following methods
-        // that probably doesn't require a connection to the app store:
-        
-        // Returns all transactions for products the user is currently entitled to
-        // i.e. all currently-subscribed transactions, and all purchased (and not refunded) non-consumables
-        //let x = Transaction.currentEntitlements
-        
-        // or,
-        /// Get the transaction that entitles the user to a product.
-        /// - Parameter productID: Identifies the product to check entitlements for.
-        /// - Returns: A transaction if the user is entitled to the product, or `nil` if they are not.
-        //public static func currentEntitlement(for productID: String) async -> VerificationResult<Transaction>?
-        
-        // or,
-        /// The user's latest transaction for a product.
-        /// - Parameter productID: Identifies the product to check entitlements for.
-        /// - Returns: A verified transaction, or `nil` if the user has never purchased this product.
-        //public static func latest(for productID: String) async -> VerificationResult<Transaction>?
-        
         // See if the transaction passed StoreKit's automatic verification
-        let checkResult = checkTransactionVerificationResult(result: mostRecentTransaction)
-        if !checkResult.verified {
-            StoreLog.transaction(.transactionValidationFailure, productId: checkResult.transaction.productID)
+        let result = checkTransactionVerificationResult(result: currentEntitlement)
+        if !result.verified {
+            StoreLog.transaction(.transactionValidationFailure, productId: result.transaction.productID)
             throw StoreException.transactionVerificationFailed
         }
-
-        let validatedTransaction = checkResult.transaction
         
         // Make sure our internal set of purchase pids is in-sync with the App Store
-        await updatePurchasedIdentifiers(validatedTransaction)
-
+        await updatePurchasedIdentifiers(result.transaction)
+        
         // See if the App Store has revoked the users access to the product (e.g. because of a refund).
         // If this transaction represents a subscription, see if the user upgraded to a higher-level subscription.
         // To determine the service that the user is entitled to, we would need to check for another transaction
         // that has a subscription with a higher level of service.
-        return validatedTransaction.revocationDate == nil && !validatedTransaction.isUpgraded
+        return result.transaction.revocationDate == nil && !result.transaction.isUpgraded
     }
     
     /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
@@ -156,8 +115,9 @@ public class StoreHelper: ObservableObject {
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
-    public func isPurchased(productId: ProductId) async throws -> Bool {
-        return false
+    public func isPurchased(product: Product) async throws -> Bool {
+
+        return try await isPurchased(productId: product.id)
     }
     
     /// Uses StoreKit's `Transaction.currentEntitlements` property to iterate over the sequence of `VerificationResult<Transaction>`
@@ -169,13 +129,10 @@ public class StoreHelper: ObservableObject {
         
         var entitledProductIds = Set<ProductId>()
 
-        print("allPurchases()...")
         for await result in Transaction.currentEntitlements {
 
             if case .verified(let transaction) = result {
-                // Ignore unverified transactions
-                print("  Found \(transaction.productID)")
-                entitledProductIds.insert(transaction.productID)
+                entitledProductIds.insert(transaction.productID)  // Ignore unverified transactions
             }
         }
         
@@ -307,7 +264,7 @@ public class StoreHelper: ObservableObject {
         }
     }
     
-    /// Update our list of purchase product identifiers (see `purchasedProducts`).
+    /// Update our list of purchased product identifiers (see `purchasedProducts`).
     ///
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
@@ -317,33 +274,13 @@ public class StoreHelper: ObservableObject {
             
             // The transaction has NOT been revoked by the App Store so this product has been purchase.
             // Add the ProductId to the list of `purchasedProducts` (it's a Set so it won't add if already there).
-            let result = purchasedProducts.insert(transaction.productID)
-            if result.inserted {
-            
-                do {
-                    
-                    // Save the purchase in the keychain
-                    try keychainHelper.add(transaction.productID)
-                }
-                catch KeychainException.purchaseNotAdded { StoreLog.exception(.purchaseNotAdded) }
-                catch { StoreLog.exception(.keychainError) }
-            }
+            purchasedProducts.insert(transaction.productID)
             
         } else {
             
             // The App Store revoked this transaction (e.g. a refund), meaning the user should not have access to it.
             // Remove the product from the list of `purchasedProducts`.
-            if purchasedProducts.remove(transaction.productID) != nil {
-                
-                do {
-                    
-                    // Remove the purchase from the keychain
-                    try keychainHelper.remove(transaction.productID)
-                    StoreLog.transaction(.transactionRevoked, productId: transaction.productID)
-                }
-                catch KeychainException.purchaseNotRemoved { StoreLog.exception(.purchaseNotRemoved) }
-                catch { StoreLog.exception(.keychainError) }
-            }
+            purchasedProducts.remove(transaction.productID)
         }
     }
     

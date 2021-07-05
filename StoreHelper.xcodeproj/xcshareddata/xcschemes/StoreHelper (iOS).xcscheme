@@ -60,6 +60,13 @@
             ReferencedContainer = "container:StoreHelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_MODE"
+            value = "disable"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <StoreKitConfigurationFileReference
          identifier = "../../Shared/Configuration/Products.storekit">
       </StoreKitConfigurationFileReference>
