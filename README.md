@@ -9,10 +9,9 @@ See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-
 Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in Xcode 13, Swift 5.5, iOS 15, macOS 12, tvOS 15 and watchOS 8.
 
 > This app requires `StoreKit2`, Swift 5.5, Xcode 13 and iOS 15.
-> See [[In-App Purchases with Xcode 12 and iOS 14]] for details of working with the original `StoreKit1` in iOS 14 and lower.
+> See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original `StoreKit1` in iOS 14 and lower.
 
-# Recent Changes
-## Changes in Xcode 13 Beta 2 from Beta 1
+# Changes for Xcode 13 Beta 2
 
 - `Transaction.listener` is now `Transaction.updates`
 - `Product.request(with:)` is now `Product.products(for:)`
