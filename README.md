@@ -30,24 +30,28 @@ See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) f
 	- [Async Await support](#Async-Await-support)
 	- [Should I use StoreKit1 or StoreKit2?](#Should-I-use-StoreKit1-or-StoreKit2)
 - [StoreHelperDemo App](#StoreHelperDemo-App)
-	- [Get Started](#Get-Started)
-	- [Defining our Products](#Defining-our-Products)
-	- [Create the StoreKit configuration file](#Create-the-StoreKit-configuration-file)
-	- [Enable StoreKit Testing via the Project Scheme](#Enable-StoreKit-Testing-via-the-Project-Scheme)
-	- [Creating a Production Product List](#Creating-a-Production-Product-List)
-	- [StoreHelper](#StoreHelper)
-	- [Displaying Products](#Displaying-Products)
-	- [The Product type](#The-Product-type)
-	- [Purchasing Products](#Purchasing-Products)
-        	- [Designing the UI](#Designing-the-UI)
-        	- [Adding support to StoreHelper](#Adding-support-to-StoreHelper)
-	- [Validating Transactions](#Validating-Transactions)
-	- [Ask-to-buy support](#Ask-to-buy-support)
-	- [What Products has the user purchased](#What-Products-has-the-user-purchased)
-	- [Use the Receipt Luke](#Use-the-Receipt-Luke)
- - [What Next](#What-Next)   
+- [Get Started](#Get-Started)
+- [Defining our Products](#Defining-our-Products)
+- [Create the StoreKit configuration file](#Create-the-StoreKit-configuration-file)
+- [Enable StoreKit Testing via the Project Scheme](#Enable-StoreKit-Testing-via-the-Project-Scheme)
+- [Creating a Production Product List](#Creating-a-Production-Product-List)
+- [Logging](#Logging)
+- [StoreHelper](#StoreHelper)
+- [Displaying Products](#Displaying-Products)
+- [The Product type](#The-Product-type)
+- [Purchasing Products](#Purchasing-Products)
+       	- [Designing the UI](#Designing-the-UI)
+       	- [Adding support to StoreHelper](#Adding-support-to-StoreHelper)
+- [Validating Transactions](#Validating-Transactions)
+- [Ask-to-buy support](#Ask-to-buy-support)
+- [What Products has the user purchased](#What-Products-has-the-user-purchased)
+- [Use the Receipt Luke](#Use-the-Receipt-Luke)
+- [Consumables](#Consumables)
+- [Subscriptions](#Subscriptions)
+- [What Next](#What-Next)   
 
 # References
+- https://developer.apple.com/in-app-purchase/
 - https://developer.apple.com/documentation/storekit/in-app_purchase
 - https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase
 - https://developer.apple.com/documentation/storekit/in-app_purchase/implementing_a_store_in_your_app_using_the_storekit_api
@@ -70,7 +74,7 @@ Specifically, in building the app we'll cover:
 - How to create a **multi-platform** SwiftUI app that allows users to purchase a range of products, including:
 
 	- **consumable** (VIP plant installation service: lasts for one day)
-	- **non-consumable** (cut flowers, potted plants, chocolates, etc.), and 
+	- **non-consumable** (cut flowers, potted plants, chocolates, etc.)
 	- **subscription** (VIP plant home care: scheduled home visits to water and care for house plants)
 
 - Creating a `StoreHelper` that encapsulates `StoreKit2` in-app purchase functionality and makes it easy to work with the App Store
@@ -123,7 +127,7 @@ The good news is that although there are two versions of the StoreKit, both fram
 The best way to get familiar with `StoreKit2` is to create a simple, but full-featured demo app. 
 I'll introduce features in an as-required manner as we build the app from it's simplest form to a fully-functional demo.
 
-## Get Started
+# Get Started
 `StoreHelperDemo` was created using Xcode 13 (beta) and the multi-platform app template.
 
 To get started, here's the structure of the Xcode project after creating empty group folders but before we start adding files. Note that I moved `ContentView.swift` into the `Shared/Views` folder and `StoreHelperApp.swift` and the `Assets` catalog into the `Shared/Support` folder:
@@ -139,7 +143,7 @@ For both targets, add the **In-App Purchase** capability. This will also add the
 
 ![](./readme-assets/StoreHelperDemo5.png)
 
-## Defining our Products
+# Defining our Products
 Before we do anything else we need to define the products we'll be selling. Ultimately this will be done in App Store Connect. However, testing in-app purchases (IAPs) using an **App Store Sandbox** environment takes quite a bit of setting up and is rather frustrating to work with. 
 
 > The sandbox test environment requires you to create multiple **sandbox test accounts** in App Store Connect. Each sandbox account has to have a unique email address and be validated as an AppleID. In addition, tests must be on a real device, not the simulator.
@@ -150,7 +154,7 @@ Fortunately, there's now a much better way.
 
 Introduced in Xcode 12 a new **local** StoreKit test environment allows you to do early testing of IAPs in the simulator without having to set anything up in App Store Connect. You define your products locally in a **StoreKit Configuration** file. Furthermore, you can view and delete transactions, issue refunds, and a whole lot more. There’s also a new `StoreKitTest` framework that enables you to do automated testing of IAPs which we'll use later on. We'll use this approach to test IAPs in our app.
 
-## Create the StoreKit configuration file
+# Create the StoreKit configuration file
 Select **File > New > File** and choose the **StoreKit Configuration File** template:
 
 ![](./readme-assets/StoreHelperDemo6.png)
@@ -229,7 +233,7 @@ The name for the product that users see.
 
 > Note that none of the data defined in the .storekit file is ever uploaded to App Store Connect. It’s only used when testing in-app purchases locally in Xcode.
 
-## Enable StoreKit Testing via the Project Scheme
+# Enable StoreKit Testing via the Project Scheme
 You now need to enable StoreKit testing in Xcode (it’s disabled by default).
 
 Select **Product > Scheme > Edit Scheme**. Now select **Run** and the **Options** tab. You can now select your configuration file from the **StoreKit Configuration** list:
@@ -240,7 +244,7 @@ You'll need to do this for both targets (iOS and macOS).
 
 Should you wish to disable StoreKit testing then repeat the above steps and remove the StoreKit configuration file from the **StoreKit Configuration** list.
 
-## Creating a Production Product List
+# Creating a Production Product List
 We'll see shortly how one of the first things our app has to do on starting is request localized product information from the App Store (this is the case both when using the local StoreKit test environment and the App Store release environment). This requires a list of our product identifiers. We've defined our products in the StoreKit configuration file, so it seems obvious that we should use that as the repository for our IAP data. Retrieving config data at runtime isn't difficult (it's `JSON`). However, the StoreKit configuration file is intended for use *when testing* and it's not a good idea to use it for production too. It would be all too easy to allow "test products" to make it into the release build!
 
 So, we'll define a plain list of our product identifiers in a property list.
@@ -312,7 +316,7 @@ public struct Configuration {
 }
 ```
 
-## Logging
+# Logging
 While researching and testing `StoreKit2` I found it really helpful to see informational messages about what's going. Rather than use `print()` statements I created a simple logging struct that would work for both debug and release builds.
 
 ```swift
@@ -381,7 +385,7 @@ public struct StoreLog {
 }
 ```
 
-## StoreHelper
+# StoreHelper
 So that we have some products to display, we'll create a minimal version of the `StoreHelper` class before we focus on the UI. Save the `StoreHelper.swift` file in `Shared/StoreHelper`:
 
 ```swift
@@ -456,7 +460,7 @@ The array of products is marked as `@Published` so we can use it to cause our UI
 
 We can now create a minimal UI that uses `StoreHelper` to request products and then displays them in a `List`.
 
-## Displaying Products
+# Displaying Products
 First, we'll add some images for our products to the asset catalog. They're named with the same unique product ids we defined in the `Products.storekit` and `Products.plist` files:
 
 ![](./readme-assets/StoreHelperDemo10.png)
@@ -543,13 +547,13 @@ Here I selected **United Kingdom (GBP)** as the storefront and **English (UK)** 
 
 In the above screenshot you'll see that, unlike with the US storefront, the UK storefront isn't displaying the product's name. If you look at the `Product.storekit` file you'll see that the reason is because I haven't added localizations for the UK.
 
-## The Product type
+# The Product type
 The `Product` struct is a an important object in `StoreKit2`. We've seen how the `static` `Product.products(for:)` method is used to request product information from the App Store. It's also used for several other key operations:
 
 ![](./readme-assets/StoreHelperDemo14.png)
 
-## Purchasing Products
-### Designing the UI
+# Purchasing Products
+## Designing the UI
 Let's add the ability to purchase products. This means calling the `purchase()` method on the `Product` object that represents the product we want to purchase.
 
 Our `ContentView` already has a list of products that it's enumerating in a `List`. So, essentially all we need to is add a `Button` and call the product's `purchase(_:)` method:
@@ -577,7 +581,7 @@ To keep the size and complexity of views manageable, I split the various parts o
 - `BadgeView` displays a small image showing the state of the purchase state of the product (i.e. purchased, failed, etc.)
 - `PriceView` shows the localized price of the product as part of a purchase `Button`. When a product has been purchased the button is not displayed
 
-### Adding support to StoreHelper
+## Adding support to StoreHelper
 We now need to add support for purchasing to `StoreHelper`. The main things to add are:
 
 - A `@Published` `Set` of `ProductId` that holds the ids of purchased products:
@@ -765,7 +769,7 @@ struct PriceViewModel {
 }
 ```
 
-## Validating Transactions
+# Validating Transactions
 A key point to note is how we **validate** transactions. Every time our app receives a transaction (e.g. when a purchase is made) from the App Store via `StoreKit`, the transaction has **already passed through a verification process** to confirm whether the transaction is signed by the App Store for **this app** for **this device**. 
 
 > That is, `Storekit2` does **automatic** transaction ("receipt") verification for you. So, no more using OpenSSL to decrypt and read App Store receipts or sending receipts to an Apple server for verification! 
@@ -809,7 +813,7 @@ If we run the app we can now make purchases:
 
 ![](./readme-assets/StoreHelperDemo20.gif)
 
-## Ask-to-buy support
+# Ask-to-buy support
 The App Store supports the concept of "ask-to-buy" purchases, where parents can configure an Apple ID to require their permission to make a purchases. 
 When a user makes this type of purchase the `PurchaseResult` returned by StoreKit's `product.purchase()` method will have a value of `.pending`. This
 state can also be applicable when a user is required to make banking changes before a purchase is confirmed.
@@ -843,14 +847,14 @@ You should see the purchase confirmed as `StoreHelper` processes the transaction
 
 ![](./readme-assets/StoreHelperDemo22.gif)
 
-## What Products has the user purchased?
+# What Products has the user purchased?
 Everything seems to be working well. However, what happens if we quit and restart the app. How do we know what purchases the user has previously made?
 
 If you stop and re-run the app you'll see that without any work on our part it seems to remember what's been purchased. This is because the UI calls `StoreHelper.isPurchased(product:)` for each product when it's displayed. This checks the `StoreKit2` `Transaction.currentEntitlement(for:)` property to get a list of transactions for the user. This includes non-consumable in-app purchases and active subscriptions.
 
 But hang on a minute, isn't there a potential problem here? Doesn't `StoreKit2` have to check with the App Store to confirm a user's transactions and entitlements? What happens when the network is unavailable and the App Store can't be reached? In that case, do we need to have some kind of "backup" collection of purchases (product ids) that gets persisted and can be used when the App Store's not available?
 
-## Use the Receipt, Luke
+# Use the Receipt, Luke
 Happily, we don't need a backup collection of purchased product ids because we can always refer to the single source of truth: the **receipt** issued by the App Store, which is stored *on the device* in the app's **main bundle**. The receipt contains a complete record of a user's in-app purchase history for that app.
 
 When an app is installed (or re-installed) the App Store issues a receipt at the same time which *includes any previous transactions*. That is, purchases made by the user previously on the same device, or purchases made on another device belonging to the same user (i.e. using the same Apple ID). 
@@ -881,7 +885,9 @@ This gives you URL of the `StoreKit1` receipt. It will be something like:
 /Users/rarcher/Library/Developer/CoreSimulator/Devices/{device-id}/data/Containers/Data/Application/{app-id}/StoreKit/receipt
 ```
 
-If you're using `StoreKit2` this directory won't exist. However, if you navigate to `...{app-id}/Library/Caches/StoreKit` you should see the receipts database:
+The `receipt` directory will contain the old-style `StoreKit1` encrypted receipt. 
+
+If you navigate to `...{app-id}/Library/Caches/StoreKit` you should see the `StoreKit2` receipts database:
 
 ![](./readme-assets/StoreHelperDemo25.png)
 
@@ -898,10 +904,322 @@ The `receipt` column is a plain text field where the contents are clearly encryp
 
 So, because we know an up-to-date version of the receipts database will always be present, we can always use it (via `StoreKit2`) to find out a user's product entitlements.
 
+# Consumables
+Now we have the basics of the app working we can move onto adding another type of product: consumables.
+
+Consumables are products that are used once, or for a limited time and then expire. If the user wants to use the product again they need to re-purchase. A typical consumable product would be a token in game that temporarily gives you more lives or higher powers. Once the token's used up the user would lose the abilities it confers.
+
+We'll add a consumable called "VIP plant installation service". It last for one appointment and then expires.
+
+Open the `Products.storekit` file and click the **+** at the bottom-left of the window to add a consumable:
+
+![](./readme-assets/StoreHelperDemo29.png)
+
+We define the product like this:
+
+![](./readme-assets/StoreHelperDemo30.png)
+
+Now add the new product to Products.plist:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Products</key>
+    <array>
+        <string>com.rarcher.nonconsumable.flowers-large</string>
+        <string>com.rarcher.nonconsumable.flowers-small</string>
+        <string>com.rarcher.nonconsumable.roses-large</string>
+        <string>com.rarcher.nonconsumable.chocolates-small</string>
+        <string>com.rarcher.consumable.plant-installation</string>
+    </array>
+</dict>
+</plist>
+```
+
+Next, add an image for the new product to the asset catalog:
+
+![](./readme-assets/StoreHelperDemo31.png)
+
+Running the app shows the new product:
+
+![](./readme-assets/StoreHelperDemo32.png)
+
+Everything seems to work. However, we're not distinguishing between consumable and non-consumable products either visually or in our code.
+
+First, let's update `StoreHelper` by adding two new computed properties `consumableProducts` and `nonConsumableProducts`:
+
+```swift
+public class StoreHelper: ObservableObject {
+    
+    /// Array of `Product` retrieved from the App Store and available for purchase.
+    @Published private(set) var products: [Product]?
+    
+    /// Computed property that returns all the consumable products in the `products` array.
+    public var consumableProducts: [Product]? {
+        guard products != nil else { return nil }
+        return products!.filter { product in product.type == .consumable }
+    }
+    
+    /// Computed property that returns all the non-consumable products in the `products` array.
+    public var nonConsumableProducts: [Product]? {
+        guard products != nil else { return nil }
+        return products!.filter { product in product.type == .nonConsumable }
+    }
+	:
+	:
+```
+
+As you can see we filter the `products` array to return only products of a specific type using `Product.type`.
+
+Now we'll update the UI in `ContentView`:
+
+```swift
+struct ContentView: View {
+    
+    @StateObject var storeHelper = StoreHelper()
+    
+    var body: some View {
+        
+        if storeHelper.hasProducts {
+            
+            List {
+                
+                if let nonConsumables = storeHelper.nonConsumableProducts {
+                    Section(header: Text("Everyday Luxuries")) {
+                        ForEach(nonConsumables, id: \.id) { product in
+                            ProductView(storeHelper: storeHelper,
+                                        productId: product.id,
+                                        displayName: product.displayName,
+                                        price: product.displayPrice)
+                        }
+                    }
+                }
+                
+                if let consumables = storeHelper.consumableProducts {
+                    Section(header: Text("VIP Services")) {
+                        ForEach(consumables, id: \.id) { product in
+                            ProductView(storeHelper: storeHelper,
+                                        productId: product.id,
+                                        displayName: product.displayName,
+                                        price: product.displayPrice)
+                        }
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            
+        } else {
+            
+            Text("No products available")
+                .font(.title)
+                .foregroundColor(.red)
+        }
+    }
+}
+```
+
+We create a grouped `List` and iterate through products in a `ForEach` loop. The `\.id` in the loop references the product's `ProductId`. 
+
+Running the app produces:
+
+![](./readme-assets/StoreHelperDemo33.png)
+
+If we try to purchase the "Plant Installation" consumable product it seems to work (and the transaction succeeds). However, the price button doesn't change to a green tick. The reason for this is in the `StoreHelper.isPurchased(productId:)` method:
+
+```swift
+public func isPurchased(productId: ProductId) async throws -> Bool {
+    guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
+        return false  // There's no transaction for the product, so it hasn't been purchased
+    }
+    :
+	:
+}
+```
+
+We're checking for transactions for the consumable but none are found. How can this be?! The reason is simple and non-obvious:
+
+> Transactions for consumable products ARE NOT STORED PERMANENTLY IN THE RECEIPT!
+
+The rationale for this from Apple's perspective is that consumables are "ephemeral". To quote Apple's documentation (https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements) for `Transaction.currentEntitlement(for:)`:
+
+> The current entitlements sequence emits the latest transaction for each product the user is currently entitled to, specifically: 
+> - :
+> - A transaction for each consumable in-app purchase that you have not finished by calling `finish()`
+
+In tests I've done transactions for consumables do not remain in the receipt even if you omit to call `finish()`.
+
+So, if you plan to sell consumable products in your own apps you'll need to create some sort of system for keeping track of them. This could be as simple as storing data in `UserDefaults`. However, for greater security use either the keychain or a database as part of your backend solution.
+
+For the purposes of this demo we'll now **remove** the consumable product (because here we're primarily interested in receipt-related functionality) in `Products.storekit`, `Products.plist` and `StoreHelper`. We'll also remove the consumables section in `ContentView`:
+
+```swift
+struct ContentView: View {
+	:
+	// *** REMOVE ***
+	if let consumables = storeHelper.consumableProducts {
+		Section(header: Text("VIP Services")) {
+			ForEach(consumables, id: \.id) { product in
+				ProductView(storeHelper: storeHelper,
+							productId: product.id,
+							displayName: product.displayName,
+							price: product.displayPrice)
+			}
+		}
+	}
+	// *** END OF REMOVE ***
+```
+
+# Subscriptions
+We'll create an auto-renewable subscription (Apple discourages the use of the older non-renewing subscriptions) for a "VIP Home Plant Care Visit". The subscription offers three different levels of service: Gold, Silver and Bronze.
+
+Open the `Products.storekit` file and click the **+** to add a new auto-renewable subscription:
+
+![](./readme-assets/StoreHelperDemo34.png)
+
+The first thing you need to do is define a subscription group:
+
+![](./readme-assets/StoreHelperDemo35.png)
+
+You can then define your products within the group:
+
+![](./readme-assets/StoreHelperDemo36.png)
+
+To create subsequent products, click the **+** to add a new auto-renewable subscription. You'll then be offered the choice of adding a new product within the existing group or creating a new group. Select the "VIP Home Visits" group:
+
+![](./readme-assets/StoreHelperDemo37.png)
+
+![](./readme-assets/StoreHelperDemo38.png)
+
+Finally, create the third subscription:
+
+![](./readme-assets/StoreHelperDemo39.png)
+
+Update `Products.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Products</key>
+    <array>
+        <string>com.rarcher.nonconsumable.flowers-large</string>
+        <string>com.rarcher.nonconsumable.flowers-small</string>
+        <string>com.rarcher.nonconsumable.roses-large</string>
+        <string>com.rarcher.nonconsumable.chocolates-small</string>
+        <string>com.rarcher.consumable.plant-installation</string>
+        <string>com.rarcher.subscription.gold</string>
+        <string>com.rarcher.subscription.silver</string>
+        <string>com.rarcher.subscription.bronze</string>
+    </array>
+</dict>
+</plist>
+```
+
+We can now update `StoreHelper` and `ContentView`:
+
+```swift
+/// Computed property that returns all the auto-renewing subscription products 
+/// in the `products` array.
+public var subscriptionProducts: [Product]? {
+	guard products != nil else { return nil }
+    return products!.filter { product in product.type == .autoRenewable }
+}
+```
+
+```swift
+struct ContentView: View {
+    
+    @StateObject var storeHelper = StoreHelper()
+    var body: some View {
+        if storeHelper.hasProducts {
+            List {
+				:
+                if let subscriptions = storeHelper.subscriptionProducts {
+                    Section(header: Text("Subscriptions")) {
+                        ForEach(subscriptions, id: \.id) { product in
+                            ProductView(storeHelper: storeHelper,
+                                        productId: product.id,
+                                        displayName: product.displayName,
+                                        price: product.displayPrice)
+                        }
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            
+        } else {
+			:
+        }
+    }
+}
+```
+
+At this point it's probably also a good idea to stop creating an instance of `StoreHelper` in `ContentView` and manually passing it down to child views. Instead, we'll create it in the `App` and use the environment to automatically pass the object down through the view hierarchy:
+
+```swift
+@main
+struct StoreHelperApp: App {
+    
+    // Create the StoreHelper object that will be shared throughout the View hierarchy...
+    @StateObject var storeHelper = StoreHelper()
+    
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environmentObject(storeHelper)  // ...and add it to ContentView
+        }
+    }
+}
+```
+
+Now in views we reference the instance of `StoreHelper` using `@EnvironmentObject`:
+
+```swift
+struct ContentView: View {
+    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
+    @EnvironmentObject var storeHelper: StoreHelper
+	:
+```
+
+We can now modify all calls to child views where we've been directly passing in `storeHelper` and add `@EnvironmentObject var storeHelper: StoreHelper` to each child view that requires it. 
+
+> One point to remember is that an the SwiftUI environment is intended to provide an `ObservableObject` to a ***view*** hierarchy. 
+> 
+> This means that an `ObservableObject` referenced with `@EnvironmentObject` in a `View` **will NOT** be automatically passed to that view's `ViewModel`. In this case you need to pass (inject) the object dependency to the ViewModel's initializer. See `PriveView` and `PriceViewModel`.
+
+After adding some image assets for the new subscriptions, the app looks like this:
+
+![](./readme-assets/StoreHelperDemo40.png)
+
+And subscription purchasing works correctly too:
+
+![](./readme-assets/StoreHelperDemo41.png)
+
+![](./readme-assets/StoreHelperDemo42.png)
+
+Notice that when we purchase the "Gold" subscription we can see that we'll be charged a trial rate of $9.99 for two months, a then $19.99 per month thereafter.
+
+However, there are a few things missing:
+
+- How does the user cancel a subscription?
+- How does the user up/downgrade a subscription?
+- Once a purchase has been made there's no information displayed on trials, how long a subscription lasts, when it renews and how much it costs
+
+Let's fix that.
+
+# Displaying detailed Subscription information
+
+
+---
+
 # What Next?
 I'll be updating this demo shortly to add support for:
 
 - Automatically handling customer **refunds**
-- Handling **subscriptions**
 - Exploring detailed **transaction information and history**
 - Multi-platform issues
+- Sandbox improvements
+
