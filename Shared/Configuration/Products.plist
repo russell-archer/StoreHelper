@@ -8,6 +8,10 @@
         <string>com.rarcher.nonconsumable.flowers-small</string>
         <string>com.rarcher.nonconsumable.roses-large</string>
         <string>com.rarcher.nonconsumable.chocolates-small</string>
+        <string>com.rarcher.consumable.plant-installation</string>
+        <string>com.rarcher.subscription.gold</string>
+        <string>com.rarcher.subscription.silver</string>
+        <string>com.rarcher.subscription.bronze</string>
     </array>
 </dict>
 </plist>

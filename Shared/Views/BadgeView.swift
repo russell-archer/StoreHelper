@@ -27,7 +27,7 @@ struct BadgeView: View {
     func badgeOptions() -> (badgeName: String, fgColor: Color)? {
         switch purchaseState {
             case .notStarted:         return nil
-            case .inProgress:         return nil
+            case .inProgress:         return (badgeName: "hourglass", Color.cyan)
             case .complete:           return (badgeName: "checkmark", Color.green)
             case .pending:            return (badgeName: "hourglass", Color.orange)
             case .cancelled:          return (badgeName: "person.crop.circle.fill.badge.xmark", Color.blue)
@@ -40,6 +40,14 @@ struct BadgeView: View {
 
 struct PurchasedView_Previews: PreviewProvider {
     static var previews: some View {
-        BadgeView(purchaseState: .complete)
+        VStack {
+            BadgeView(purchaseState: .notStarted)
+            BadgeView(purchaseState: .inProgress)
+            BadgeView(purchaseState: .complete)
+            BadgeView(purchaseState: .pending)
+            BadgeView(purchaseState: .cancelled)
+            BadgeView(purchaseState: .failed)
+            BadgeView(purchaseState: .failedVerification)
+        }
     }
 }

@@ -12,7 +12,8 @@ import StoreKit
 /// The product's price is also displayed in the localized currency.
 struct PurchaseButton: View {
     
-    @ObservedObject var storeHelper: StoreHelper
+    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
+    @EnvironmentObject var storeHelper: StoreHelper
     
     @State var purchasing: Bool = false
     @State var cancelled: Bool = false
@@ -42,8 +43,7 @@ struct PurchaseButton: View {
                     if cancelled { BadgeView(purchaseState: .cancelled) }
                     if pending { BadgeView(purchaseState: .pending) }
                     
-                    PriceView(storeHelper: storeHelper,
-                              purchasing: $purchasing,
+                    PriceView(purchasing: $purchasing,
                               cancelled: $cancelled,
                               pending: $pending,
                               failed: $failed,
@@ -75,6 +75,9 @@ struct PurchaseButton: View {
 
 struct PurchaseButton_Previews: PreviewProvider {
     static var previews: some View {
-        PurchaseButton(storeHelper: StoreHelper(), productId: "nonconsumable.flowers-large", price: "£1.99")
+        
+        @StateObject var storeHelper = StoreHelper()
+        return PurchaseButton(productId: "nonconsumable.flowers-large", price: "£1.99")
+            .environmentObject(storeHelper)
     }
 }

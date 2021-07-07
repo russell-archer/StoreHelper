@@ -11,7 +11,8 @@ import StoreKit
 /// Displays a single row of product information for the main content List.
 struct ProductView: View {
     
-    @ObservedObject var storeHelper: StoreHelper
+    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
+    @EnvironmentObject var storeHelper: StoreHelper
     
     var productId: ProductId
     var displayName: String
@@ -21,17 +22,19 @@ struct ProductView: View {
         HStack {
             Image(productId)
                 .resizable()
-                .frame(width: 75, height: 75)
+                .frame(width: 75, height: 80)
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
             
             Text(displayName)
                 .font(.title2)
                 .padding()
+                .lineLimit(2)
+                .minimumScaleFactor(0.5)
             
             Spacer()
             
-            PurchaseButton(storeHelper: storeHelper, productId: productId, price: price)
+            PurchaseButton(productId: productId, price: price)
         }
         .padding()
     }
@@ -40,9 +43,15 @@ struct ProductView: View {
 struct ProductView_Previews: PreviewProvider {
     
     static var previews: some View {
-        ProductView(storeHelper: StoreHelper(),
-                    productId: "nonconsumable.flowers-large",
-                    displayName: "flowers-large",
-                    price: "£0.99")
+        
+        @StateObject var storeHelper = StoreHelper()
+//        return ProductView(productId: "com.rarcher.nonconsumable.chocolates-small",
+//                           displayName: "Large Flowers",
+//                           price: "£0.99").environmentObject(storeHelper)
+        
+        return ProductView(
+            productId: "com.rarcher.subscription.gold",
+            displayName: "Gold. Weekly Home Visits",
+            price: "4.99").environmentObject(storeHelper)
     }
 }

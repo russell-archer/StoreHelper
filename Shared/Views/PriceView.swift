@@ -11,7 +11,8 @@ import StoreKit
 /// Displays a product price and a button that enables purchasing.
 struct PriceView: View {
     
-    @ObservedObject var storeHelper: StoreHelper
+    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
+    @EnvironmentObject var storeHelper: StoreHelper
     
     @Binding var purchasing: Bool
     @Binding var cancelled: Bool
@@ -54,6 +55,26 @@ struct PriceView: View {
                     .cornerRadius(25)
             }
         }
+    }
+}
+
+struct PriceView_Previews: PreviewProvider {
+
+    static var previews: some View {
+        HStack {
+            ProgressView()
+            Spacer()
+            Button(action: {}) {
+                Text("£1.99")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(height: 40)
+                    .background(Color.blue)
+                    .cornerRadius(25)
+            }
+        }
+        .padding()
     }
 }
 

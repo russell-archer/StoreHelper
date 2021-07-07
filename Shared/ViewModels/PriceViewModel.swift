@@ -29,7 +29,7 @@ struct PriceViewModel {
             if purchaseResult.transaction != nil { updatePurchaseState(newState: purchaseResult.purchaseState) }
             else { updatePurchaseState(newState: purchaseResult.purchaseState) }  // The user cancelled, or it's pending approval
             
-        } catch { updatePurchaseState(newState: .failed) } // The purchase or validation failed
+        } catch { updatePurchaseState(newState: .failed) }  // The purchase or validation failed
     }
     
     private func updatePurchaseState(newState: StoreHelper.PurchaseState) {

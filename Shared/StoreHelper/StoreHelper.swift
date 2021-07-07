@@ -34,6 +34,18 @@ public class StoreHelper: ObservableObject {
         return products!.count > 0 ? true : false
     }
     
+    /// Computed property that returns all the non-consumable products in the `products` array.
+    public var nonConsumableProducts: [Product]? {
+        guard products != nil else { return nil }
+        return products!.filter { product in product.type == .nonConsumable }
+    }
+    
+    /// Computed property that returns all the auto-renewing subscription products in the `products` array.
+    public var subscriptionProducts: [Product]? {
+        guard products != nil else { return nil }
+        return products!.filter { product in product.type == .autoRenewable }
+    }
+    
     // MARK: - Private properties
     
     /// Handle for App Store transactions.
@@ -51,16 +63,16 @@ public class StoreHelper: ObservableObject {
         
         // Listen for App Store transactions
         transactionListener = handleTransactions()
-        
+
         // Read our list of product ids
         if let productIds = Configuration.readConfigFile() {
-            
+
             // Get localized product info from the App Store
             StoreLog.event(.requestProductsStarted)
             async {
-                
+
                 products = await requestProductsFromAppStore(productIds: productIds)
-                
+
                 if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } else {
                     StoreLog.event(.requestProductsSuccess)
                 }
@@ -71,7 +83,7 @@ public class StoreHelper: ObservableObject {
     deinit { transactionListener?.cancel() }
     
     // MARK: - Public methods
-
+    
     /// Request localized product info from the App Store for a set of ProductId.
     ///
     /// This method runs on the main thread because it will result in updates to the UI.
@@ -116,21 +128,22 @@ public class StoreHelper: ObservableObject {
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
     public func isPurchased(product: Product) async throws -> Bool {
-
+        
         return try await isPurchased(productId: product.id)
     }
     
     /// Uses StoreKit's `Transaction.currentEntitlements` property to iterate over the sequence of `VerificationResult<Transaction>`
     /// representing all transactions for products the user is currently entitled to. That is, all currently-subscribed
-    /// transactions and all purchased (and not refunded) non-consumables.
+    /// transactions and all purchased (and not refunded) non-consumables. Note that transactions for consumables are not
+    /// in the receipt.
     /// - Returns: A verified `Set<ProductId>` for all products the user is entitled to have access to. The set will be empty if the
     /// user has not purchased anything previously.
     public func currentEntitlements() async -> Set<ProductId> {
         
         var entitledProductIds = Set<ProductId>()
-
+        
         for await result in Transaction.currentEntitlements {
-
+            
             if case .verified(let transaction) = result {
                 entitledProductIds.insert(transaction.productID)  // Ignore unverified transactions
             }
@@ -150,7 +163,7 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
     public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
-
+        
         guard purchaseState != .inProgress else {
             StoreLog.exception(.purchaseInProgressException, productId: product.id)
             throw StoreException.purchaseInProgressException
@@ -159,7 +172,7 @@ public class StoreHelper: ObservableObject {
         // Start a purchase transaction
         purchaseState = .inProgress
         StoreLog.event(.purchaseInProgress, productId: product.id)
-
+        
         guard let result = try? await product.purchase() else {
             purchaseState = .failed
             StoreLog.event(.purchaseFailure, productId: product.id)
@@ -242,13 +255,13 @@ public class StoreHelper: ObservableObject {
         return detach {
             
             for await verificationResult in Transaction.updates {
-
+                
                 // See if StoreKit validated the transaction
                 let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
                 StoreLog.transaction(.transactionReceived, productId: checkResult.transaction.productID)
-
+                
                 if checkResult.verified {
-
+                    
                     let validatedTransaction = checkResult.transaction
                     
                     // The transaction was validated so update the list of products the user has access to

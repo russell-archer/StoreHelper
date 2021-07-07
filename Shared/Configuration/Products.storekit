@@ -6,12 +6,12 @@
   "products" : [
     {
       "displayPrice" : "1.99",
-      "familyShareable" : true,
+      "familyShareable" : false,
       "internalID" : "48594F7A",
       "localizations" : [
         {
           "description" : "A cool bunch of mixed flowers",
-          "displayName" : "Flowers Large",
+          "displayName" : "Large Flowers",
           "locale" : "en_US"
         }
       ],
@@ -26,7 +26,7 @@
       "localizations" : [
         {
           "description" : "A cool small bunch of flowers",
-          "displayName" : "Flowers Small",
+          "displayName" : "Small Flowers",
           "locale" : "en_US"
         }
       ],
@@ -41,7 +41,7 @@
       "localizations" : [
         {
           "description" : "A large bunch of red roses",
-          "displayName" : "Roses Large",
+          "displayName" : "Large Roses",
           "locale" : "en_US"
         }
       ],
@@ -51,18 +51,33 @@
     },
     {
       "displayPrice" : "3.99",
-      "familyShareable" : false,
+      "familyShareable" : true,
       "internalID" : "6AE20A0C",
       "localizations" : [
         {
           "description" : "A small box of chocolates",
-          "displayName" : "Chocolates Small",
+          "displayName" : "Small Chocolates",
           "locale" : "en_US"
         }
       ],
       "productID" : "com.rarcher.nonconsumable.chocolates-small",
       "referenceName" : "chocolates-small",
       "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "29",
+      "familyShareable" : false,
+      "internalID" : "37B33974",
+      "localizations" : [
+        {
+          "description" : "VIP plant installation service",
+          "displayName" : "Plant Installation",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.rarcher.consumable.plant-installation",
+      "referenceName" : "plant-installation",
+      "type" : "Consumable"
     }
   ],
   "settings" : {
@@ -74,7 +89,86 @@
     "_storeKitError" : 0
   },
   "subscriptionGroups" : [
+    {
+      "id" : "8126C4BB",
+      "localizations" : [
 
+      ],
+      "name" : "VIP Home Visits",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "AF41C8C8",
+          "introductoryOffer" : {
+            "displayPrice" : "9.99",
+            "internalID" : "D9531218",
+            "paymentMode" : "payUpFront",
+            "subscriptionPeriod" : "P2M"
+          },
+          "localizations" : [
+            {
+              "description" : "Get expert care for your plants every week.",
+              "displayName" : "Gold. Weekly Home Visits",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.subscription.gold",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Gold. Weekly Home Visits",
+          "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "11.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "B8897679",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Get expert care for your plants twice a month",
+              "displayName" : "Silver. Visits twice a month",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.subscription.silver",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Silver. Twice Monthly Home Visits",
+          "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "59041E8B",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Get expert care for your plants every month",
+              "displayName" : "Bronze. Monthly home visits",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.subscription.bronze",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Bronze. Monthly Home Visits",
+          "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
   ],
   "version" : {
     "major" : 1,
