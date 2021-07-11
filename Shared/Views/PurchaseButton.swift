@@ -34,7 +34,7 @@ struct PurchaseButton: View {
         } else {
             
             HStack {
-                if purchased {
+                if purchased, product!.type != .consumable {
                     
                     BadgeView(purchaseState: .complete)
                     

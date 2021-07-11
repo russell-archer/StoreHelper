@@ -45,13 +45,9 @@ struct ProductView_Previews: PreviewProvider {
     static var previews: some View {
         
         @StateObject var storeHelper = StoreHelper()
-//        return ProductView(productId: "com.rarcher.nonconsumable.chocolates-small",
-//                           displayName: "Large Flowers",
-//                           price: "£0.99").environmentObject(storeHelper)
         
-        return ProductView(
-            productId: "com.rarcher.subscription.gold",
-            displayName: "Gold. Weekly Home Visits",
-            price: "4.99").environmentObject(storeHelper)
+        return ProductView(productId: "com.rarcher.nonconsumable.chocolates-small",
+                           displayName: "Small Chocolates",
+                           price: "£0.99").environmentObject(storeHelper)
     }
 }

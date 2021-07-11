@@ -48,6 +48,9 @@ public enum StoreNotification: Error, Equatable {
     case transactionSuccess
     case transactionRevoked
     
+    case consumableSavedInKeychain
+    case consumableKeychainError
+    
     /// A short description of the notification.
     /// - Returns: Returns a short description of the notification.
     public func shortDescription() -> String {
@@ -75,6 +78,9 @@ public enum StoreNotification: Error, Equatable {
             case .transactionFailure:              return "Transaction failure"
             case .transactionSuccess:              return "Transaction success"
             case .transactionRevoked:              return "Transaction was revoked (refunded) by the App Store"
+                
+            case .consumableSavedInKeychain:       return "Consumable purchase successfully saved to the keychain"
+            case .consumableKeychainError:         return "Keychain error"
         }
     }
 }

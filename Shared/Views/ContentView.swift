@@ -26,7 +26,15 @@ struct ContentView: View {
                         }
                     }
                 }
-
+                
+                if let consumables = storeHelper.consumableProducts {
+                    Section(header: Text("VIP Services")) {
+                        ForEach(consumables, id: \.id) { product in
+                            ConsumableView(productId: product.id, displayName: product.displayName, price: product.displayPrice)
+                        }
+                    }
+                }
+                
                 if let subscriptions = storeHelper.subscriptionProducts {
                     Section(header: Text("Subscriptions")) {
                         ForEach(subscriptions, id: \.id) { product in
@@ -66,6 +74,13 @@ struct ContentView_Previews: PreviewProvider {
                 ProductView(
                     productId: "com.rarcher.nonconsumable.roses-large",
                     displayName: "Large Flowers",
+                    price: "4.99")
+            }
+            
+            Section(header: Text("VIP Services")) {
+                ProductView(
+                    productId: "com.rarcher.consumable.plant-installation",
+                    displayName: "Plant Installation",
                     price: "4.99")
             }
             

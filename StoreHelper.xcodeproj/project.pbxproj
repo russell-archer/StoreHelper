@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		687273A92683749300C37D94 /* PriceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687273A82683749300C37D94 /* PriceViewModel.swift */; };
 		687273AA2683749300C37D94 /* PriceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687273A82683749300C37D94 /* PriceViewModel.swift */; };
+		68A440CF26986F6D00D2408B /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A440CE26986F6D00D2408B /* KeychainHelper.swift */; };
+		68A440D026986F6D00D2408B /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A440CE26986F6D00D2408B /* KeychainHelper.swift */; };
+		68A440D2269897DD00D2408B /* ConsumableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A440D1269897DD00D2408B /* ConsumableView.swift */; };
+		68A440D3269897DD00D2408B /* ConsumableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A440D1269897DD00D2408B /* ConsumableView.swift */; };
 		68ACE67D2680D8DA00AA9895 /* StoreErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */; };
 		68ACE67E2680D8DA00AA9895 /* StoreErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */; };
 		68ACE6802680D90800AA9895 /* PurchaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE67F2680D90800AA9895 /* PurchaseButton.swift */; };
@@ -71,6 +75,8 @@
 		687BC36426933B9F00D156EE /* StoreHelperDemo25.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo25.png; sourceTree = "<group>"; };
 		687BC36526933B9F00D156EE /* StoreHelperDemo26.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo26.png; sourceTree = "<group>"; };
 		687BC36626933B9F00D156EE /* StoreHelperDemo27.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo27.png; sourceTree = "<group>"; };
+		68A440CE26986F6D00D2408B /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		68A440D1269897DD00D2408B /* ConsumableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsumableView.swift; sourceTree = "<group>"; };
 		68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreErrorView.swift; sourceTree = "<group>"; };
 		68ACE67F2680D90800AA9895 /* PurchaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseButton.swift; sourceTree = "<group>"; };
 		68ACE6822680D92700AA9895 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
@@ -290,6 +296,7 @@
 				68F7737B267A43C400C3C670 /* Assets.xcassets */,
 				68F77379267A43C300C3C670 /* StoreHelperApp.swift */,
 				68F773CE267A494500C3C670 /* Utils.swift */,
+				68A440CE26986F6D00D2408B /* KeychainHelper.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -301,6 +308,7 @@
 				68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */,
 				68ACE67F2680D90800AA9895 /* PurchaseButton.swift */,
 				68ACE6822680D92700AA9895 /* ProductView.swift */,
+				68A440D1269897DD00D2408B /* ConsumableView.swift */,
 				68ACE6852680D94300AA9895 /* PriceView.swift */,
 				68ACE6882680D95D00AA9895 /* BadgeView.swift */,
 			);
@@ -510,8 +518,10 @@
 				68ACE6832680D92700AA9895 /* ProductView.swift in Sources */,
 				68ACE6862680D94300AA9895 /* PriceView.swift in Sources */,
 				68F773CF267A494500C3C670 /* Utils.swift in Sources */,
+				68A440D2269897DD00D2408B /* ConsumableView.swift in Sources */,
 				68ACE6802680D90800AA9895 /* PurchaseButton.swift in Sources */,
 				68ACE6892680D95D00AA9895 /* BadgeView.swift in Sources */,
+				68A440CF26986F6D00D2408B /* KeychainHelper.swift in Sources */,
 				68ACE67D2680D8DA00AA9895 /* StoreErrorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -531,8 +541,10 @@
 				68ACE6842680D92700AA9895 /* ProductView.swift in Sources */,
 				68ACE6872680D94300AA9895 /* PriceView.swift in Sources */,
 				68F773D0267A494500C3C670 /* Utils.swift in Sources */,
+				68A440D3269897DD00D2408B /* ConsumableView.swift in Sources */,
 				68ACE6812680D90800AA9895 /* PurchaseButton.swift in Sources */,
 				68ACE68A2680D95D00AA9895 /* BadgeView.swift in Sources */,
+				68A440D026986F6D00D2408B /* KeychainHelper.swift in Sources */,
 				68ACE67E2680D8DA00AA9895 /* StoreErrorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
