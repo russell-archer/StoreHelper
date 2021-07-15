@@ -54,10 +54,10 @@ struct PurchaseButton: View {
                 }
             }
             .onAppear {
-                async { await purchaseState(for: product!) }
+                Task.init { await purchaseState(for: product!) }
             }
             .onChange(of: storeHelper.purchasedProducts) { _ in
-                async { await purchaseState(for: product!) }
+                Task.init { await purchaseState(for: product!) }
             }
             .alert(isPresented: $failed) {
                 

@@ -43,7 +43,7 @@ struct PriceView: View {
             
             Button(action: {
                 purchasing = true
-                async { await priceViewModel.purchase(product: product) }
+                Task.init { await priceViewModel.purchase(product: product) }
                 
             }) {
                 Text(price)

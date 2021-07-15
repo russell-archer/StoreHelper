@@ -58,7 +58,7 @@ public class StoreHelper: ObservableObject {
     // MARK: - Private properties
     
     /// Handle for App Store transactions.
-    private var transactionListener: Task.Handle<Void, Error>? = nil
+    private var transactionListener: Task<Void, Error>? = nil
     
     // MARK: - Initialization
     
@@ -78,7 +78,8 @@ public class StoreHelper: ObservableObject {
             
             // Get localized product info from the App Store
             StoreLog.event(.requestProductsStarted)
-            async {
+            
+            Task.init {
                 
                 products = await requestProductsFromAppStore(productIds: productIds)
                 
@@ -274,11 +275,11 @@ public class StoreHelper: ObservableObject {
     // MARK: - Private methods
     
     /// This is an infinite async sequence (loop). It will continue waiting for transactions until it is explicitly
-    /// canceled by calling the Task.Handle.cancel() method. See `transactionListener`.
-    /// - Returns: Returns a handle for the transaction handling loop task.
-    private func handleTransactions() -> Task.Handle<Void, Error> {
+    /// canceled by calling the Task.cancel() method. See `transactionListener`.
+    /// - Returns: Returns a task for the transaction handling loop task.
+    private func handleTransactions() -> Task<Void, Error> {
         
-        return detach {
+        return Task.detached {
             
             for await verificationResult in Transaction.updates {
                 
@@ -395,7 +396,7 @@ extension StoreHelper {
         guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return }
         cids.forEach { cid in
             if KeychainHelper.delete(cid) {
-                async { await updatePurchasedIdentifiers(cid.productId, insert: false) }
+                Task.init { await updatePurchasedIdentifiers(cid.productId, insert: false) }
             }
         }
     }

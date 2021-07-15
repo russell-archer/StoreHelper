@@ -11,6 +11,13 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 > This app requires `StoreKit2`, Swift 5.5, Xcode 13 and iOS 15.
 > See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original `StoreKit1` in iOS 14 and lower.
 
+# Changes for Xcode 13 Beta 3
+ 
+ - The use of `Task.Handle` has been deprecated. The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
+ - The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
+ - The detached task (`detach`) in `StoreHelper.handleTransactions()` has been replaced with `Task.detached`
+ - Wherever an `async {}` block was used in a synchronous context this has now been replaced with `Task.init {}`
+
 # Changes for Xcode 13 Beta 2
 
 - `Transaction.listener` is now `Transaction.updates`
@@ -48,6 +55,7 @@ See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) f
 - [Use the Receipt Luke](#Use-the-Receipt-Luke)
 - [Consumables](#Consumables)
 - [Subscriptions](#Subscriptions)
+- [Displaying detailed Subscription information](#Displaying-detailed-Subscription-information)
 - [What Next](#What-Next)   
 
 # References
@@ -421,7 +429,7 @@ class StoreHelper: ObservableObject {
             
             // Get localized product info from the App Store
             StoreLog.event(.requestProductsStarted)
-            async {
+            Task.init {
                 
                 products = await requestProductsFromAppStore(productIds: productIds)
                 
@@ -451,7 +459,7 @@ We also have a `@Published` array of `Product`. This array gets updated during t
 
 ```swift
 // Get localized product info from the App Store
-async { 
+Task.init { 
 	products = await requestProductsFromAppStore(productIds: productIds) 
 }
 ```
@@ -562,14 +570,14 @@ Our `ContentView` already has a list of products that it's enumerating in a `Lis
 List(storeHelper.products!) { product in
 	:
 	Button(action: {
- 		async { let result = try? await product.purchase() }
+ 		Task.init { let result = try? await product.purchase() }
  	}) {
 		Text("Purchase")
  	}	
 }
 ```
 
-Notice how we need to add an `async {...}` block to our button's action closure. This allows us to run async code in a "synchronous context" (the `ContentView`).
+Notice how we need to add an `Task.init {...}` block to our button's action closure. This allows us to run async code in a "synchronous context" (the `ContentView`).
 
 To keep the size and complexity of views manageable, I split the various parts of the UI into separate views like this:
 
@@ -607,14 +615,14 @@ public func purchase(_ product: Product) async throws -> (transaction: Transacti
 
 ```swift
 /// Handle for App Store transactions.
-internal var transactionListener: Task.Handle<Void, Error>? = nil
+internal var transactionListener: Task<Void, Error>? = nil
 :
 init() {
     transactionListener = handleTransactions()
 	:
 }
 :
-internal func handleTransactions() -> Task.Handle<Void, Error> { ... }
+internal func handleTransactions() -> Task<Void, Error> { ... }
 ```
 
 Here's the code for `StoreHelper`. For brevity, all comments and logging statements have been removed. 
@@ -631,12 +639,12 @@ public class StoreHelper: ObservableObject {
     @Published private(set) var purchasedProducts = Set<ProductId>()
     public private(set) var purchaseState: PurchaseState = .notStarted
     public enum PurchaseState { case notStarted, inProgress, complete, pending, cancelled, failed, failedVerification, unknown }
-    internal var transactionListener: Task.Handle<Void, Error>? = nil
+    internal var transactionListener: Task<Void, Error>? = nil
     
     init() {
         transactionListener = handleTransactions()
         if let productIds = Configuration.readConfigFile() {
-            async {
+            Task.init {
                 products = await requestProductsFromAppStore(productIds: productIds)    
                 if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } 
             }
@@ -706,8 +714,8 @@ public class StoreHelper: ObservableObject {
         return matchingProduct.first
     }
     
-    internal func handleTransactions() -> Task.Handle<Void, Error> {
-        return detach {
+    internal func handleTransactions() -> Task<Void, Error> {
+        return Task.detached {
             for await verificationResult in Transaction.listener {
                 let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
 
@@ -1038,7 +1046,9 @@ public func isPurchased(productId: ProductId) async throws -> Bool {
 }
 ```
 
-We're checking for transactions for the consumable but none are found. How can this be?! The reason is simple and non-obvious:
+We're checking for transactions for the consumable but none are found. How can this be?! 
+
+The reason is simple and non-obvious:
 
 > Transactions for consumable products ARE NOT STORED PERMANENTLY IN THE RECEIPT!
 
@@ -1052,24 +1062,326 @@ In tests I've done transactions for consumables do not remain in the receipt eve
 
 So, if you plan to sell consumable products in your own apps you'll need to create some sort of system for keeping track of them. This could be as simple as storing data in `UserDefaults`. However, for greater security use either the keychain or a database as part of your backend solution.
 
-For the purposes of this demo we'll now **remove** the consumable product (because here we're primarily interested in receipt-related functionality) in `Products.storekit`, `Products.plist` and `StoreHelper`. We'll also remove the consumables section in `ContentView`:
+For the purposes of this demo we'll use a simple Keychain-based system.
+
+Here's a helper class for that:
 
 ```swift
-struct ContentView: View {
-	:
-	// *** REMOVE ***
-	if let consumables = storeHelper.consumableProducts {
-		Section(header: Text("VIP Services")) {
-			ForEach(consumables, id: \.id) { product in
-				ProductView(storeHelper: storeHelper,
-							productId: product.id,
-							displayName: product.displayName,
-							price: product.displayPrice)
-			}
-		}
-	}
-	// *** END OF REMOVE ***
+import Foundation
+import Security
+
+/// A consumable product id and associated count value.
+///
+/// Consumable product purchase transactions are considered transient by Apple and are
+/// therefore not stored in the App Store receipt. `KeychainHelper` uses `ConsumableProductId`
+/// to store consumable product ids in the keychain. Each time the consumable is purchased the
+/// count should incremented. When a purchase is expired the count is decremented. When the count
+/// reaches zero the user no longer has access to the product.
+public struct ConsumableProductId: Hashable {
+    let productId: ProductId
+    let count: Int
+}
+
+/// KeychainHelper provides methods for working with collections of `ConsumableProductId` in the keychain.
+public struct KeychainHelper {
+    
+    /// Add a consumable `ProductId` to the keychain and set its count value to 1.
+    /// If the keychain already contains the `ProductId` its count value is incremented.
+    /// - Parameter productId: The consumable `ProductId` for which the count value will be incremented.
+    /// - Returns: Returns true if the purchase was added or updated, false otherwise.
+    public static func purchase(_ productId: ProductId) -> Bool {
+        
+        if has(productId) { return update(productId, purchase: true) }
+        
+        // Create a query for what we want to add to the keychain
+        let query: [String : Any] = [kSecClass as String  : kSecClassGenericPassword,
+                                     kSecAttrAccount as String : productId,
+                                     kSecValueData as String : "1".data(using: .utf8)!]
+        
+        // Add the item to the keychain
+        let status = SecItemAdd(query as CFDictionary, nil)
+        return status == errSecSuccess
+    }
+    
+    /// Decrements the purchase count for a consumable `ProductId` in the keychain. If the count value is
+    /// already zero no action is taken.
+    /// - Parameter productId: The consumable `ProductId` for which the count value will be decremented.
+    /// - Returns: Returns true if the product was expired (removed), false otherwise.
+    public static func expire(_ productId: ProductId) -> Bool {
+        update(productId, purchase: false)
+    }
+    
+    /// Search the keychain for a consumable `ProductId`.
+    /// - Parameter productId: The consumable `ProductId` to search for.
+    /// - Returns: Returns true if the consumable `ProductId` was found in the keychain, false otherwise.
+    public static func has(_ productId: ProductId) -> Bool {
+        
+        // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
+        let query = [kSecClass as String : kSecClassGenericPassword,
+                     kSecAttrAccount as String : productId,
+                     kSecMatchLimit as String: kSecMatchLimitOne] as CFDictionary
+        
+        // Search for the item in the keychain
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query, &item)
+        return status == errSecSuccess
+    }
+    
+    /// Get the count value associated with a consumable `ProductId`.
+    /// - Parameter productId: The consumable `ProductId`.
+    /// - Returns: Returns the value of the count, or 0 if not found.
+    public static func count(for productId: ProductId) -> Int {
+        
+        // Create a query of what we want to search for.
+        let query = [kSecClass as String : kSecClassGenericPassword,
+                     kSecAttrAccount as String : productId,
+                     kSecMatchLimit as String: kSecMatchLimitOne,
+                     kSecReturnAttributes as String: true,
+                     kSecReturnData as String: true] as CFDictionary
+        
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query, &item)
+        guard status == errSecSuccess else { return 0 }
+        
+        // Extract the count value data
+        guard let foundItem = item as? [String : Any],
+              let countData = foundItem[kSecValueData as String] as? Data,
+              let countValue = String(data: countData, encoding: String.Encoding.utf8)
+        else { return 0 }
+        
+        return Int(countValue) ?? 0
+    }
+    
+    /// Update the count value associated with the consumable `ProductId` in the keychain.
+    /// If the `ProductId` doesn't exist in the keychain it's added and its value set to 1.
+    /// - Parameters:
+    ///   - productId: The consumable `ProductId`.
+    ///   - purchase: true if the consumable product has been purchased, false if it has been expired.
+    /// - Returns: Returns true if the update was successful, false otherwise.
+    public static func update(_ productId: ProductId, purchase: Bool) -> Bool {
+        
+        if !has(productId) { return KeychainHelper.purchase(productId) }
+        
+        var count = count(for: productId)
+        if count < 0 { count = 0 }
+        
+        // Create a query for what we want to change in the keychain
+        let query: [String : Any] = [kSecClass as String : kSecClassGenericPassword,
+                                     kSecAttrAccount as String : productId,
+                                     kSecValueData as String : String(count).data(using: String.Encoding.utf8)!]
+        
+        // Create a query for changes we want to make
+        var newCount = purchase ? count+1 : count-1
+        if newCount < 0 { newCount = 0 }
+        
+        let changes: [String: Any] = [kSecAttrAccount as String : productId,
+                                      kSecValueData as String : String(newCount).data(using: String.Encoding.utf8)!]
+        
+        // Update the item
+        let status = SecItemUpdate(query as CFDictionary, changes as CFDictionary)
+        return status == errSecSuccess
+    }
+    
+    /// Search for all the consumable product ids for the current user that are stored in the keychain.
+    /// - Parameter productIds: A set of `ProductId` that is used to match entries in the keychain to available products.
+    /// - Returns: Returns a set of ConsumableProductId for all the product ids stored in the keychain.
+    public static func all(productIds: Set<ProductId>) -> Set<ConsumableProductId>? {
+        
+        // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
+        let query = [kSecClass as String : kSecClassGenericPassword,
+                     kSecMatchLimit as String: kSecMatchLimitAll,
+                     kSecReturnAttributes as String: true,
+                     kSecReturnData as String: true] as CFDictionary
+        
+        // Search for all the items created by this app in the keychain
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query, &item)
+        guard status == errSecSuccess else { return nil }
+        
+        // The item var is an array of dictionaries
+        guard let entries = item as? [[String : Any]] else { return nil }
+        
+        var foundProducts = Set<ConsumableProductId>()
+        for entry in entries {
+            if  let pid = entry[kSecAttrAccount as String] as? String,
+                productIds.contains(pid),
+                let data = entry[kSecValueData as String] as? Data,
+                let sValue = String(data: data, encoding: String.Encoding.utf8),
+                let value = Int(sValue) {
+                foundProducts.insert(ConsumableProductId(productId: pid, count: value))
+            }
+        }
+        
+        return foundProducts.count > 0 ? foundProducts : nil
+    }
+    
+    /// Delete the `ProductId` from the keychain.
+    /// - Parameter productId: `ProductId` to remove.
+    /// - Returns: Returns true if the `ProductId` was deleted, false otherwise.
+    public static func delete(_ consumableProduct: ConsumableProductId) -> Bool {
+        
+        // Create a query of what we want to search for
+        let query = [kSecClass as String : kSecClassGenericPassword,
+                     kSecAttrAccount as String : consumableProduct.productId,
+                     kSecValueData as String: String(consumableProduct.count).data(using: String.Encoding.utf8)!,
+                     kSecMatchLimit as String: kSecMatchLimitOne] as CFDictionary
+        
+        // Search for the item in the keychain
+        let status = SecItemDelete(query)
+        return status == errSecSuccess
+    }
+}
 ```
+
+We also need to make a few changes in `StoreHelper:`
+
+```swift
+/// Requests the most recent transaction for a product from the App Store and determines if it 
+/// has been previously purchased.
+///
+/// May throw an exception of type `StoreException.transactionVerificationFailed`.
+/// - Parameter productId: The `ProductId` of the product.
+/// - Returns: Returns true if the product has been purchased, false otherwise.
+public func isPurchased(productId: ProductId) async throws -> Bool {
+    guard let product = product(from: productId) else { return false }
+    
+    // We need to treat consumables differently because their transaction are NOT stored 
+	// in the receipt.
+    if product.type == .consumable {
+        await updatePurchasedIdentifiers(productId, insert: true)
+        return KeychainHelper.count(for: productId) > 0
+    }
+	:
+}
+:
+@MainActor private func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) async {
+    guard let product = product(from: productId) else { return }
+    
+    if insert {
+        if product.type == .consumable {
+            let count = count(for: productId)
+            let products = purchasedProducts.filter({ $0 == productId })
+            if count == products.count { return }
+        } else {
+            if purchasedProducts.contains(productId) { return }
+        }
+        
+        purchasedProducts.append(productId)
+        
+    } else {
+        if let index = purchasedProducts.firstIndex(where: { $0 == productId}) {
+            purchasedProducts.remove(at: index)
+        }
+    }
+}
+
+extension StoreHelper {
+    
+    /// Gives the count for purchases for a consumable product. Not applicable to nonconsumables 
+	/// and subscriptions.
+    /// - Parameter productId: The `ProductId` of a consumable product.
+    /// - Returns: The count for purchases for a consumable product (a consumable may be 
+	/// purchased multiple times).
+    public func count(for productId: ProductId) -> Int {
+        if let product = product(from: productId) {
+            if product.type != .consumable { return 0 }
+            return KeychainHelper.count(for: productId)
+        }
+        
+        return 0
+    }
+    
+    /// Removes all `ProductId` entries in the keychain associated with consumable product purchases.
+    public func resetKeychainConsumables() {
+        guard products != nil else { return }
+        
+        let consumableProductIds = products!.filter({ $0.type == .consumable}).map({ $0.id })
+        guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return }
+        cids.forEach { cid in
+            if KeychainHelper.delete(cid) {
+                Task.init { await updatePurchasedIdentifiers(cid.productId, insert: false) }
+            }
+        }
+    }
+}
+
+```
+
+We also introduce a `ConsumableView` that displays a count of the number of unexpired purchases of the consumable product the user has:
+
+```swift
+import SwiftUI
+import StoreKit
+
+/// Displays a single row of product information for the main content List.
+struct ConsumableView: View {
+    
+    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
+    @EnvironmentObject var storeHelper: StoreHelper
+    @State var count: Int = 0
+    
+    var productId: ProductId
+    var displayName: String
+    var price: String
+    
+    var body: some View {
+        HStack {
+            if count == 0 {
+                Image(productId)
+                    .resizable()
+                    .frame(width: 75, height: 80)
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(25)
+            } else {
+                Image(productId)
+                    .resizable()
+                    .frame(width: 75, height: 80)
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(25)
+                    .overlay(Badge(count: $count))
+            }
+            Text(displayName)
+                .font(.title2)
+                .padding()
+                .lineLimit(2)
+                .minimumScaleFactor(0.5)
+            Spacer()
+            PurchaseButton(productId: productId, price: price)
+        }
+        .padding()
+        .onAppear {
+            count = storeHelper.count(for: productId)
+        }
+        .onChange(of: storeHelper.purchasedProducts) { _ in
+            count = storeHelper.count(for: productId)
+        }
+    }
+}
+
+struct Badge : View {
+    @Binding var count : Int
+	
+    var body: some View {
+        ZStack {
+            Capsule()
+                .fill(Color.red)
+                .frame(width: 30, height: 30, alignment: .topTrailing)
+                .position(CGPoint(x: 70, y: 10))
+            
+            Text(String(count)).foregroundColor(.white)
+                .font(Font.system(size: 20).bold()).position(CGPoint(x: 70, y: 10))
+        }
+    }
+}
+```
+
+If you purchase a consumable the app now looks like this:
+
+![](./readme-assets/StoreHelperDemo43.png)
+
+And if you purchase the product again:
+
+![[StoreHelper Demo 44.png]]
 
 # Subscriptions
 We'll create an auto-renewable subscription (Apple discourages the use of the older non-renewing subscriptions) for a "VIP Home Plant Care Visit". The subscription offers three different levels of service: Gold, Silver and Bronze.
@@ -1192,13 +1504,13 @@ We can now modify all calls to child views where we've been directly passing in 
 
 After adding some image assets for the new subscriptions, the app looks like this:
 
-![](./readme-assets/StoreHelperDemo40.png)
+![](./readme-assets/StoreHelperDemo45.png)
 
 And subscription purchasing works correctly too:
 
 ![](./readme-assets/StoreHelperDemo41.png)
 
-![](./readme-assets/StoreHelperDemo42.png)
+![](./readme-assets/StoreHelperDemo46.png)
 
 Notice that when we purchase the "Gold" subscription we can see that we'll be charged a trial rate of $9.99 for two months, a then $19.99 per month thereafter.
 
@@ -1210,8 +1522,11 @@ However, there are a few things missing:
 
 Let's fix that.
 
+TODO
+
 # Displaying detailed Subscription information
 
+TODO
 
 ---
 
@@ -1220,6 +1535,5 @@ I'll be updating this demo shortly to add support for:
 
 - Automatically handling customer **refunds**
 - Exploring detailed **transaction information and history**
-- Multi-platform issues
 - Sandbox improvements
 
