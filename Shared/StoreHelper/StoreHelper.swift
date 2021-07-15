@@ -112,7 +112,7 @@ public class StoreHelper: ObservableObject {
         
         guard let product = product(from: productId) else { return false }
         
-        // We need to treat consumables differently because their transaction are NOT stored inthe receipt.
+        // We need to treat consumables differently because their transaction are NOT stored in the receipt.
         if product.type == .consumable {
             await updatePurchasedIdentifiers(productId, insert: true)
             return KeychainHelper.count(for: productId) > 0
