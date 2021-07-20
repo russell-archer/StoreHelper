@@ -47,7 +47,7 @@ struct PriceView: View {
                 
             }) {
                 Text(price)
-                    .font(.title2)
+                    .font(.body)
                     .foregroundColor(.white)
                     .padding()
                     .frame(height: 40)

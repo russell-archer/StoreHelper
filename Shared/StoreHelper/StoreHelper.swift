@@ -124,7 +124,7 @@ public class StoreHelper: ObservableObject {
         }
         
         // See if the transaction passed StoreKit's automatic verification
-        let result = checkTransactionVerificationResult(result: currentEntitlement)
+        let result = checkVerificationResult(result: currentEntitlement)
         if !result.verified {
             StoreLog.transaction(.transactionValidationFailure, productId: result.transaction.productID)
             throw StoreException.transactionVerificationFailed
@@ -212,7 +212,7 @@ public class StoreHelper: ObservableObject {
                 // App Store's validation process. This is equivalent to receipt validation in StoreKit1.
                 
                 // Did the transaction pass StoreKit’s automatic validation?
-                let checkResult = checkTransactionVerificationResult(result: verificationResult)
+                let checkResult = checkVerificationResult(result: verificationResult)
                 if !checkResult.verified {
                     purchaseState = .failedVerification
                     StoreLog.transaction(.transactionValidationFailure, productId: checkResult.transaction.productID)
@@ -272,6 +272,96 @@ public class StoreHelper: ObservableObject {
         return matchingProduct.first
     }
     
+    public func purchaseInfo(for product: ProductId) async -> String {
+        return "Test for purchase info"
+    }
+    
+    public func allTransactions() async {
+        
+        // The transaction history doesn’t include expired consumables or expired non-renewables, repurchased
+        // non-consumables or subscriptions, or restored purchases.
+        for await t in Transaction.all {
+            if case .verified(let transaction) = t {
+                
+                print("productID            : \(transaction.productID)")
+                print("id                   : \(transaction.id)")
+                print("productType          : \(transaction.productType)")
+                print("purchaseDate         : \(transaction.purchaseDate)")
+                print("originalPurchaseDate : \(transaction.originalPurchaseDate)")
+                print("expirationDate       : \(transaction.expirationDate == nil ? "-" : transaction.expirationDate!.description)")  // The date the subscription expires or renews.
+                print("revocationDate       : \(transaction.revocationDate == nil ? "-" : transaction.revocationDate!.description)")
+                print("isUpgraded           : \(transaction.isUpgraded)")
+                print("ownershipType        : \(transaction.ownershipType)")
+                print("purchasedQuantity    : \(transaction.purchasedQuantity)")
+                print("subscriptionGroupID  : \(transaction.subscriptionGroupID ?? "-")")
+
+                // Product.SubscriptionInfo.Status  -- collection of statuses, becauses users can have multiple subs to the same product
+                // e.g. subscribed themselves and received auto sub through family sharing. We need to enumerate the collection
+                // to find the highest level of service they're entitled to.
+                //
+                // Note that Product.subscription.status is an array that contains status information for a subscription group, including
+                // renewal and transaction information.
+                
+                if transaction.productType == .autoRenewable {
+                    print("product is a subscription...")
+                    if  let product = product(from: transaction.productID),
+                        let subscription = product.subscription,
+                        let statusCollection = try? await subscription.status {
+                        
+                        statusCollection.forEach { status in
+                        
+//                            There are three places to look for subscription data (Product.SubscriptionInfo):
+//                            * product.subscription
+//                            product.latestTransaction     // info on the most recent subscription transaction
+//                            status.renewalInfo            // VerificationResult<Product.SubscriptionInfo.RenewalInfo>. Validated by storekit. ALL info about a subscription e.g
+//                            status.state                  // Enum for sub state: Product.SubscriptionInfo.RenewalState e.g. == subscribed
+                            
+                            var stateString: String
+                            switch status.state {
+                                case .subscribed: stateString = "subscribed"
+                                case .expired: stateString = "expired"
+                                default: stateString = "other"
+                            }
+                            
+                            print("subscription state: \(stateString)")
+                            
+                            var periodUnitText: String
+                            switch subscription.subscriptionPeriod.unit {
+                                    
+                                case .day: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "days" : "day"
+                                case .week: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "weeks" : "week"
+                                case .month: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "months" : "month"
+                                case .year: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "years" : "year"
+                                @unknown default: periodUnitText = "unknown"
+                            }
+                            
+                            print("subscription renews every: \(periodUnitText)")
+                            
+                            let result = checkVerificationResult(result: status.renewalInfo)
+                            if result.verified {
+                                print("willAutoRenew : \(result.transaction.willAutoRenew)")
+                                print("renewal date  : \(transaction.expirationDate == nil ? "-" : transaction.expirationDate!.description)")
+                                print("currentProductID : \(result.transaction.currentProductID)")
+                                print("autoRenewPreference : \(result.transaction.autoRenewPreference ?? "-")")
+                                if let expires = transaction.expirationDate {
+                                    let diffComponents = Calendar.current.dateComponents([.day], from: Date(), to: expires)
+                                    if let daysLeft = diffComponents.day, daysLeft > 0 {
+                                        print("Subscription renews in \(daysLeft) days")
+                                    } else {
+                                        print("Subscription renews today!")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                print("----------------------------------------------------------------")
+
+            }
+        }
+    }
+    
     // MARK: - Private methods
     
     /// This is an infinite async sequence (loop). It will continue waiting for transactions until it is explicitly
@@ -284,7 +374,7 @@ public class StoreHelper: ObservableObject {
             for await verificationResult in Transaction.updates {
                 
                 // See if StoreKit validated the transaction
-                let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
+                let checkResult = self.checkVerificationResult(result: verificationResult)
                 StoreLog.transaction(.transactionReceived, productId: checkResult.transaction.productID)
                 
                 if checkResult.verified {
@@ -357,8 +447,8 @@ public class StoreHelper: ObservableObject {
     /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.
     ///
     /// - Parameter result: The transaction VerificationResult to check.
-    /// - Returns: The verified `Transaction`, or nil if the transaction result was unverified.
-    private func checkTransactionVerificationResult(result: VerificationResult<Transaction>) -> (transaction: Transaction, verified: Bool) {
+    /// - Returns: A tuple containing the verified/unverified transaction and a boolean flag indicating success or failure.
+    private func checkVerificationResult<T>(result: VerificationResult<T>) -> (transaction: T, verified: Bool) {
         
         switch result {
             case .unverified(let unverifiedTransaction):

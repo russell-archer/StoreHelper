@@ -86,7 +86,8 @@
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
     "_storefront" : "USA",
-    "_storeKitError" : 0
+    "_storeKitError" : 0,
+    "_timeRate" : 1
   },
   "subscriptionGroups" : [
     {

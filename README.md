@@ -13,10 +13,13 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 
 # Changes for Xcode 13 Beta 3
  
- - The use of `Task.Handle` has been deprecated. The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
- - The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
- - The detached task (`detach`) in `StoreHelper.handleTransactions()` has been replaced with `Task.detached`
- - Wherever an `async {}` block was used in a synchronous context this has now been replaced with `Task.init {}`
+ - The use of `Task.Handle` has been deprecated
+	 - The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
+	 - The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
+ - The `detach` keyword for creating detached tasks has been deprecated
+	 - The use of `detach` in `StoreHelper.handleTransactions()`  has been replaced with `Task.detached`
+ - The use of `async {}` blocks in a synchronous context has been deprecated
+	 - All `async {}` blocks have been replaced with `Task.init {}`
 
 # Changes for Xcode 13 Beta 2
 
@@ -1520,7 +1523,7 @@ However, there are a few things missing:
 - How does the user up/downgrade a subscription?
 - Once a purchase has been made there's no information displayed on trials, how long a subscription lasts, when it renews and how much it costs
 
-Let's fix that.
+Let's fix that. 
 
 TODO
 
