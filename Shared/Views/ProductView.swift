@@ -70,7 +70,7 @@ struct ProductView: View {
             }
             
             if purchaseState == .purchased {
-                PurchaseInfoView()
+                PurchaseInfoView(storeHelper: storeHelper, productId: productId)
             }
         }
         .padding()

@@ -277,94 +277,103 @@ public class StoreHelper: ObservableObject {
         return matchingProduct.first
     }
     
-    public func purchaseInfo(for product: ProductId) async -> String {
-        return "Test for purchase info"
+    /// Information on a non-consumable product or auto-renewing subscription.
+    /// - Parameter productId: The `ProductId` of the product.
+    /// - Returns: Information on a non-consumable product or auto-renewing subscription.
+    /// If the product is a consumable or non-recurring subscription an empty string is returned.
+    @MainActor public func purchaseInfo(for productId: ProductId) async -> String {
+        
+        guard let p = product(from: productId) else { return "" }
+        return await purchaseInfo(for: p)
     }
     
-    public func allTransactions() async {
+    /// Information on a non-consumable product or auto-renewing subscription.
+    /// - Parameter product: The `Product`.
+    /// - Returns: Information on a non-consumable product or auto-renewing subscription.
+    /// If the product is a consumable or non-recurring subscription an empty string is returned.
+    @MainActor public func purchaseInfo(for product: Product) async -> String {
+
+        // Product.SubscriptionInfo.Status  -- collection of statuses, becauses users can have multiple subs to the same product
+        // e.g. subscribed themselves and received auto sub through family sharing. We need to enumerate the collection
+        // to find the highest level of service they're entitled to.
+        //
+        // Note that Product.subscription.status is an array that contains status information for a subscription group, including
+        // renewal and transaction information.
         
-        // The transaction history doesn’t include expired consumables or expired non-renewables, repurchased
-        // non-consumables or subscriptions, or restored purchases.
-        for await t in Transaction.all {
-            if case .verified(let transaction) = t {
+        guard product.type != .consumable && product.type != .nonRenewable else { return "" }
+        guard let unverifiedTransaction = await product.latestTransaction else { return "" }
+        
+        let transactionResult = checkVerificationResult(result: unverifiedTransaction)
+        guard transactionResult.verified else { return "Purchase info could not be verified with the App Store." }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMM y"
+        
+        var text = ""
+
+        let transaction = transactionResult.transaction
+        if transaction.productType == .nonConsumable {
+            
+            text = "Purchased on \(dateFormatter.string(from: transaction.purchaseDate))."
+            if transaction.revocationDate != nil {
+                text += " App Store revoked the purchase on \(dateFormatter.string(from: transaction.revocationDate!))."
+            }
+            
+            return text
+        }
+        
+        // The product is an auto-renewing subscription
+        text = "Subscription. "
+        guard let subscription = product.subscription else { return text }
+        guard let statusCollection = try? await subscription.status else { return text }
+
+        statusCollection.forEach { status in
+
+            // There are three places to look for subscription data (Product.SubscriptionInfo):
+            // product.latestTransaction     // info on the most recent subscription transaction
+            // status.renewalInfo            // VerificationResult<Product.SubscriptionInfo.RenewalInfo>. Validated by storekit. ALL info about a subscription e.g
+            // status.state                  // Enum for sub state: Product.SubscriptionInfo.RenewalState e.g. == subscribed
+            
+            if status.state == .subscribed { text += " You are currently subscribed." }
+            else { text += " This subscription has expired." }
+            
+            var periodUnitText: String
+            switch subscription.subscriptionPeriod.unit {
+                    
+                case .day:   periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "days"   : "day"
+                case .week:  periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "weeks"  : "week"
+                case .month: periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "months" : "month"
+                case .year:  periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "years"  : "year"
+                @unknown default: periodUnitText = "period unknown."
+            }
+            
+            text += " Renews every \(periodUnitText)."
+            
+            let result = checkVerificationResult(result: status.renewalInfo)
+            if result.verified {
+                text += " Auto-renew is"
+                text += result.transaction.willAutoRenew ? " on." : " off."
                 
-                print("productID            : \(transaction.productID)")
-                print("id                   : \(transaction.id)")
-                print("productType          : \(transaction.productType)")
-                print("purchaseDate         : \(transaction.purchaseDate)")
-                print("originalPurchaseDate : \(transaction.originalPurchaseDate)")
-                print("expirationDate       : \(transaction.expirationDate == nil ? "-" : transaction.expirationDate!.description)")  // The date the subscription expires or renews.
-                print("revocationDate       : \(transaction.revocationDate == nil ? "-" : transaction.revocationDate!.description)")
-                print("isUpgraded           : \(transaction.isUpgraded)")
-                print("ownershipType        : \(transaction.ownershipType)")
-                print("purchasedQuantity    : \(transaction.purchasedQuantity)")
-                print("subscriptionGroupID  : \(transaction.subscriptionGroupID ?? "-")")
-                
-                // Product.SubscriptionInfo.Status  -- collection of statuses, becauses users can have multiple subs to the same product
-                // e.g. subscribed themselves and received auto sub through family sharing. We need to enumerate the collection
-                // to find the highest level of service they're entitled to.
-                //
-                // Note that Product.subscription.status is an array that contains status information for a subscription group, including
-                // renewal and transaction information.
-                
-                if transaction.productType == .autoRenewable {
-                    print("product is a subscription...")
-                    if  let product = product(from: transaction.productID),
-                        let subscription = product.subscription,
-                        let statusCollection = try? await subscription.status {
-                        
-                        statusCollection.forEach { status in
-                            
-                            //                            There are three places to look for subscription data (Product.SubscriptionInfo):
-                            //                            * product.subscription
-                            //                            product.latestTransaction     // info on the most recent subscription transaction
-                            //                            status.renewalInfo            // VerificationResult<Product.SubscriptionInfo.RenewalInfo>. Validated by storekit. ALL info about a subscription e.g
-                            //                            status.state                  // Enum for sub state: Product.SubscriptionInfo.RenewalState e.g. == subscribed
-                            
-                            var stateString: String
-                            switch status.state {
-                                case .subscribed: stateString = "subscribed"
-                                case .expired: stateString = "expired"
-                                default: stateString = "other"
-                            }
-                            
-                            print("subscription state: \(stateString)")
-                            
-                            var periodUnitText: String
-                            switch subscription.subscriptionPeriod.unit {
-                                    
-                                case .day: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "days" : "day"
-                                case .week: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "weeks" : "week"
-                                case .month: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "months" : "month"
-                                case .year: periodUnitText = subscription.subscriptionPeriod.value > 1 ? "years" : "year"
-                                @unknown default: periodUnitText = "unknown"
-                            }
-                            
-                            print("subscription renews every: \(periodUnitText)")
-                            
-                            let result = checkVerificationResult(result: status.renewalInfo)
-                            if result.verified {
-                                print("willAutoRenew : \(result.transaction.willAutoRenew)")
-                                print("renewal date  : \(transaction.expirationDate == nil ? "-" : transaction.expirationDate!.description)")
-                                print("currentProductID : \(result.transaction.currentProductID)")
-                                print("autoRenewPreference : \(result.transaction.autoRenewPreference ?? "-")")
-                                if let expires = transaction.expirationDate {
-                                    let diffComponents = Calendar.current.dateComponents([.day], from: Date(), to: expires)
-                                    if let daysLeft = diffComponents.day, daysLeft > 0 {
-                                        print("Subscription renews in \(daysLeft) days")
-                                    } else {
-                                        print("Subscription renews today!")
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if let renewDate = transaction.expirationDate {
+
+                    text += " Renewal date is \(dateFormatter.string(from: renewDate))."
                 }
                 
-                print("----------------------------------------------------------------")
-                
+                if let expires = transaction.expirationDate {
+                    let diffComponents = Calendar.current.dateComponents([.day], from: Date(), to: expires)
+                    if let daysLeft = diffComponents.day {
+                        text += " Subscription renews in \(daysLeft)"
+                        if daysLeft > 1 { text += " days." }
+                        else if daysLeft == 1 { text += " day." }
+                        else { text += " Subscription renews today!" }
+                    }
+                }
+            } else {
+                text += " Unable to verify auto-renewal information with App Store. "
             }
         }
+        
+        return text
     }
     
     // MARK: - Private methods
@@ -497,3 +506,4 @@ extension StoreHelper {
         }
     }
 }
+

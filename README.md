@@ -123,7 +123,7 @@ See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-arche
 - This makes working with async APIs much easier and results in a more "natural" flow to your code
 
 ## Should I use StoreKit1 or StoreKit2?
-Working with in-app purchases using `StoreKit2` is a vastly superior experience over using `StoreKit1` and you should choose to use it possible.
+Working with in-app purchases using `StoreKit2` is a vastly superior experience over using `StoreKit1` and you should choose to use it if possible.
 However, `StoreKit2` requires that your app targets **iOS 15/macOS 12**. If you need to support iOS 14 and lower you'll need to continue using `StoreKit1`.
 
 Apple provides [documentation](https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase) to help you decide which version of StoreKit is right for your app.
@@ -180,7 +180,7 @@ You can now define your products in the StoreKit configuration file. For now we'
 
 ![](./readme-assets/StoreHelperDemo8.png)
 
-```stylus
+```xml
 Type			: NonConsumable
 ReferenceName 		: flowers-large
 ProductID 		: com.rarcher.nonconsumable.flowers-large
@@ -201,7 +201,7 @@ Description 		: A cool small bunch of flowers
 
 Type			: NonConsumable
 ReferenceName 		: roses-large
-ProductID 			: com.rarcher.nonconsumable.roses-large
+ProductID 		: com.rarcher.nonconsumable.roses-large
 Price 			: 2.99
 FamilyShareable 	: false
 Locale 			: en_US
@@ -210,7 +210,7 @@ Description 		: A large bunch of red roses
 
 Type			: NonConsumable
 ReferenceName 		: chocolates-small
-ProductID 			: com.rarcher.nonconsumable.chocolates-small
+ProductID 		: com.rarcher.nonconsumable.chocolates-small
 Price 			: 3.99
 FamilyShareable 	: true
 Locale 			: en_US
