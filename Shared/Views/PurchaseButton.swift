@@ -12,14 +12,8 @@ import StoreKit
 /// The product's price is also displayed in the localized currency.
 struct PurchaseButton: View {
     
-    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
-    
-    @State var purchasing: Bool = false
-    @State var cancelled: Bool = false
-    @State var pending: Bool = false
-    @State var failed: Bool = false
-    @State var purchased: Bool = false
+    @Binding var purchaseState: PurchaseState
     
     var productId: ProductId
     var price: String
@@ -34,50 +28,31 @@ struct PurchaseButton: View {
         } else {
             
             HStack {
-                if purchased, product!.type != .consumable {
+                
+                if product!.type == .consumable {
                     
-                    BadgeView(purchaseState: .complete)
+                    if purchaseState != .purchased { BadgeView(purchaseState: $purchaseState) }
+                    PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!)
                     
                 } else {
                     
-                    if cancelled { BadgeView(purchaseState: .cancelled) }
-                    if pending { BadgeView(purchaseState: .pending) }
-                    
-                    PriceView(purchasing: $purchasing,
-                              cancelled: $cancelled,
-                              pending: $pending,
-                              failed: $failed,
-                              purchased: $purchased,
-                              productId: productId,
-                              price: price,
-                              product: product!)
+                    BadgeView(purchaseState: $purchaseState)
+                    if purchaseState != .purchased { PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!) }
                 }
             }
-            .onAppear {
-                Task.init { await purchaseState(for: product!) }
-            }
-            .onChange(of: storeHelper.purchasedProducts) { _ in
-                Task.init { await purchaseState(for: product!) }
-            }
-            .alert(isPresented: $failed) {
-                
-                Alert(title: Text("Purchase Error"),
-                      message: Text("Sorry, your purchase of \(product!.displayName) failed."),
-                      dismissButton: .default(Text("OK")))
-            }
         }
-    }
-    
-    func purchaseState(for product: Product) async {
-        purchased = (try? await storeHelper.isPurchased(product: product)) ?? false
     }
 }
 
 struct PurchaseButton_Previews: PreviewProvider {
     static var previews: some View {
-        
+
         @StateObject var storeHelper = StoreHelper()
-        return PurchaseButton(productId: "nonconsumable.flowers-large", price: "£1.99")
+        @State var purchaseState: PurchaseState = .inProgress
+
+        return PurchaseButton(purchaseState: $purchaseState,
+                              productId: "nonconsumable.flowers-large",
+                              price: "£1.99")
             .environmentObject(storeHelper)
     }
 }

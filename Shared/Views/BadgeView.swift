@@ -10,12 +10,11 @@ import SwiftUI
 /// Displays a small image that gives a visual clue to the product's purchase state.
 struct BadgeView: View {
     
-    var purchaseState: StoreHelper.PurchaseState
+    @Binding var purchaseState: PurchaseState
     
     var body: some View {
         
         if let options = badgeOptions() {
-            
             Image(systemName: options.badgeName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -28,7 +27,7 @@ struct BadgeView: View {
         switch purchaseState {
             case .notStarted:         return nil
             case .inProgress:         return (badgeName: "hourglass", Color.cyan)
-            case .complete:           return (badgeName: "checkmark", Color.green)
+            case .purchased:          return (badgeName: "checkmark", Color.green)
             case .pending:            return (badgeName: "hourglass", Color.orange)
             case .cancelled:          return (badgeName: "person.crop.circle.fill.badge.xmark", Color.blue)
             case .failed:             return (badgeName: "hand.raised.slash", Color.red)
@@ -39,15 +38,15 @@ struct BadgeView: View {
 }
 
 struct PurchasedView_Previews: PreviewProvider {
+    
     static var previews: some View {
         VStack {
-            BadgeView(purchaseState: .notStarted)
-            BadgeView(purchaseState: .inProgress)
-            BadgeView(purchaseState: .complete)
-            BadgeView(purchaseState: .pending)
-            BadgeView(purchaseState: .cancelled)
-            BadgeView(purchaseState: .failed)
-            BadgeView(purchaseState: .failedVerification)
+            BadgeView(purchaseState: .constant(.inProgress))
+            BadgeView(purchaseState: .constant(.purchased))
+            BadgeView(purchaseState: .constant(.pending))
+            BadgeView(purchaseState: .constant(.cancelled))
+            BadgeView(purchaseState: .constant(.failed))
+            BadgeView(purchaseState: .constant(.failedVerification))
         }
     }
 }

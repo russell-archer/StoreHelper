@@ -5,12 +5,42 @@
 //  Created by Russell Archer on 16/06/2021.
 //
 
+/*
+ 
+ The arrangement of views is as follows:
+ 
+ +---------------------------------------------------------------+
+ | ContentView                                                   |
+ |                                                               |
+ | List {                                                        |
+ |                                                               |
+ | +----------------------------------------------------------+  |
+ | | ProductView                                              |  |
+ | |                                                          |  |
+ | |    Product   Product  +-------------------------------+  |  |
+ | |    Image      Name    | PurchaseButton                |  |  |
+ | |                       |                               |  |  |
+ | |                       | +-----------+  +------------+ |  |  |
+ | |                       | | BadgeView |  | PriceView  | |  |  |
+ | |                       | +-----------+  +------------+ |  |  |
+ | |                       +-------------------------------+  |  |
+ | |                                                          |  |
+ | |    +--------------------------------------------------+  |  |
+ | |    | PurchaseInfoView                                 |  |  |
+ | |    +--------------------------------------------------+  |  |
+ | |                                                          |  |
+ | +----------------------------------------------------------+  |
+ |                                                               |
+ | }                                                             |
+ +---------------------------------------------------------------+
+ 
+ */
+
 import SwiftUI
 
 /// The main app View.
 struct ContentView: View {
     
-    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
     
     var body: some View {

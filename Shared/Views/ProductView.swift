@@ -5,16 +5,46 @@
 //  Created by Russell Archer on 21/06/2021.
 //
 
+/*
+ 
+ The arrangement of views is as follows:
+ 
+ +---------------------------------------------------------------+
+ | ContentView                                                   |
+ |                                                               |
+ | List {                                                        |
+ |                                                               |
+ | +----------------------------------------------------------+  |
+ | | ProductView                                              |  |
+ | |                                                          |  |
+ | |    Product   Product  +-------------------------------+  |  |
+ | |    Image      Name    | PurchaseButton                |  |  |
+ | |                       |                               |  |  |
+ | |                       | +-----------+  +------------+ |  |  |
+ | |                       | | BadgeView |  | PriceView  | |  |  |
+ | |                       | +-----------+  +------------+ |  |  |
+ | |                       +-------------------------------+  |  |
+ | |                                                          |  |
+ | |    +--------------------------------------------------+  |  |
+ | |    | PurchaseInfoView                                 |  |  |
+ | |    +--------------------------------------------------+  |  |
+ | |                                                          |  |
+ | +----------------------------------------------------------+  |
+ |                                                               |
+ | }                                                             |
+ +---------------------------------------------------------------+
+ 
+ */
+
 import SwiftUI
 import StoreKit
 
 /// Displays a single row of product information for the main content List.
 struct ProductView: View {
     
-    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
+    @State var purchaseState: PurchaseState = .unknown
     
-    @State var purchased: Bool = true
     var productId: ProductId
     var displayName: String
     var price: String
@@ -35,24 +65,26 @@ struct ProductView: View {
                     .minimumScaleFactor(0.5)
                 
                 Spacer()
-                PurchaseButton(productId: productId, price: price)
+                
+                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
             
-            if purchased {
+            if purchaseState == .purchased {
                 PurchaseInfoView()
             }
         }
+        .padding()
         .onAppear {
             Task.init { await purchaseState(for: productId) }
         }
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init { await purchaseState(for: productId) }
         }
-        .padding()
     }
     
     func purchaseState(for productId: ProductId) async {
-        purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+        let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+        purchaseState = purchased ? .purchased : .unknown
     }
 }
 

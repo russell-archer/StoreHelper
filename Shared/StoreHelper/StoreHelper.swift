@@ -9,6 +9,9 @@ import StoreKit
 
 public typealias ProductId = String
 
+/// The state of a purchase.
+public enum PurchaseState { case notStarted, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 public class StoreHelper: ObservableObject {
@@ -18,18 +21,15 @@ public class StoreHelper: ObservableObject {
     /// Array of `Product` retrieved from the App Store and available for purchase.
     @Published private(set) var products: [Product]?
     
-    /// List of `ProductId` for products that have been purchased.
+    /// Array of `ProductId` for products that have been purchased. Each purchased non-consumable product will appear
+    /// exactly once. Consumable products can appear more than once.
     ///
-    /// If you wish to know how many times a consumable product has been purchased you should call StoreHelper.count(for:).
-    /// Call isPurchased(product:) or .isPurchased(productId:) to find out if any kind of product has been purchased.
+    /// This array is primarily used to trigger updates in the UI. It is not persisted but re-built as required
+    /// whenever a purchase successfully completes, or when a call is made to `isPurchased(product:)`.
+    ///
+    /// - Call `isPurchased(product:)` to see if any type of product has been purchased and validated against the receipt.
+    /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
     @Published private(set) var purchasedProducts = [ProductId]()
-    
-    /// The state of a purchase. See `purchase(_:)` and `purchaseState`.
-    public enum PurchaseState { case notStarted, inProgress, complete, pending, cancelled, failed, failedVerification, unknown }
-    
-    /// The current internal state of StoreHelper. If `purchaseState == inprogress` then an attempt to start
-    /// a new purchase will result in a `purchaseInProgressException` being thrown by `purchase(_:)`.
-    public private(set) var purchaseState: PurchaseState = .notStarted
     
     /// True if we have a list of `Product` returned to us by the App Store.
     public var hasProducts: Bool {
@@ -59,6 +59,10 @@ public class StoreHelper: ObservableObject {
     
     /// Handle for App Store transactions.
     private var transactionListener: Task<Void, Error>? = nil
+    
+    /// The current internal state of StoreHelper. If `purchaseState == inProgress` then an attempt to start
+    /// a new purchase will result in a `purchaseInProgressException` being thrown by `purchase(_:)`.
+    private var purchaseState: PurchaseState = .unknown
     
     // MARK: - Initialization
     
@@ -181,7 +185,7 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
     public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
-        
+  
         guard purchaseState != .inProgress else {
             StoreLog.exception(.purchaseInProgressException, productId: product.id)
             throw StoreException.purchaseInProgressException
@@ -230,15 +234,16 @@ public class StoreHelper: ObservableObject {
                 await validatedTransaction.finish()
                 
                 // Let the caller know the purchase succeeded and that the user should be given access to the product
-                purchaseState = .complete
+                purchaseState = .purchased
                 StoreLog.event(.purchaseSuccess, productId: product.id)
                 
                 if validatedTransaction.productType == .consumable {
-                    // We need to treat consumables differently because their transaction are NOT stored inthe receipt.
-                    if !KeychainHelper.purchase(product.id) { StoreLog.event(.consumableKeychainError) }
+                    // We need to treat consumables differently because their transactions are NOT stored in the receipt.
+                    if KeychainHelper.purchase(product.id) { await updatePurchasedIdentifiers(product.id, insert: true) }
+                    else { StoreLog.event(.consumableKeychainError) }
                 }
                 
-                return (transaction: validatedTransaction, purchaseState: .complete)
+                return (transaction: validatedTransaction, purchaseState: .purchased)
                 
             case .userCancelled:
                 purchaseState = .cancelled
@@ -294,7 +299,7 @@ public class StoreHelper: ObservableObject {
                 print("ownershipType        : \(transaction.ownershipType)")
                 print("purchasedQuantity    : \(transaction.purchasedQuantity)")
                 print("subscriptionGroupID  : \(transaction.subscriptionGroupID ?? "-")")
-
+                
                 // Product.SubscriptionInfo.Status  -- collection of statuses, becauses users can have multiple subs to the same product
                 // e.g. subscribed themselves and received auto sub through family sharing. We need to enumerate the collection
                 // to find the highest level of service they're entitled to.
@@ -309,12 +314,12 @@ public class StoreHelper: ObservableObject {
                         let statusCollection = try? await subscription.status {
                         
                         statusCollection.forEach { status in
-                        
-//                            There are three places to look for subscription data (Product.SubscriptionInfo):
-//                            * product.subscription
-//                            product.latestTransaction     // info on the most recent subscription transaction
-//                            status.renewalInfo            // VerificationResult<Product.SubscriptionInfo.RenewalInfo>. Validated by storekit. ALL info about a subscription e.g
-//                            status.state                  // Enum for sub state: Product.SubscriptionInfo.RenewalState e.g. == subscribed
+                            
+                            //                            There are three places to look for subscription data (Product.SubscriptionInfo):
+                            //                            * product.subscription
+                            //                            product.latestTransaction     // info on the most recent subscription transaction
+                            //                            status.renewalInfo            // VerificationResult<Product.SubscriptionInfo.RenewalInfo>. Validated by storekit. ALL info about a subscription e.g
+                            //                            status.state                  // Enum for sub state: Product.SubscriptionInfo.RenewalState e.g. == subscribed
                             
                             var stateString: String
                             switch status.state {
@@ -357,7 +362,7 @@ public class StoreHelper: ObservableObject {
                 }
                 
                 print("----------------------------------------------------------------")
-
+                
             }
         }
     }
@@ -429,6 +434,7 @@ public class StoreHelper: ObservableObject {
                 let count = count(for: productId)
                 let products = purchasedProducts.filter({ $0 == productId })
                 if count == products.count { return }
+                
             } else {
                 
                 if purchasedProducts.contains(productId) { return }
@@ -482,7 +488,7 @@ extension StoreHelper {
         
         guard products != nil else { return }
         
-        let consumableProductIds = products!.filter({ $0.type == .consumable}).map({ $0.id })
+        let consumableProductIds = products!.filter({ $0.type == .consumable }).map({ $0.id })
         guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return }
         cids.forEach { cid in
             if KeychainHelper.delete(cid) {

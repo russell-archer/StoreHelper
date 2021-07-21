@@ -11,14 +11,8 @@ import StoreKit
 /// Displays a product price and a button that enables purchasing.
 struct PriceView: View {
     
-    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
-    
-    @Binding var purchasing: Bool
-    @Binding var cancelled: Bool
-    @Binding var pending: Bool
-    @Binding var failed: Bool
-    @Binding var purchased: Bool
+    @Binding var purchaseState: PurchaseState
     
     var productId: ProductId
     var price: String
@@ -26,23 +20,12 @@ struct PriceView: View {
     
     var body: some View {
         
-        let priceViewModel = PriceViewModel(storeHelper: storeHelper,
-                                            purchasing: $purchasing,
-                                            cancelled: $cancelled,
-                                            pending: $pending,
-                                            failed: $failed,
-                                            purchased: $purchased)
+        let priceViewModel = PriceViewModel(storeHelper: storeHelper, purchaseState: $purchaseState)
         
         HStack {
             
-            if purchasing {
-                ProgressView()
-            }
-            
-            Spacer()
-            
             Button(action: {
-                purchasing = true
+                purchaseState = .inProgress
                 Task.init { await priceViewModel.purchase(product: product) }
                 
             }) {
@@ -62,8 +45,6 @@ struct PriceView_Previews: PreviewProvider {
 
     static var previews: some View {
         HStack {
-            ProgressView()
-            Spacer()
             Button(action: {}) {
                 Text("£1.99")
                     .font(.title2)

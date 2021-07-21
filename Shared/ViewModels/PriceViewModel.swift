@@ -12,12 +12,7 @@ import SwiftUI
 struct PriceViewModel {
     
     @ObservedObject var storeHelper: StoreHelper
-    
-    @Binding var purchasing: Bool
-    @Binding var cancelled: Bool
-    @Binding var pending: Bool
-    @Binding var failed: Bool
-    @Binding var purchased: Bool
+    @Binding var purchaseState: PurchaseState
     
     /// Purchase a product using StoreHelper and StoreKit2.
     /// - Parameter product: The `Product` to purchase
@@ -26,18 +21,8 @@ struct PriceViewModel {
         do {
             
             let purchaseResult = try await storeHelper.purchase(product)
-            if purchaseResult.transaction != nil { updatePurchaseState(newState: purchaseResult.purchaseState) }
-            else { updatePurchaseState(newState: purchaseResult.purchaseState) }  // The user cancelled, or it's pending approval
+            purchaseState = purchaseResult.purchaseState
             
-        } catch { updatePurchaseState(newState: .failed) }  // The purchase or validation failed
-    }
-    
-    private func updatePurchaseState(newState: StoreHelper.PurchaseState) {
-        
-        purchasing  = false
-        cancelled   = newState == .cancelled
-        pending     = newState == .pending
-        failed      = newState == .failed
-        purchased   = newState == .complete
+        } catch { purchaseState = .failed }  // The purchase or validation failed
     }
 }
