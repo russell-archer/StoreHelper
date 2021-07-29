@@ -6,6 +6,7 @@
 //
 
 import StoreKit
+import OrderedCollections
 
 public typealias ProductId = String
 
@@ -31,6 +32,10 @@ public class StoreHelper: ObservableObject {
     /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
     @Published private(set) var purchasedProducts = [ProductId]()
     
+    /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
+    /// product ids are defined in the property list file is maintained in the set.
+    public private(set) var productIds: OrderedSet<ProductId>?
+    
     /// True if we have a list of `Product` returned to us by the App Store.
     public var hasProducts: Bool {
         guard products != nil else { return false }
@@ -42,18 +47,21 @@ public class StoreHelper: ObservableObject {
         guard products != nil else { return nil }
         return products!.filter { product in product.type == .consumable }
     }
-    
+
     /// Computed property that returns all the non-consumable products in the `products` array.
     public var nonConsumableProducts: [Product]? {
         guard products != nil else { return nil }
         return products!.filter { product in product.type == .nonConsumable }
     }
-    
+
     /// Computed property that returns all the auto-renewing subscription products in the `products` array.
     public var subscriptionProducts: [Product]? {
         guard products != nil else { return nil }
         return products!.filter { product in product.type == .autoRenewable }
     }
+
+    /// Subscription-related helper methods.
+    public var subscriptionHelper = SubscriptionHelper()
     
     // MARK: - Private properties
     
@@ -78,18 +86,20 @@ public class StoreHelper: ObservableObject {
         transactionListener = handleTransactions()
         
         // Read our list of product ids
-        if let productIds = Configuration.readConfigFile() {
-            
-            // Get localized product info from the App Store
-            StoreLog.event(.requestProductsStarted)
-            
-            Task.init {
-                
-                products = await requestProductsFromAppStore(productIds: productIds)
-                
-                if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } else {
-                    StoreLog.event(.requestProductsSuccess)
-                }
+        productIds = Configuration.readConfigFile()
+        guard productIds != nil else { return }
+        
+        // Get localized product info from the App Store
+        StoreLog.event(.requestProductsStarted)
+
+        Task.init {
+
+            products = await requestProductsFromAppStore(productIds: productIds!)
+
+            // As currently coded the app will never know if new products are added to the App Store.
+            // We should probably add the ability to periodically re-fetch the product list.
+            if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } else {
+                StoreLog.event(.requestProductsSuccess)
             }
         }
     }
@@ -103,7 +113,7 @@ public class StoreHelper: ObservableObject {
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter productIds: The product ids that you want localized information for.
     /// - Returns: Returns an array of `Product`, or nil if no product information is returned by the App Store.
-    @MainActor public func requestProductsFromAppStore(productIds: Set<ProductId>) async -> [Product]? {
+    @MainActor public func requestProductsFromAppStore(productIds: OrderedSet<ProductId>) async -> [Product]? {
         
         return try? await Product.products(for: productIds)
     }
@@ -281,99 +291,160 @@ public class StoreHelper: ObservableObject {
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Information on a non-consumable product or auto-renewing subscription.
     /// If the product is a consumable or non-recurring subscription an empty string is returned.
-    @MainActor public func purchaseInfo(for productId: ProductId) async -> String {
+    @MainActor public func purchaseInfo(for productId: ProductId) async -> PurchaseInfo? {
         
-        guard let p = product(from: productId) else { return "" }
+        guard let p = product(from: productId) else { return nil }
         return await purchaseInfo(for: p)
     }
     
     /// Information on a non-consumable product or auto-renewing subscription.
     /// - Parameter product: The `Product`.
     /// - Returns: Information on a non-consumable product or auto-renewing subscription.
-    /// If the product is a consumable or non-recurring subscription an empty string is returned.
-    @MainActor public func purchaseInfo(for product: Product) async -> String {
-
-        // Product.SubscriptionInfo.Status  -- collection of statuses, becauses users can have multiple subs to the same product
-        // e.g. subscribed themselves and received auto sub through family sharing. We need to enumerate the collection
-        // to find the highest level of service they're entitled to.
-        //
-        // Note that Product.subscription.status is an array that contains status information for a subscription group, including
-        // renewal and transaction information.
+    /// If the product is a consumable or non-recurring subscription nil is returned.
+    @MainActor public func purchaseInfo(for product: Product) async -> PurchaseInfo? {
         
-        guard product.type != .consumable && product.type != .nonRenewable else { return "" }
-        guard let unverifiedTransaction = await product.latestTransaction else { return "" }
+        guard product.type != .consumable && product.type != .nonRenewable else { return nil }
         
+        var purchaseInfo = PurchaseInfo(product: product)
+        
+        guard let unverifiedTransaction = await product.latestTransaction else { return purchaseInfo }
         let transactionResult = checkVerificationResult(result: unverifiedTransaction)
-        guard transactionResult.verified else { return "Purchase info could not be verified with the App Store." }
+        guard transactionResult.verified else { return purchaseInfo }
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "d MMM y"
-        
-        var text = ""
-
-        let transaction = transactionResult.transaction
-        if transaction.productType == .nonConsumable {
-            
-            text = "Purchased on \(dateFormatter.string(from: transaction.purchaseDate))."
-            if transaction.revocationDate != nil {
-                text += " App Store revoked the purchase on \(dateFormatter.string(from: transaction.revocationDate!))."
-            }
-            
-            return text
+        if product.type == .nonConsumable {
+            purchaseInfo.verifiedTransaction = transactionResult.transaction
+            return purchaseInfo
         }
         
-        // The product is an auto-renewing subscription
-        text = "Subscription. "
-        guard let subscription = product.subscription else { return text }
-        guard let statusCollection = try? await subscription.status else { return text }
+        // The product is an auto-renewing subscription.
+        // `Product.subscription.status` is an array of `Product.SubscriptionInfo.Status`. This is becauses users can
+        // have multiple subscriptions to the same product. For example, a user may have subscribed themselves as well
+        // as receiving an automatic subscription through family sharing. We need to enumerate the status array to find
+        // the highest level of service they're entitled to.
+        //
+        // Note that Product.subscription.status is an array that contains status information for all subscription
+        // groups. This demo app only has one subscription group, so all products in the Product.subscription.status array
+        // are part of the same group. In an app with two or more subscription groups you need to distinguish between groups
+        // by using the product.subscription.subscriptionGroupID property. Alternatively, use the following naming convention
+        // for subscription product ids: "com.developer.subscription.subscription-group-name.product-name". This will allow
+        // you to distinguish products by group and subscription level. See SubscriptionHelper.
 
-        statusCollection.forEach { status in
+        guard let subscription     = product.subscription,
+              let subscriptions    = subscriptionProducts,
+              let statusCollection = try? await subscription.status,
+              let targetGroup      = SubscriptionHelper.groupName(from: product.id) else { return purchaseInfo }
+              
+        let subscriptionProductIds = OrderedSet<ProductId>(subscriptions.compactMap { $0.id })
+        guard let targetGroupProductIds = SubscriptionHelper.products(in: targetGroup, with: subscriptionProductIds) else { return purchaseInfo }
 
-            // There are three places to look for subscription data (Product.SubscriptionInfo):
-            // product.latestTransaction     // info on the most recent subscription transaction
-            // status.renewalInfo            // VerificationResult<Product.SubscriptionInfo.RenewalInfo>. Validated by storekit. ALL info about a subscription e.g
-            // status.state                  // Enum for sub state: Product.SubscriptionInfo.RenewalState e.g. == subscribed
+        // Find the highest value product that the user's subscribed to in the subscription group the product id belongs to
+        var highestValueIndex: Int = -1
+        var highestValueProduct: Product?
+        var highestValueStatus: Product.SubscriptionInfo.Status?
+        
+        for status in statusCollection {
             
-            if status.state == .subscribed { text += " You are currently subscribed." }
-            else { text += " This subscription has expired." }
+            guard status.state != .revoked, status.state != .expired else { continue }
             
-            var periodUnitText: String
-            switch subscription.subscriptionPeriod.unit {
-                    
-                case .day:   periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "days"   : "day"
-                case .week:  periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "weeks"  : "week"
-                case .month: periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "months" : "month"
-                case .year:  periodUnitText = subscription.subscriptionPeriod.value > 1 ? String(subscription.subscriptionPeriod.value) + "years"  : "year"
-                @unknown default: periodUnitText = "period unknown."
-            }
-            
-            text += " Renews every \(periodUnitText)."
             
             let result = checkVerificationResult(result: status.renewalInfo)
-            if result.verified {
-                text += " Auto-renew is"
-                text += result.transaction.willAutoRenew ? " on." : " off."
-                
-                if let renewDate = transaction.expirationDate {
-
-                    text += " Renewal date is \(dateFormatter.string(from: renewDate))."
-                }
-                
-                if let expires = transaction.expirationDate {
-                    let diffComponents = Calendar.current.dateComponents([.day], from: Date(), to: expires)
-                    if let daysLeft = diffComponents.day {
-                        text += " Subscription renews in \(daysLeft)"
-                        if daysLeft > 1 { text += " days." }
-                        else if daysLeft == 1 { text += " day." }
-                        else { text += " Subscription renews today!" }
-                    }
-                }
-            } else {
-                text += " Unable to verify auto-renewal information with App Store. "
+            guard result.verified else { continue }  // Subscription not verified by StoreKit so ignore it
+            
+            guard let candidateSubscription = subscriptions.first(where: { $0.id == result.transaction.currentProductID}) else { continue }
+            let currentGroup = SubscriptionHelper.groupName(from: result.transaction.currentProductID)
+            
+            // Is this transaction from the same subscription group as the product we're searching for?
+            guard currentGroup == targetGroup else { continue }
+            
+            // We've found a valid transaction for a product in the target subscription group.
+            // Is it's value the highest we've encountered so far?
+            let currentValueIndex = SubscriptionHelper.productValueIndex(in: targetGroup, for: result.transaction.currentProductID, with: targetGroupProductIds)
+            if currentValueIndex > highestValueIndex {
+                highestValueIndex = currentValueIndex
+                highestValueProduct = candidateSubscription
+                highestValueStatus = status
             }
         }
         
-        return text
+        guard let selectedProduct = highestValueProduct, let selectedStatus = highestValueStatus else { return purchaseInfo }
+
+        purchaseInfo.product = selectedProduct
+        purchaseInfo.subscriptionStatus = selectedStatus
+        purchaseInfo.subscriptionState = selectedStatus.state
+        purchaseInfo.subscriptionGroup = targetGroup
+        
+        let result = checkVerificationResult(result: selectedStatus.renewalInfo)
+        if result.verified { purchaseInfo.verifiedSubscriptionRenewalInfo = result.transaction }
+        
+        return purchaseInfo
+    }
+    
+    /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.
+    ///
+    /// - Parameter result: The transaction VerificationResult to check.
+    /// - Returns: A tuple containing the verified/unverified transaction and a boolean flag indicating success or failure.
+    public func checkVerificationResult<T>(result: VerificationResult<T>) -> (transaction: T, verified: Bool) {
+        
+        switch result {
+            case .unverified(let unverifiedTransaction):
+                return (transaction: unverifiedTransaction, verified: false)  // StoreKit failed to automatically validate the transaction
+                
+            case .verified(let verifiedTransaction):
+                return (transaction: verifiedTransaction, verified: true)  // StoreKit successfully automatically validated the transaction
+        }
+    }
+    
+    // MARK: - Internal methods
+    
+    /// Update our list of purchased product identifiers (see `purchasedProducts`).
+    ///
+    /// This method runs on the main thread because it will result in updates to the UI.
+    /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
+    @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
+        
+        if transaction.revocationDate == nil {
+            
+            // The transaction has NOT been revoked by the App Store so this product has been purchase.
+            // Add the ProductId to the list of `purchasedProducts` (it's a Set so it won't add if already there).
+            await updatePurchasedIdentifiers(transaction.productID, insert: true)
+            
+        } else {
+            
+            // The App Store revoked this transaction (e.g. a refund), meaning the user should not have access to it.
+            // Remove the product from the list of `purchasedProducts`.
+            await updatePurchasedIdentifiers(transaction.productID, insert: false)
+        }
+    }
+    
+    /// Update our list of purchased product identifiers (see `purchasedProducts`).
+    /// - Parameters:
+    ///   - productId: The `ProductId` to insert/remove.
+    ///   - insert: If true the `ProductId` is inserted, otherwise it's removed.
+    @MainActor internal func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) async {
+        
+        guard let product = product(from: productId) else { return }
+        
+        if insert {
+            
+            if product.type == .consumable {
+                
+                let count = KeychainHelper.count(for: productId)
+                let products = purchasedProducts.filter({ $0 == productId })
+                if count == products.count { return }
+                
+            } else {
+                
+                if purchasedProducts.contains(productId) { return }
+            }
+            
+            purchasedProducts.append(productId)
+            
+        } else {
+            
+            if let index = purchasedProducts.firstIndex(where: { $0 == productId}) {
+                purchasedProducts.remove(at: index)
+            }
+        }
     }
     
     // MARK: - Private methods
@@ -407,103 +478,6 @@ public class StoreHelper: ObservableObject {
             }
         }
     }
-    
-    /// Update our list of purchased product identifiers (see `purchasedProducts`).
-    ///
-    /// This method runs on the main thread because it will result in updates to the UI.
-    /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
-    @MainActor private func updatePurchasedIdentifiers(_ transaction: Transaction) async {
-        
-        if transaction.revocationDate == nil {
-            
-            // The transaction has NOT been revoked by the App Store so this product has been purchase.
-            // Add the ProductId to the list of `purchasedProducts` (it's a Set so it won't add if already there).
-            await updatePurchasedIdentifiers(transaction.productID, insert: true)
-            
-        } else {
-            
-            // The App Store revoked this transaction (e.g. a refund), meaning the user should not have access to it.
-            // Remove the product from the list of `purchasedProducts`.
-            await updatePurchasedIdentifiers(transaction.productID, insert: false)
-        }
-    }
-    
-    /// Update our list of purchased product identifiers (see `purchasedProducts`).
-    /// - Parameters:
-    ///   - productId: The `ProductId` to insert/remove.
-    ///   - insert: If true the `ProductId` is inserted, otherwise it's removed.
-    @MainActor private func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) async {
-        
-        guard let product = product(from: productId) else { return }
-        
-        if insert {
-            
-            if product.type == .consumable {
-                
-                let count = count(for: productId)
-                let products = purchasedProducts.filter({ $0 == productId })
-                if count == products.count { return }
-                
-            } else {
-                
-                if purchasedProducts.contains(productId) { return }
-            }
-            
-            purchasedProducts.append(productId)
-            
-        } else {
-            
-            if let index = purchasedProducts.firstIndex(where: { $0 == productId}) {
-                purchasedProducts.remove(at: index)
-            }
-        }
-    }
-    
-    /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.
-    ///
-    /// - Parameter result: The transaction VerificationResult to check.
-    /// - Returns: A tuple containing the verified/unverified transaction and a boolean flag indicating success or failure.
-    private func checkVerificationResult<T>(result: VerificationResult<T>) -> (transaction: T, verified: Bool) {
-        
-        switch result {
-            case .unverified(let unverifiedTransaction):
-                return (transaction: unverifiedTransaction, verified: false)  // StoreKit failed to automatically validate the transaction
-                
-            case .verified(let verifiedTransaction):
-                return (transaction: verifiedTransaction, verified: true)  // StoreKit successfully automatically validated the transaction
-        }
-    }
 }
 
-// MARK: - Keychain-related methods
-
-extension StoreHelper {
-    
-    /// Gives the count for purchases for a consumable product. Not applicable to nonconsumables and subscriptions.
-    /// - Parameter productId: The `ProductId` of a consumable product.
-    /// - Returns: The count for purchases for a consumable product (a consumable may be purchased multiple times).
-    public func count(for productId: ProductId) -> Int {
-        
-        if let product = product(from: productId) {
-            if product.type != .consumable { return 0 }
-            return KeychainHelper.count(for: productId)
-        }
-        
-        return 0
-    }
-    
-    /// Removes all `ProductId` entries in the keychain associated with consumable product purchases.
-    public func resetKeychainConsumables() {
-        
-        guard products != nil else { return }
-        
-        let consumableProductIds = products!.filter({ $0.type == .consumable }).map({ $0.id })
-        guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return }
-        cids.forEach { cid in
-            if KeychainHelper.delete(cid) {
-                Task.init { await updatePurchasedIdentifiers(cid.productId, insert: false) }
-            }
-        }
-    }
-}
 

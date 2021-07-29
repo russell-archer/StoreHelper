@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OrderedCollections
 
 /// Provides static methods for reading plist configuration files.
 public struct Configuration {
@@ -14,7 +15,7 @@ public struct Configuration {
     
     /// Read the contents of the product definition property list.
     /// - Returns: Returns a set of ProductId if the list was read, nil otherwise.
-    public static func readConfigFile() -> Set<ProductId>? {
+    public static func readConfigFile() -> OrderedSet<ProductId>? {
         
         guard let result = Configuration.readPropertyFile(filename: StoreConstants.ConfigFile) else {
             StoreLog.event(.configurationNotFound)
@@ -36,7 +37,7 @@ public struct Configuration {
         
         StoreLog.event(.configurationSuccess)
 
-        return Set<ProductId>(values.compactMap { $0 })
+        return OrderedSet<ProductId>(values.compactMap { $0 })
     }
     
     /// Read a plist property file and return a dictionary of values

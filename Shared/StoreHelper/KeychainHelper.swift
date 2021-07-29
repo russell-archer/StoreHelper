@@ -65,7 +65,7 @@ public struct KeychainHelper {
         return status == errSecSuccess
     }
     
-    /// Get the count value associated with a consumable `ProductId`.
+    /// Gives the count for purchases for a consumable product. Not applicable to nonconsumables and subscriptions.
     /// - Parameter productId: The consumable `ProductId`.
     /// - Returns: Returns the value of the count, or 0 if not found.
     public static func count(for productId: ProductId) -> Int {
@@ -167,6 +167,22 @@ public struct KeychainHelper {
         // Search for the item in the keychain
         let status = SecItemDelete(query)
         return status == errSecSuccess
+    }
+    
+    /// Removes all `ProductId` entries in the keychain associated with consumable product purchases.
+    /// The StoreHelper collection of purchased product ids should be updated for each product id returned.
+    /// For example, Task.init { await updatePurchasedIdentifiers(productId, insert: false) }.
+    /// - Parameter consumableProductIds: An array of consumable `ProductId`.
+    /// - Returns: Returns an array of `ProductId` that has been deleted from the keychain.
+    public func resetKeychainConsumables(for consumableProductIds: [ProductId]) -> [ProductId]? {
+        
+        guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return nil }
+        var deletedPids = [ProductId]()
+        cids.forEach { cid in
+            if KeychainHelper.delete(cid) { deletedPids.append(cid.productId) }
+        }
+        
+        return deletedPids.count > 0 ? deletedPids : nil
     }
 }
 

@@ -95,7 +95,7 @@
       "localizations" : [
 
       ],
-      "name" : "VIP Home Visits",
+      "name" : "VIP",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -118,7 +118,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.rarcher.subscription.gold",
+          "productID" : "com.rarcher.subscription.vip.gold",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Gold. Weekly Home Visits",
           "subscriptionGroupID" : "8126C4BB",
@@ -140,7 +140,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.rarcher.subscription.silver",
+          "productID" : "com.rarcher.subscription.vip.silver",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Silver. Twice Monthly Home Visits",
           "subscriptionGroupID" : "8126C4BB",
@@ -162,7 +162,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.rarcher.subscription.bronze",
+          "productID" : "com.rarcher.subscription.vip.bronze",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Bronze. Monthly Home Visits",
           "subscriptionGroupID" : "8126C4BB",

@@ -11,7 +11,7 @@ import StoreKit
 /// Displays purchase or subscription information.
 struct PurchaseInfoView: View {
     
-    @ObservedObject var storeHelper: StoreHelper
+    @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseInfoText = ""
     var productId: ProductId
     
@@ -35,7 +35,7 @@ struct PurchaseInfoView_Previews: PreviewProvider {
     static var previews: some View {
         
         @StateObject var storeHelper = StoreHelper()
-        return PurchaseInfoView(storeHelper: storeHelper, productId: "com.rarcher.nonconsumable.chocolates-small")
+        return PurchaseInfoView(productId: "com.rarcher.nonconsumable.chocolates-small")
             .environmentObject(storeHelper)
     }
 }

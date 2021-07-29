@@ -52,11 +52,11 @@ struct ConsumableView: View {
         .padding()
         .onAppear {
             Task.init { await purchaseState(for: productId) }
-            count = storeHelper.count(for: productId)
+            count = KeychainHelper.count(for: productId)
         }
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init { await purchaseState(for: productId) }
-            count = storeHelper.count(for: productId)
+            count = KeychainHelper.count(for: productId)
         }
     }
     

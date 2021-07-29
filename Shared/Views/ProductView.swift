@@ -5,37 +5,6 @@
 //  Created by Russell Archer on 21/06/2021.
 //
 
-/*
- 
- The arrangement of views is as follows:
- 
- +---------------------------------------------------------------+
- | ContentView                                                   |
- |                                                               |
- | List {                                                        |
- |                                                               |
- | +----------------------------------------------------------+  |
- | | ProductView                                              |  |
- | |                                                          |  |
- | |    Product   Product  +-------------------------------+  |  |
- | |    Image      Name    | PurchaseButton                |  |  |
- | |                       |                               |  |  |
- | |                       | +-----------+  +------------+ |  |  |
- | |                       | | BadgeView |  | PriceView  | |  |  |
- | |                       | +-----------+  +------------+ |  |  |
- | |                       +-------------------------------+  |  |
- | |                                                          |  |
- | |    +--------------------------------------------------+  |  |
- | |    | PurchaseInfoView                                 |  |  |
- | |    +--------------------------------------------------+  |  |
- | |                                                          |  |
- | +----------------------------------------------------------+  |
- |                                                               |
- | }                                                             |
- +---------------------------------------------------------------+
- 
- */
-
 import SwiftUI
 import StoreKit
 
@@ -70,7 +39,7 @@ struct ProductView: View {
             }
             
             if purchaseState == .purchased {
-                PurchaseInfoView(storeHelper: storeHelper, productId: productId)
+                PurchaseInfoView(productId: productId)
             }
         }
         .padding()
