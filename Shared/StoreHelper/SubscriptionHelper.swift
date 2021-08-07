@@ -12,7 +12,7 @@ import OrderedCollections
 /// Helper class for subscriptions.
 ///
 /// The methods in this class require that auto-renewing subscription product ids adopt the naming
-/// convention: "com.{author}.subscription.{subscription-name}.{product-name}".
+/// convention: "com.{author}.subscription.{subscription-group-name}.{product-name}".
 /// For example, "com.rarcher.subscription.vip.bronze".
 ///
 /// Also, service level relies on the ordering of product ids within a subscription group in the
