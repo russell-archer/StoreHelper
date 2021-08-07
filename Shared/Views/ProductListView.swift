@@ -27,7 +27,7 @@ struct ProductListView: View {
                 }
                 
                 if let subscriptions = storeHelper.subscriptionProducts {
-                    ProductListViewRow(products: subscriptions, headerText: "Subscriptions")
+                    SubscriptionListViewRow(products: subscriptions, headerText: "Subscriptions")
                 }
             }
             .listStyle(.insetGrouped)

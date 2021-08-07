@@ -13,10 +13,7 @@ struct HamburgerMenu: View {
     
     var body: some View {
         
-        Button(action: {
-            withAnimation { showOptionsMenu.toggle() }
-            
-        }) {
+        Button(action: { withAnimation { showOptionsMenu.toggle() }}) {
             Image(systemName: "line.horizontal.3")
                 .imageScale(.large)
                 .foregroundColor(.primary)

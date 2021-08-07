@@ -27,7 +27,7 @@ public struct KeychainHelper {
     /// If the keychain already contains the `ProductId` its count value is incremented.
     /// - Parameter productId: The consumable `ProductId` for which the count value will be incremented.
     /// - Returns: Returns true if the purchase was added or updated, false otherwise.
-    public static func purchase(_ productId: ProductId) -> Bool {
+    @MainActor public static func purchase(_ productId: ProductId) -> Bool {
         
         if has(productId) { return update(productId, purchase: true) }
         
@@ -45,14 +45,14 @@ public struct KeychainHelper {
     /// already zero no action is taken.
     /// - Parameter productId: The consumable `ProductId` for which the count value will be decremented.
     /// - Returns: Returns true if the product was expired (removed), false otherwise.
-    public static func expire(_ productId: ProductId) -> Bool {
+    @MainActor public static func expire(_ productId: ProductId) -> Bool {
         update(productId, purchase: false)
     }
     
     /// Search the keychain for a consumable `ProductId`.
     /// - Parameter productId: The consumable `ProductId` to search for.
     /// - Returns: Returns true if the consumable `ProductId` was found in the keychain, false otherwise.
-    public static func has(_ productId: ProductId) -> Bool {
+    @MainActor public static func has(_ productId: ProductId) -> Bool {
         
         // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
         let query = [kSecClass as String : kSecClassGenericPassword,
@@ -68,7 +68,7 @@ public struct KeychainHelper {
     /// Gives the count for purchases for a consumable product. Not applicable to nonconsumables and subscriptions.
     /// - Parameter productId: The consumable `ProductId`.
     /// - Returns: Returns the value of the count, or 0 if not found.
-    public static func count(for productId: ProductId) -> Int {
+    @MainActor public static func count(for productId: ProductId) -> Int {
         
         // Create a query of what we want to search for.
         let query = [kSecClass as String : kSecClassGenericPassword,
@@ -96,7 +96,7 @@ public struct KeychainHelper {
     ///   - productId: The consumable `ProductId`.
     ///   - purchase: true if the consumable product has been purchased, false if it has been expired.
     /// - Returns: Returns true if the update was successful, false otherwise.
-    public static func update(_ productId: ProductId, purchase: Bool) -> Bool {
+    @MainActor public static func update(_ productId: ProductId, purchase: Bool) -> Bool {
         
         if !has(productId) { return KeychainHelper.purchase(productId) }
         
@@ -123,7 +123,7 @@ public struct KeychainHelper {
     /// Search for all the consumable product ids for the current user that are stored in the keychain.
     /// - Parameter productIds: A set of `ProductId` that is used to match entries in the keychain to available products.
     /// - Returns: Returns a set of ConsumableProductId for all the product ids stored in the keychain.
-    public static func all(productIds: Set<ProductId>) -> Set<ConsumableProductId>? {
+    @MainActor public static func all(productIds: Set<ProductId>) -> Set<ConsumableProductId>? {
         
         // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
         let query = [kSecClass as String : kSecClassGenericPassword,
@@ -156,7 +156,7 @@ public struct KeychainHelper {
     /// Delete the `ProductId` from the keychain.
     /// - Parameter productId: `ProductId` to remove.
     /// - Returns: Returns true if the `ProductId` was deleted, false otherwise.
-    public static func delete(_ consumableProduct: ConsumableProductId) -> Bool {
+    @MainActor public static func delete(_ consumableProduct: ConsumableProductId) -> Bool {
         
         // Create a query of what we want to search for
         let query = [kSecClass as String : kSecClassGenericPassword,
@@ -174,7 +174,7 @@ public struct KeychainHelper {
     /// For example, Task.init { await updatePurchasedIdentifiers(productId, insert: false) }.
     /// - Parameter consumableProductIds: An array of consumable `ProductId`.
     /// - Returns: Returns an array of `ProductId` that has been deleted from the keychain.
-    public func resetKeychainConsumables(for consumableProductIds: [ProductId]) -> [ProductId]? {
+    @MainActor public func resetKeychainConsumables(for consumableProductIds: [ProductId]) -> [ProductId]? {
         
         guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return nil }
         var deletedPids = [ProductId]()

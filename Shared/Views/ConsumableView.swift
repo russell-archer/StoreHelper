@@ -17,37 +17,44 @@ struct ConsumableView: View {
     
     var productId: ProductId
     var displayName: String
+    var description: String
     var price: String
     
     var body: some View {
-        HStack {
-            if count == 0 {
+        VStack {
+            HStack {
+                if count == 0 {
+                    
+                    Image(productId)
+                        .resizable()
+                        .frame(width: 75, height: 80)
+                        .aspectRatio(contentMode: .fit)
+                        .cornerRadius(25)
+                    
+                } else {
+                    
+                    Image(productId)
+                        .resizable()
+                        .frame(width: 75, height: 80)
+                        .aspectRatio(contentMode: .fit)
+                        .cornerRadius(25)
+                        .overlay(ConsumableBadgeView(count: $count))
+                }
                 
-                Image(productId)
-                    .resizable()
-                    .frame(width: 75, height: 80)
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(25)
+                Text(displayName)
+                    .font(.headline)
+                    .padding()
+                    .lineLimit(3)
                 
-            } else {
+                Spacer()
                 
-                Image(productId)
-                    .resizable()
-                    .frame(width: 75, height: 80)
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(25)
-                    .overlay(ConsumableBadgeView(count: $count))
+                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
             
-            Text(displayName)
-                .font(.title2)
-                .padding()
+            Text(description)
+                .font(.subheadline)
+                .foregroundColor(.gray)
                 .lineLimit(2)
-                .minimumScaleFactor(0.5)
-            
-            Spacer()
-            
-            PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
         }
         .padding()
         .onAppear {
@@ -74,6 +81,7 @@ struct ConsumableView_Previews: PreviewProvider {
         
         return ConsumableView(productId: "com.rarcher.consumable.plant-installation",
                               displayName: "Plant Installation",
+                              description: "Expert plant installation",
                               price: "£0.99")
             .environmentObject(storeHelper)
     }

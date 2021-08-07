@@ -46,7 +46,7 @@ struct PriceView_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
             Button(action: {}) {
-                Text("£1.99")
+                Text("£1.98")
                     .font(.title2)
                     .foregroundColor(.white)
                     .padding()

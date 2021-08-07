@@ -13,7 +13,7 @@ public typealias ProductId = String
 /// The state of a purchase.
 public enum PurchaseState { case notStarted, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 public class StoreHelper: ObservableObject {
     
@@ -36,32 +36,23 @@ public class StoreHelper: ObservableObject {
     /// product ids are defined in the property list file is maintained in the set.
     public private(set) var productIds: OrderedSet<ProductId>?
     
+    /// Subscription-related helper methods.
+    public var subscriptionHelper: SubscriptionHelper!
+    
+    // MARK: - Public helper properties
+    
+    public var consumableProducts:      [Product]?   { products?.filter { $0.type == .consumable }}
+    public var nonConsumableProducts:   [Product]?   { products?.filter { $0.type == .nonConsumable }}
+    public var subscriptionProducts:    [Product]?   { products?.filter { $0.type == .autoRenewable }}
+    public var consumableProductIds:    [ProductId]? { products?.filter { $0.type == .consumable }.map { $0.id }}
+    public var nonConsumableProductIds: [ProductId]? { products?.filter { $0.type == .nonConsumable }.map { $0.id }}
+    public var subscriptionProductIds:  [ProductId]? { products?.filter { $0.type == .autoRenewable }.map { $0.id }}
+    
     /// True if we have a list of `Product` returned to us by the App Store.
     public var hasProducts: Bool {
         guard products != nil else { return false }
         return products!.count > 0 ? true : false
     }
-    
-    /// Computed property that returns all the consumable products in the `products` array.
-    public var consumableProducts: [Product]? {
-        guard products != nil else { return nil }
-        return products!.filter { product in product.type == .consumable }
-    }
-
-    /// Computed property that returns all the non-consumable products in the `products` array.
-    public var nonConsumableProducts: [Product]? {
-        guard products != nil else { return nil }
-        return products!.filter { product in product.type == .nonConsumable }
-    }
-
-    /// Computed property that returns all the auto-renewing subscription products in the `products` array.
-    public var subscriptionProducts: [Product]? {
-        guard products != nil else { return nil }
-        return products!.filter { product in product.type == .autoRenewable }
-    }
-
-    /// Subscription-related helper methods.
-    public var subscriptionHelper = SubscriptionHelper()
     
     // MARK: - Private properties
     
@@ -71,7 +62,7 @@ public class StoreHelper: ObservableObject {
     /// The current internal state of StoreHelper. If `purchaseState == inProgress` then an attempt to start
     /// a new purchase will result in a `purchaseInProgressException` being thrown by `purchase(_:)`.
     private var purchaseState: PurchaseState = .unknown
-    
+
     // MARK: - Initialization
     
     /// StoreHelper enables support for working with in-app purchases and StoreKit2 using the async/await pattern.
@@ -80,8 +71,11 @@ public class StoreHelper: ObservableObject {
     /// - Read the Products.plist configuration file to get a list of `ProductId` that defines the set of products we'll request from the App Store.
     /// - Start listening for App Store transactions.
     /// - Request localized product info from the App Store.
-    init() {
+    @MainActor init() {
         
+        // Initialize our subscription helper
+        subscriptionHelper = SubscriptionHelper(storeHelper: self)
+                
         // Listen for App Store transactions
         transactionListener = handleTransactions()
         
@@ -98,9 +92,12 @@ public class StoreHelper: ObservableObject {
 
             // As currently coded the app will never know if new products are added to the App Store.
             // We should probably add the ability to periodically re-fetch the product list.
-            if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } else {
-                StoreLog.event(.requestProductsSuccess)
+            guard products != nil else {
+                StoreLog.event(.requestProductsFailure)
+                return
             }
+            
+            StoreLog.event(.requestProductsSuccess)
         }
     }
     
@@ -123,7 +120,7 @@ public class StoreHelper: ObservableObject {
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
-    public func isPurchased(productId: ProductId) async throws -> Bool {
+    @MainActor public func isPurchased(productId: ProductId) async throws -> Bool {
         
         guard let product = product(from: productId) else { return false }
         
@@ -149,8 +146,6 @@ public class StoreHelper: ObservableObject {
         
         // See if the App Store has revoked the users access to the product (e.g. because of a refund).
         // If this transaction represents a subscription, see if the user upgraded to a higher-level subscription.
-        // To determine the service that the user is entitled to, we would need to check for another transaction
-        // that has a subscription with a higher level of service.
         return result.transaction.revocationDate == nil && !result.transaction.isUpgraded
     }
     
@@ -159,7 +154,7 @@ public class StoreHelper: ObservableObject {
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
-    public func isPurchased(product: Product) async throws -> Bool {
+    @MainActor public func isPurchased(product: Product) async throws -> Bool {
         
         return try await isPurchased(productId: product.id)
     }
@@ -170,7 +165,7 @@ public class StoreHelper: ObservableObject {
     /// in the receipt.
     /// - Returns: A verified `Set<ProductId>` for all products the user is entitled to have access to. The set will be empty if the
     /// user has not purchased anything previously.
-    public func currentEntitlements() async -> Set<ProductId> {
+    @MainActor public func currentEntitlements() async -> Set<ProductId> {
         
         var entitledProductIds = Set<ProductId>()
         
@@ -194,7 +189,7 @@ public class StoreHelper: ObservableObject {
     /// - Parameter product: The `Product` to purchase.
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
-    public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
+    @MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
   
         guard purchaseState != .inProgress else {
             StoreLog.exception(.purchaseInProgressException, productId: product.id)
@@ -287,103 +282,123 @@ public class StoreHelper: ObservableObject {
         return matchingProduct.first
     }
     
-    /// Information on a non-consumable product or auto-renewing subscription.
+    /// Information on a non-consumable product.
     /// - Parameter productId: The `ProductId` of the product.
-    /// - Returns: Information on a non-consumable product or auto-renewing subscription.
-    /// If the product is a consumable or non-recurring subscription an empty string is returned.
+    /// - Returns: Information on a non-consumable product.
+    /// If the product is not non-consumable nil is returned.
     @MainActor public func purchaseInfo(for productId: ProductId) async -> PurchaseInfo? {
         
         guard let p = product(from: productId) else { return nil }
         return await purchaseInfo(for: p)
     }
     
-    /// Information on a non-consumable product or auto-renewing subscription.
-    /// - Parameter product: The `Product`.
-    /// - Returns: Information on a non-consumable product or auto-renewing subscription.
-    /// If the product is a consumable or non-recurring subscription nil is returned.
+    /// Transaction information for a non-consumable product.
+    /// - Parameter product: The `Product` you want information on.
+    /// - Returns: Transaction information on a non-consumable product.
+    /// If the product is not non-consumable nil is returned.
     @MainActor public func purchaseInfo(for product: Product) async -> PurchaseInfo? {
         
-        guard product.type != .consumable && product.type != .nonRenewable else { return nil }
+        guard product.type == .nonConsumable else { return nil }
         
         var purchaseInfo = PurchaseInfo(product: product)
+        guard let unverifiedTransaction = await product.latestTransaction else { return nil }
         
-        guard let unverifiedTransaction = await product.latestTransaction else { return purchaseInfo }
         let transactionResult = checkVerificationResult(result: unverifiedTransaction)
-        guard transactionResult.verified else { return purchaseInfo }
+        guard transactionResult.verified else { return nil }
         
-        if product.type == .nonConsumable {
-            purchaseInfo.verifiedTransaction = transactionResult.transaction
-            return purchaseInfo
-        }
+        purchaseInfo.latestVerifiedTransaction = transactionResult.transaction
+        return purchaseInfo
+    }
+    
+    /// Information on the highest service level auto-renewing subscription the user is subscribed to
+    /// in the `subscriptionGroup`.
+    /// - Parameter subscriptionGroup: The name of the subscription group
+    /// - Returns: Information on the highest service level auto-renewing subscription the user is
+    /// subscribed to in the `subscriptionGroup`.
+    ///
+    /// When getting information on the highest service level auto-renewing subscription the user is
+    /// subscribed to we enumerate the `Product.subscription.status` array that is a property of each
+    /// `Product` in the group. Each Product in a subscription group provides access to the same
+    /// `Product.SubscriptionInfo.Status` array via its `product.subscription.status` property.
+    ///
+    /// Enumeration of the `SubscriptionInfo.Status` array is necessary because a user may have multiple
+    /// active subscriptions to products in the same subscription group. For example, a user may have
+    /// subscribed themselves to the "Gold" product, as well as receiving an automatic subscription
+    /// to the "Silver" product through family sharing. In this case, we'd need to return information
+    /// on the "Gold" product.
+    ///
+    /// The `Product.subscription.status` is an array of type `[Product.SubscriptionInfo.Status]` that
+    /// contains status information for ALL subscription groups. This demo app only has one subscription
+    /// group, so all products in the `Product.subscription.status` array are part of the same group.
+    /// In an app with two or more subscription groups you need to distinguish between groups by using
+    /// the `product.subscription.subscriptionGroupID` property. Alternatively, use subscriptionHelper.groupName(from:)
+    /// to find the subscription group associated with a product. This will allow you to distinguish
+    /// products by group and subscription service level.
+    @MainActor public func subscriptionInfo(for subscriptionGroup: String) async -> SubscriptionInfo? {
         
-        // The product is an auto-renewing subscription.
-        // `Product.subscription.status` is an array of `Product.SubscriptionInfo.Status`. This is becauses users can
-        // have multiple subscriptions to the same product. For example, a user may have subscribed themselves as well
-        // as receiving an automatic subscription through family sharing. We need to enumerate the status array to find
-        // the highest level of service they're entitled to.
-        //
-        // Note that Product.subscription.status is an array that contains status information for all subscription
-        // groups. This demo app only has one subscription group, so all products in the Product.subscription.status array
-        // are part of the same group. In an app with two or more subscription groups you need to distinguish between groups
-        // by using the product.subscription.subscriptionGroupID property. Alternatively, use the following naming convention
-        // for subscription product ids: "com.developer.subscription.subscription-group-name.product-name". This will allow
-        // you to distinguish products by group and subscription level. See SubscriptionHelper.
-
-        guard let subscription     = product.subscription,
-              let subscriptions    = subscriptionProducts,
-              let statusCollection = try? await subscription.status,
-              let targetGroup      = SubscriptionHelper.groupName(from: product.id) else { return purchaseInfo }
-              
-        let subscriptionProductIds = OrderedSet<ProductId>(subscriptions.compactMap { $0.id })
-        guard let targetGroupProductIds = SubscriptionHelper.products(in: targetGroup, with: subscriptionProductIds) else { return purchaseInfo }
-
-        // Find the highest value product that the user's subscribed to in the subscription group the product id belongs to
-        var highestValueIndex: Int = -1
+        // Get the product ids for all the products in the subscription group.
+        // Take the first id and convert it to a Product so we can access the group-common subscription.status array.
+        guard let groupProductIds = subscriptionHelper.subscriptions(in: subscriptionGroup),
+              let groupProductId = groupProductIds.first,
+              let product = product(from: groupProductId),
+              let subscription = product.subscription,
+              let statusCollection = try? await subscription.status else { return nil }
+        
+        var subscriptionInfo = SubscriptionInfo()
+        var highestServiceLevel: Int = -1
         var highestValueProduct: Product?
+        var highestValueTransaction: Transaction?
         var highestValueStatus: Product.SubscriptionInfo.Status?
-        
+        var highestRenewalInfo: Product.SubscriptionInfo.RenewalInfo?
+
         for status in statusCollection {
             
-            guard status.state != .revoked, status.state != .expired else { continue }
+            // Check the transaction verification
+            let statusTransactionResult = checkVerificationResult(result: status.transaction)
+            guard statusTransactionResult.verified else { continue }
             
+            // If the user's not subscribed to this product then keep looking
+            guard status.state == .subscribed else { continue }
             
-            let result = checkVerificationResult(result: status.renewalInfo)
-            guard result.verified else { continue }  // Subscription not verified by StoreKit so ignore it
+            // Check the renewal info verification
+            let renewalInfoResult = checkVerificationResult(result: status.renewalInfo)
+            guard renewalInfoResult.verified else { continue }  // Subscription not verified by StoreKit so ignore it
             
-            guard let candidateSubscription = subscriptions.first(where: { $0.id == result.transaction.currentProductID}) else { continue }
-            let currentGroup = SubscriptionHelper.groupName(from: result.transaction.currentProductID)
+            // Make sure this product is from the same subscription group as the product we're searching for
+            let currentGroup = subscriptionHelper.groupName(from: renewalInfoResult.transaction.currentProductID)
+            guard currentGroup == subscriptionGroup else { continue }
             
-            // Is this transaction from the same subscription group as the product we're searching for?
-            guard currentGroup == targetGroup else { continue }
+            // Get the Product for this subscription
+            guard let candidateSubscription = self.product(from: renewalInfoResult.transaction.currentProductID) else { continue }
             
             // We've found a valid transaction for a product in the target subscription group.
-            // Is it's value the highest we've encountered so far?
-            let currentValueIndex = SubscriptionHelper.productValueIndex(in: targetGroup, for: result.transaction.currentProductID, with: targetGroupProductIds)
-            if currentValueIndex > highestValueIndex {
-                highestValueIndex = currentValueIndex
+            // Is it's service level the highest we've encountered so far?
+            let currentServiceLevel = subscriptionHelper.subscriptionServiceLevel(in: subscriptionGroup, for: renewalInfoResult.transaction.currentProductID)
+            if currentServiceLevel > highestServiceLevel {
+                highestServiceLevel = currentServiceLevel
                 highestValueProduct = candidateSubscription
+                highestValueTransaction = statusTransactionResult.transaction
                 highestValueStatus = status
+                highestRenewalInfo = renewalInfoResult.transaction
             }
         }
         
-        guard let selectedProduct = highestValueProduct, let selectedStatus = highestValueStatus else { return purchaseInfo }
-
-        purchaseInfo.product = selectedProduct
-        purchaseInfo.subscriptionStatus = selectedStatus
-        purchaseInfo.subscriptionState = selectedStatus.state
-        purchaseInfo.subscriptionGroup = targetGroup
+        guard let selectedProduct = highestValueProduct, let selectedStatus = highestValueStatus else { return nil }
         
-        let result = checkVerificationResult(result: selectedStatus.renewalInfo)
-        if result.verified { purchaseInfo.verifiedSubscriptionRenewalInfo = result.transaction }
+        subscriptionInfo.product = selectedProduct
+        subscriptionInfo.subscriptionGroup = subscriptionGroup
+        subscriptionInfo.latestVerifiedTransaction = highestValueTransaction
+        subscriptionInfo.verifiedSubscriptionRenewalInfo = highestRenewalInfo
+        subscriptionInfo.subscriptionStatus = selectedStatus
         
-        return purchaseInfo
+        return subscriptionInfo
     }
     
     /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.
     ///
     /// - Parameter result: The transaction VerificationResult to check.
     /// - Returns: A tuple containing the verified/unverified transaction and a boolean flag indicating success or failure.
-    public func checkVerificationResult<T>(result: VerificationResult<T>) -> (transaction: T, verified: Bool) {
+    @MainActor public func checkVerificationResult<T>(result: VerificationResult<T>) -> (transaction: T, verified: Bool) {
         
         switch result {
             case .unverified(let unverifiedTransaction):
@@ -452,14 +467,14 @@ public class StoreHelper: ObservableObject {
     /// This is an infinite async sequence (loop). It will continue waiting for transactions until it is explicitly
     /// canceled by calling the Task.cancel() method. See `transactionListener`.
     /// - Returns: Returns a task for the transaction handling loop task.
-    private func handleTransactions() -> Task<Void, Error> {
+    @MainActor private func handleTransactions() -> Task<Void, Error> {
         
         return Task.detached {
             
             for await verificationResult in Transaction.updates {
                 
                 // See if StoreKit validated the transaction
-                let checkResult = self.checkVerificationResult(result: verificationResult)
+                let checkResult = await self.checkVerificationResult(result: verificationResult)
                 StoreLog.transaction(.transactionReceived, productId: checkResult.transaction.productID)
                 
                 if checkResult.verified {

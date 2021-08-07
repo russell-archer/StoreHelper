@@ -16,10 +16,11 @@ struct ProductView: View {
     
     var productId: ProductId
     var displayName: String
+    var description: String
     var price: String
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             HStack {
                 Image(productId)
                     .resizable()
@@ -28,15 +29,18 @@ struct ProductView: View {
                     .cornerRadius(25)
                 
                 Text(displayName)
-                    .font(.title2)
+                    .font(.headline)
                     .padding()
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.5)
                 
                 Spacer()
                 
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
+            
+            Text(description)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .lineLimit(2)
             
             if purchaseState == .purchased {
                 PurchaseInfoView(productId: productId)
@@ -61,10 +65,44 @@ struct ProductView_Previews: PreviewProvider {
     
     static var previews: some View {
         
-        @StateObject var storeHelper = StoreHelper()
-        
-        return ProductView(productId: "com.rarcher.nonconsumable.chocolates-small",
-                           displayName: "Small Chocolates",
-                           price: "£0.99").environmentObject(storeHelper)
+        VStack {
+            HStack {
+                Image("com.rarcher.nonconsumable.chocolates-small")
+                    .resizable()
+                    .frame(width: 75, height: 80)
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(25)
+                
+                Text("Small Chocolates")
+                    .font(.title2)
+                    .padding()
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                HStack {
+                    Text("£1.99")
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(height: 40)
+                        .background(Color.blue)
+                        .cornerRadius(25)
+                }
+            }
+            
+            Text("Weekly home visits by an expert")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .lineLimit(2)
+            
+            HStack(alignment: .center) {
+                Text("Purchased on 10-12-2021")
+                    .font(.footnote)
+                    .foregroundColor(.blue)
+                    .padding(1)
+            }
+        }
+        .padding()
     }
 }

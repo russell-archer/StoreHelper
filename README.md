@@ -6,25 +6,26 @@ See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-
 # Description
 ![](./readme-assets/StoreHelperDemo0.png)
 
-Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in Xcode 13, Swift 5.5, iOS 15, macOS 12, tvOS 15 and watchOS 8.
+Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in Xcode 13, Swift 5.5, iOS 15 and macOS 12.
 
-> This app requires `StoreKit2`, Swift 5.5, Xcode 13 and iOS 15.
-> See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original `StoreKit1` in iOS 14 and lower.
+> This app requires `StoreKit2`, Swift 5.5, Xcode 13 and iOS 15. 
+> 
+> See [[In-App Purchases with Xcode 12 and iOS 14]] for details of working with the original `StoreKit1` in iOS 14 and lower.
 
-# Changes for Xcode 13 Beta 3
- 
- - The use of `Task.Handle` has been deprecated
-	 - The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
-	 - The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
- - The `detach` keyword for creating detached tasks has been deprecated
-	 - The use of `detach` in `StoreHelper.handleTransactions()`  has been replaced with `Task.detached`
- - The use of `async {}` blocks in a synchronous context has been deprecated
-	 - All `async {}` blocks have been replaced with `Task.init {}`
-
-# Changes for Xcode 13 Beta 2
-
-- `Transaction.listener` is now `Transaction.updates`
-- `Product.request(with:)` is now `Product.products(for:)`
+# Xcode 13 Beta Changes
+- Beta 4
+	- None required
+- Beta 3
+	- The use of `Task.Handle` has been deprecated
+	- The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
+	- The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
+	- The `detach` keyword for creating detached tasks has been deprecated
+	- The use of `detach` in `StoreHelper.handleTransactions()`  has been replaced with `Task.detached`
+	- The use of `async {}` blocks in a synchronous context has been deprecated
+	- All `async {}` blocks have been replaced with `Task.init {}`
+- Beta 2
+	- `Transaction.listener` is now `Transaction.updates`
+	- `Product.request(with:)` is now `Product.products(for:)`
 
 # Source Code
 See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) for source code. 
@@ -78,7 +79,7 @@ See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) f
 
 This SwiftUI app will demonstrate how to use Apple's new `StoreKit2` framework to provide in-app purchases to your users. 
 
-The basic premise of the demo is that we're creating an app for an on-line florist that sells a range of flowers, chocolates and other related services like home visits to water and care for house plants.
+The basic premise for the demo is that we're creating an app for an on-line florist that sells a range of flowers, chocolates and other related services like home visits to water and care for house plants.
 
 Specifically, in building the app we'll cover:
 
@@ -93,8 +94,8 @@ Specifically, in building the app we'll cover:
 - How to **purchase** a product and **validate the transaction**
 - Handling **pending ("ask to buy") transactions** where parental permission must be obtained before a purchase is completed
 - Handling **canceled** and **failed transactions**
-- Automatically handling customer **refunds**
-- Exploring detailed **transaction information and history**
+- Handling customer **refunds**
+- Exploring detailed **transaction information and history** for non-consumables and subscriptions
 - Testing purchases locally using **StoreKit configuration** files
 
 # What's changed from the original StoreKit?
@@ -114,11 +115,11 @@ See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-arche
 - Better still, transactions are now **automatically** validated by `StoreKit2`!!
 
 ## Async/Await support
-`StoreKit1` used a closure-based method of working with async APIs and notifications:
+`StoreKit1` uses a closure-based method of working with async APIs and notifications:
 
-- This led to code that was difficult to read, with program flow being somewhat disjointed
+- This leads to code that is difficult to read, with program flow being somewhat disjointed
 
-`StoreKit2` fully embraces the `Async`/`Await` pattern introduced in Swift 5.5, Xcode 13 and iOS 15:
+`StoreKit2` fully embraces the new `Async`/`Await` pattern introduced in Swift 5.5, Xcode 13 and iOS 15:
 
 - This makes working with async APIs much easier and results in a more "natural" flow to your code
 
@@ -135,8 +136,7 @@ The good news is that although there are two versions of the StoreKit, both fram
 - Transactions made with one version of StoreKit are immediately available in the other version
 
 # StoreHelperDemo App
-The best way to get familiar with `StoreKit2` is to create a simple, but full-featured demo app. 
-I'll introduce features in an as-required manner as we build the app from it's simplest form to a fully-functional demo.
+The best way to get familiar with `StoreKit2` is to create a simple, but full-featured (from an in-app purchase perspective) demo app. I'll introduce features in an as-required manner as we build the app from it's simplest form to a fully-functional demo.
 
 # Get Started
 `StoreHelperDemo` was created using Xcode 13 (beta) and the multi-platform app template.
@@ -159,11 +159,13 @@ Before we do anything else we need to define the products we'll be selling. Ulti
 
 > The sandbox test environment requires you to create multiple **sandbox test accounts** in App Store Connect. Each sandbox account has to have a unique email address and be validated as an AppleID. In addition, tests must be on a real device, not the simulator.
 > 
-> On the test device you need to sign out of your normal AppleID and sign-in using the sandbox account. This really means you need a spare device to do testing on. To make things more painful, each time you make a purchase using a sandbox account that account becomes “used up” and can’t be used to re-purchase the same product. There’s no way to clear purchases, so you need to use a fresh sandbox account for each set of product purchases.
+> On the test device you need to sign out of your normal AppleID and sign-in using the sandbox account. This really means you need a spare device to do testing on. 
+> 
+> Prior to WWDC21, using the sandbox test environment was pretty painful. Each time you made a purchase using a sandbox account that account became “used up” and couldn't be used to re-purchase the same product. There was no way to clear purchases and you had to use a fresh sandbox account for each set of product purchases! Happily, post-WWDC21 you can now reset a user's purchases, change the account region and adjust renewal rates!
 
 Fortunately, there's now a much better way.
 
-Introduced in Xcode 12 a new **local** StoreKit test environment allows you to do early testing of IAPs in the simulator without having to set anything up in App Store Connect. You define your products locally in a **StoreKit Configuration** file. Furthermore, you can view and delete transactions, issue refunds, and a whole lot more. There’s also a new `StoreKitTest` framework that enables you to do automated testing of IAPs which we'll use later on. We'll use this approach to test IAPs in our app.
+Introduced in Xcode 12 a new **local** StoreKit test environment allows you to do early testing of IAPs in the simulator without having to set anything up in App Store Connect. You define your products locally in a **StoreKit Configuration** file. Furthermore, you can view and delete transactions, issue refunds, and a whole lot more. There’s also a new `StoreKitTest` framework that enables you to do automated testing of IAPs. We'll use this approach to test IAPs in our app.
 
 # Create the StoreKit configuration file
 Select **File > New > File** and choose the **StoreKit Configuration File** template:
@@ -180,43 +182,13 @@ You can now define your products in the StoreKit configuration file. For now we'
 
 ![](./readme-assets/StoreHelperDemo8.png)
 
-```xml
-Type			: NonConsumable
-ReferenceName 		: flowers-large
-ProductID 		: com.rarcher.nonconsumable.flowers-large
-Price 			: 1.99
-FamilyShareable 	: true
-Locale 			: en_US
-DisplayName 		: Flowers Large
-Description 		: A cool bunch of mixed flowers
 
-Type			: NonConsumable
-ReferenceName 		: flowers-small
-ProductID 		: com.rarcher.nonconsumable.flowers-small
-Price 			: 0.99
-FamilyShareable 	: false
-Locale 			: en_US
-DisplayName 		: Flowers Small
-Description 		: A cool small bunch of flowers
-
-Type			: NonConsumable
-ReferenceName 		: roses-large
-ProductID 		: com.rarcher.nonconsumable.roses-large
-Price 			: 2.99
-FamilyShareable 	: false
-Locale 			: en_US
-DisplayName 		: Roses Large
-Description 		: A large bunch of red roses
-
-Type			: NonConsumable
-ReferenceName 		: chocolates-small
-ProductID 		: com.rarcher.nonconsumable.chocolates-small
-Price 			: 3.99
-FamilyShareable 	: true
-Locale 			: en_US
-Description 		: A small box of chocolates
-DisplayName 		: Chocolates Small
-```
+| Type | Reference Name | Product ID | Price | Family Shareable | Locale | Display Name | Description |
+| --- | --- | ---| --- | --- | --- | --- | --- | 
+| Non-Consumable | flowers-large | com.rarcher.nonconsumable.flowers-large | 1.99 | true | en_US | Flowers Large | A cool bunch of mixed flowers |
+| Non-Consumable | flowers-small | com.rarcher.nonconsumable.flowers-small | 0.99 | false | en_US | Flowers Small | A cool small bunch of flowers |
+| Non-Consumable | roses-large | com.rarcher.nonconsumable.roses-large | 2.99 | false | en_US | Roses Large | A large bunch of red roses |
+| Non-Consumable | chocolates-small | com.rarcher.nonconsumable.chocolates-small | 3.99 | true | en_US | A small box of chocolates | Chocolates Small |
 
 - **Type**
 The type of product (Non-Consumable, Consumable, Non-Renewing, Auto-Renewing).
@@ -225,7 +197,7 @@ The type of product (Non-Consumable, Consumable, Non-Renewing, Auto-Renewing).
 A short descriptive reference for the product. Not visible to users.
 
 - **Product ID** 
-The unique code used to identify an IAP product. This same ID will be used in App Store Connect when setting up in-app purchases for production. Note that Product ID is a string that, by convention, uses the format “com.developer.product”, although it can be anything you like. Not visible to users.
+The unique code used to identify an IAP product. This same ID will be used in App Store Connect when setting up in-app purchases for production. Note that Product ID is a string that, by convention, uses the format *com.developer.product-type.product-name*, although it can be anything you like. Not visible to users.
 
 - **Price** 
 A hard-coded price for the product. In production your app will request localized price (and other) information from the App Store. Visible to users.
@@ -245,9 +217,11 @@ The name for the product that users see.
 > Note that none of the data defined in the .storekit file is ever uploaded to App Store Connect. It’s only used when testing in-app purchases locally in Xcode.
 
 # Enable StoreKit Testing via the Project Scheme
-You now need to enable StoreKit testing in Xcode (it’s disabled by default).
+You now need to enable StoreKit testing in Xcode as it’s disabled by default.
 
-Select **Product > Scheme > Edit Scheme**. Now select **Run** and the **Options** tab. You can now select your configuration file from the **StoreKit Configuration** list:
+Select **Product > Scheme > Edit Scheme**. 
+Now select **Run** and the **Options** tab. 
+You can now select your configuration file from the **StoreKit Configuration** list:
 
 ![](./readme-assets/StoreHelperDemo9.png)
 
@@ -256,9 +230,9 @@ You'll need to do this for both targets (iOS and macOS).
 Should you wish to disable StoreKit testing then repeat the above steps and remove the StoreKit configuration file from the **StoreKit Configuration** list.
 
 # Creating a Production Product List
-We'll see shortly how one of the first things our app has to do on starting is request localized product information from the App Store (this is the case both when using the local StoreKit test environment and the App Store release environment). This requires a list of our product identifiers. We've defined our products in the StoreKit configuration file, so it seems obvious that we should use that as the repository for our IAP data. Retrieving config data at runtime isn't difficult (it's `JSON`). However, the StoreKit configuration file is intended for use *when testing* and it's not a good idea to use it for production too. It would be all too easy to allow "test products" to make it into the release build!
+We'll see shortly how one of the first things our app has to do on starting is request localized product information from the App Store. This is the case both when using the local StoreKit test environment and the App Store release environment. This requires a list of our product identifiers. We've defined our products in the StoreKit configuration file, so it seems obvious that we should use that as the repository for our IAP data. Retrieving config data at runtime isn't difficult (it's `JSON`). However, the StoreKit configuration file is intended for use *when testing* and it's not a good idea to use it for production too. It would be all too easy to allow "test products" to make it into the release build!
 
-So, we'll define a plain list of our product identifiers in a property list.
+So, we'll define a list of our product identifiers in a property list.
 
 Create a new property list named "**Products.plist**", save it to the `Shared/Configuration` folder and add the product identifiers:
 
@@ -291,25 +265,9 @@ public struct Configuration {
     public static func readConfigFile() -> Set<ProductId>? {
         
         guard let result = Configuration.readPropertyFile(filename: StoreConstants.ConfigFile) else {
-            StoreLog.event(.configurationNotFound)
-            StoreLog.event(.configurationFailure)
             return nil
         }
-        
-        guard result.count > 0 else {
-            StoreLog.event(.configurationEmpty)
-            StoreLog.event(.configurationFailure)
-            return nil
-        }
-        
-        guard let values = result[StoreConstants.ConfigFile] as? [String] else {
-            StoreLog.event(.configurationEmpty)
-            StoreLog.event(.configurationFailure)
-            return nil
-        }
-        
-        StoreLog.event(.configurationSuccess)
-
+		:
         return Set<ProductId>(values.compactMap { $0 })
     }
     
@@ -328,91 +286,24 @@ public struct Configuration {
 ```
 
 # Logging
-While researching and testing `StoreKit2` I found it really helpful to see informational messages about what's going. Rather than use `print()` statements I created a simple logging struct that would work for both debug and release builds.
+While researching and testing `StoreKit2` I found it really helpful to see informational messages about what's going. Rather than use `print()` statements I created a simple logging `StoreLog` struct that would work for both debug and release builds.
 
-```swift
-//
-//  StoreLog.swift
-//  StoreHelper
-//
-//  Created by Russell Archer on 16/06/2021.
-//
+I use Apple's unified logging system to log errors, notifications and general messages. This system works on simulators and real devices for both debug and release builds. You can view the logs in the Console app by selecting the test device in the left console pane.
 
-import Foundation
-import os.log
+If running on the simulator, select the machine the simulator is running on. Type your app's bundle identifier into the search field and then narrow the results by selecting "SUBSYSTEM" from the search field's filter. Logs also appear in Xcode's console in the same manner as print statements.
 
-/// We use Apple's unified logging system to log errors, notifications and general messages.
-/// This system works on simulators and real devices for both debug and release builds.
-/// You can view the logs in the Console app by selecting the test device in the left console pane.
-/// If running on the simulator, select the machine the simulator is running on. Type your app's
-/// bundle identifier into the search field and then narrow the results by selecting "SUBSYSTEM"
-/// from the search field's filter. Logs also appear in Xcode's console in the same manner as
-/// print statements.
-///
-/// When running the app on a real device that's not attached to the Xcode debugger,
-/// dynamic strings (i.e. the error, event or message parameter you send to the event() function)
-/// will not be publicly viewable. They're automatically redacted with the word "private" in the
-/// console. This prevents the accidental logging of potentially sensistive user data. Because
-/// we know in advance that StoreNotificaton enums do NOT contain sensitive information, we let the
-/// unified logging system know it's OK to log these strings through the use of the "%{public}s"
-/// keyword. However, we don't know what the event(message:) function will be used to display,
-/// so its logs will be redacted.
-public struct StoreLog {
-    private static let storeLog = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "STORE")
-    
-    /// Logs a StoreNotification. Note that the text (shortDescription) of the log entry will be
-    /// publically available in the Console app.
-    /// - Parameter event: A StoreNotification.
-    public static func event(_ event: StoreNotification) {
-        #if DEBUG
-        print(event.shortDescription())
-        #else
-        os_log("%{public}s", log: storeLog, type: .default, event.shortDescription())
-        #endif
-    }
-    
-    /// Logs an StoreNotification. Note that the text (shortDescription) and the productId for the
-    /// log entry will be publically available in the Console app.
-    /// - Parameters:
-    ///   - event:      A StoreNotification.
-    ///   - productId:  A ProductId associated with the event.
-    public static func event(_ event: StoreNotification, productId: ProductId) {
-        #if DEBUG
-        print("\(event.shortDescription()) for product \(productId)")
-        #else
-        os_log("%{public}s for product %{public}s", log: storeLog, type: .default, event.shortDescription(), productId)
-        #endif
-    }
-    
-    /// Logs a message.
-    /// - Parameter message: The message to log.
-    public static func event(_ message: String) {
-        #if DEBUG
-        print(message)
-        #else
-        os_log("%s", log: storeLog, type: .info, message)
-        #endif
-    }
-}
-```
+When running the app on a real device that's not attached to the Xcode debugger, dynamic strings (i.e. the error, event or message parameter you send to the event() function) will not be publicly viewable. They're automatically redacted with the word "private" in the console. This prevents the accidental logging of potentially sensitive user data. Because we know in advance that `StoreNotificaton` enums do not contain sensitive information, we let the unified logging system know it's OK to log these strings through the use of the "%{public}s" keyword. However, we don't know what the event(message:) function will be used to display, so its logs will be redacted.
 
 # StoreHelper
 So that we have some products to display, we'll create a minimal version of the `StoreHelper` class before we focus on the UI. Save the `StoreHelper.swift` file in `Shared/StoreHelper`:
 
 ```swift
-//
-//  StoreHelper.swift
-//  StoreHelper
-//
-//  Created by Russell Archer on 16/06/2021.
-//
-
 import StoreKit
 
 public typealias ProductId = String
 
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 class StoreHelper: ObservableObject {
     
     /// List of `Product` retrieved from the App Store and available for purchase.
@@ -456,7 +347,7 @@ class StoreHelper: ObservableObject {
 }
 ```
 
-Notice how the initializer reads the products property list to get a set of `ProductId` and then asynchronously calls `requestProductsFromAppStore(productIds:)`, which in turn calls the `StoreKit2` `Product.products(for:)` method.
+Notice how the initializer reads the `Products.plist` property list to get a set of `ProductId` and then asynchronously calls `requestProductsFromAppStore(productIds:)`, which in turn calls the `StoreKit2` `Product.products(for:)` method.
 
 We also have a `@Published` array of `Product`. This array gets updated during the StoreHelper initializer:
 
@@ -608,7 +499,7 @@ public enum PurchaseState { case notStarted, inProgress, complete, pending, canc
 public private(set) var purchaseState: PurchaseState = .notStarted
 ```
 
-- A `purchase(_:)` method (rather than call it directly from the UI, I moved the call to StoreKit's `product.purchase()` method into `StoreHelper`):
+- A `purchase(_:)` method. Rather than call it directly from the UI, I moved the call to StoreKit's `product.purchase()` method into `StoreHelper`:
 
 ```swift
 public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  { ... }
@@ -829,7 +720,7 @@ The App Store supports the concept of "ask-to-buy" purchases, where parents can 
 When a user makes this type of purchase the `PurchaseResult` returned by StoreKit's `product.purchase()` method will have a value of `.pending`. This
 state can also be applicable when a user is required to make banking changes before a purchase is confirmed.
 
-With `StoreKit` testing (which works with both `StoreKit` and `StoreKit2`) we can easily simulate pending purchases to see if our app correctly supports them.
+With `StoreKit` testing (which works with both `StoreKit1` and `StoreKit2`) we can easily simulate pending purchases to see if our app correctly supports them.
 
 To enable ask-to-buy support in `StoreKit` select the `.storekit` configuration file and then select **Editor > Enable Ask To Buy**:
 
@@ -920,7 +811,7 @@ Now we have the basics of the app working we can move onto adding another type o
 
 Consumables are products that are used once, or for a limited time and then expire. If the user wants to use the product again they need to re-purchase. A typical consumable product would be a token in game that temporarily gives you more lives or higher powers. Once the token's used up the user would lose the abilities it confers.
 
-We'll add a consumable called "VIP plant installation service". It last for one appointment and then expires.
+We'll add a consumable called "VIP plant installation service". It lasts for one appointment and then expires.
 
 Open the `Products.storekit` file and click the **+** at the bottom-left of the window to add a consumable:
 
@@ -967,17 +858,8 @@ public class StoreHelper: ObservableObject {
     /// Array of `Product` retrieved from the App Store and available for purchase.
     @Published private(set) var products: [Product]?
     
-    /// Computed property that returns all the consumable products in the `products` array.
-    public var consumableProducts: [Product]? {
-        guard products != nil else { return nil }
-        return products!.filter { product in product.type == .consumable }
-    }
-    
-    /// Computed property that returns all the non-consumable products in the `products` array.
-    public var nonConsumableProducts: [Product]? {
-        guard products != nil else { return nil }
-        return products!.filter { product in product.type == .nonConsumable }
-    }
+    public var consumableProducts: [Product]? { products?.filter { $0.type == .consumable }}
+    public var nonConsumableProducts: [Product]? { products?.filter { $0.type == .nonConsumable }}
 	:
 	:
 ```
@@ -998,7 +880,7 @@ struct ContentView: View {
             List {
                 
                 if let nonConsumables = storeHelper.nonConsumableProducts {
-                    Section(header: Text("Everyday Luxuries")) {
+                    Section(header: Text("Products")) {
                         ForEach(nonConsumables, id: \.id) { product in
                             ProductView(storeHelper: storeHelper,
                                         productId: product.id,
@@ -1009,7 +891,7 @@ struct ContentView: View {
                 }
                 
                 if let consumables = storeHelper.consumableProducts {
-                    Section(header: Text("VIP Services")) {
+                    Section(header: Text("Services")) {
                         ForEach(consumables, id: \.id) { product in
                             ProductView(storeHelper: storeHelper,
                                         productId: product.id,
@@ -1053,7 +935,7 @@ We're checking for transactions for the consumable but none are found. How can t
 
 The reason is simple and non-obvious:
 
-> Transactions for consumable products ARE NOT STORED PERMANENTLY IN THE RECEIPT!
+> Transactions for consumable products ARE NOT STORED IN THE RECEIPT!
 
 The rationale for this from Apple's perspective is that consumables are "ephemeral". To quote Apple's documentation (https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements) for `Transaction.currentEntitlement(for:)`:
 
@@ -1061,11 +943,11 @@ The rationale for this from Apple's perspective is that consumables are "ephemer
 > - :
 > - A transaction for each consumable in-app purchase that you have not finished by calling `finish()`
 
-In tests I've done transactions for consumables do not remain in the receipt even if you omit to call `finish()`.
+In tests I've done transactions for consumables do not remain in the receipt, even if you omit to call `finish()`.
 
 So, if you plan to sell consumable products in your own apps you'll need to create some sort of system for keeping track of them. This could be as simple as storing data in `UserDefaults`. However, for greater security use either the keychain or a database as part of your backend solution.
 
-For the purposes of this demo we'll use a simple Keychain-based system.
+For the purposes of this demo we'll use a Keychain-based system that simply keeps a count of each purchase of a consumable product. Each time the consumable is purchased the count is incremented. When a purchase is "expired" the count is decremented. When the count reaches zero the user no longer has access to the product.
 
 Here's a helper class for that:
 
@@ -1074,165 +956,20 @@ import Foundation
 import Security
 
 /// A consumable product id and associated count value.
-///
-/// Consumable product purchase transactions are considered transient by Apple and are
-/// therefore not stored in the App Store receipt. `KeychainHelper` uses `ConsumableProductId`
-/// to store consumable product ids in the keychain. Each time the consumable is purchased the
-/// count should incremented. When a purchase is expired the count is decremented. When the count
-/// reaches zero the user no longer has access to the product.
 public struct ConsumableProductId: Hashable {
     let productId: ProductId
     let count: Int
 }
 
-/// KeychainHelper provides methods for working with collections of `ConsumableProductId` in the keychain.
+/// KeychainHelper provides methods for working with collections of `ConsumableProductId` 
+/// in the keychain.
 public struct KeychainHelper {
-    
-    /// Add a consumable `ProductId` to the keychain and set its count value to 1.
-    /// If the keychain already contains the `ProductId` its count value is incremented.
-    /// - Parameter productId: The consumable `ProductId` for which the count value will be incremented.
-    /// - Returns: Returns true if the purchase was added or updated, false otherwise.
-    public static func purchase(_ productId: ProductId) -> Bool {
-        
-        if has(productId) { return update(productId, purchase: true) }
-        
-        // Create a query for what we want to add to the keychain
-        let query: [String : Any] = [kSecClass as String  : kSecClassGenericPassword,
-                                     kSecAttrAccount as String : productId,
-                                     kSecValueData as String : "1".data(using: .utf8)!]
-        
-        // Add the item to the keychain
-        let status = SecItemAdd(query as CFDictionary, nil)
-        return status == errSecSuccess
-    }
-    
-    /// Decrements the purchase count for a consumable `ProductId` in the keychain. If the count value is
-    /// already zero no action is taken.
-    /// - Parameter productId: The consumable `ProductId` for which the count value will be decremented.
-    /// - Returns: Returns true if the product was expired (removed), false otherwise.
-    public static func expire(_ productId: ProductId) -> Bool {
-        update(productId, purchase: false)
-    }
-    
-    /// Search the keychain for a consumable `ProductId`.
-    /// - Parameter productId: The consumable `ProductId` to search for.
-    /// - Returns: Returns true if the consumable `ProductId` was found in the keychain, false otherwise.
-    public static func has(_ productId: ProductId) -> Bool {
-        
-        // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
-        let query = [kSecClass as String : kSecClassGenericPassword,
-                     kSecAttrAccount as String : productId,
-                     kSecMatchLimit as String: kSecMatchLimitOne] as CFDictionary
-        
-        // Search for the item in the keychain
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query, &item)
-        return status == errSecSuccess
-    }
-    
-    /// Get the count value associated with a consumable `ProductId`.
-    /// - Parameter productId: The consumable `ProductId`.
-    /// - Returns: Returns the value of the count, or 0 if not found.
-    public static func count(for productId: ProductId) -> Int {
-        
-        // Create a query of what we want to search for.
-        let query = [kSecClass as String : kSecClassGenericPassword,
-                     kSecAttrAccount as String : productId,
-                     kSecMatchLimit as String: kSecMatchLimitOne,
-                     kSecReturnAttributes as String: true,
-                     kSecReturnData as String: true] as CFDictionary
-        
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query, &item)
-        guard status == errSecSuccess else { return 0 }
-        
-        // Extract the count value data
-        guard let foundItem = item as? [String : Any],
-              let countData = foundItem[kSecValueData as String] as? Data,
-              let countValue = String(data: countData, encoding: String.Encoding.utf8)
-        else { return 0 }
-        
-        return Int(countValue) ?? 0
-    }
-    
-    /// Update the count value associated with the consumable `ProductId` in the keychain.
-    /// If the `ProductId` doesn't exist in the keychain it's added and its value set to 1.
-    /// - Parameters:
-    ///   - productId: The consumable `ProductId`.
-    ///   - purchase: true if the consumable product has been purchased, false if it has been expired.
-    /// - Returns: Returns true if the update was successful, false otherwise.
-    public static func update(_ productId: ProductId, purchase: Bool) -> Bool {
-        
-        if !has(productId) { return KeychainHelper.purchase(productId) }
-        
-        var count = count(for: productId)
-        if count < 0 { count = 0 }
-        
-        // Create a query for what we want to change in the keychain
-        let query: [String : Any] = [kSecClass as String : kSecClassGenericPassword,
-                                     kSecAttrAccount as String : productId,
-                                     kSecValueData as String : String(count).data(using: String.Encoding.utf8)!]
-        
-        // Create a query for changes we want to make
-        var newCount = purchase ? count+1 : count-1
-        if newCount < 0 { newCount = 0 }
-        
-        let changes: [String: Any] = [kSecAttrAccount as String : productId,
-                                      kSecValueData as String : String(newCount).data(using: String.Encoding.utf8)!]
-        
-        // Update the item
-        let status = SecItemUpdate(query as CFDictionary, changes as CFDictionary)
-        return status == errSecSuccess
-    }
-    
-    /// Search for all the consumable product ids for the current user that are stored in the keychain.
-    /// - Parameter productIds: A set of `ProductId` that is used to match entries in the keychain to available products.
-    /// - Returns: Returns a set of ConsumableProductId for all the product ids stored in the keychain.
-    public static func all(productIds: Set<ProductId>) -> Set<ConsumableProductId>? {
-        
-        // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
-        let query = [kSecClass as String : kSecClassGenericPassword,
-                     kSecMatchLimit as String: kSecMatchLimitAll,
-                     kSecReturnAttributes as String: true,
-                     kSecReturnData as String: true] as CFDictionary
-        
-        // Search for all the items created by this app in the keychain
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query, &item)
-        guard status == errSecSuccess else { return nil }
-        
-        // The item var is an array of dictionaries
-        guard let entries = item as? [[String : Any]] else { return nil }
-        
-        var foundProducts = Set<ConsumableProductId>()
-        for entry in entries {
-            if  let pid = entry[kSecAttrAccount as String] as? String,
-                productIds.contains(pid),
-                let data = entry[kSecValueData as String] as? Data,
-                let sValue = String(data: data, encoding: String.Encoding.utf8),
-                let value = Int(sValue) {
-                foundProducts.insert(ConsumableProductId(productId: pid, count: value))
-            }
-        }
-        
-        return foundProducts.count > 0 ? foundProducts : nil
-    }
-    
-    /// Delete the `ProductId` from the keychain.
-    /// - Parameter productId: `ProductId` to remove.
-    /// - Returns: Returns true if the `ProductId` was deleted, false otherwise.
-    public static func delete(_ consumableProduct: ConsumableProductId) -> Bool {
-        
-        // Create a query of what we want to search for
-        let query = [kSecClass as String : kSecClassGenericPassword,
-                     kSecAttrAccount as String : consumableProduct.productId,
-                     kSecValueData as String: String(consumableProduct.count).data(using: String.Encoding.utf8)!,
-                     kSecMatchLimit as String: kSecMatchLimitOne] as CFDictionary
-        
-        // Search for the item in the keychain
-        let status = SecItemDelete(query)
-        return status == errSecSuccess
-    }
+    public static func purchase(_ productId: ProductId) -> Bool { ... }
+    public static func expire(_ productId: ProductId) -> Bool { ... }
+    public static func has(_ productId: ProductId) -> Bool { ... }
+    public static func count(for productId: ProductId) -> Int { ... }
+    public static func update(_ productId: ProductId, purchase: Bool) -> Bool { ... }
+    public static func delete(_ consumableProduct: ConsumableProductId) -> Bool  { ... }
 }
 ```
 
@@ -1307,7 +1044,6 @@ extension StoreHelper {
         }
     }
 }
-
 ```
 
 We also introduce a `ConsumableView` that displays a count of the number of unexpired purchases of the consumable product the user has:
@@ -1387,9 +1123,11 @@ And if you purchase the product again:
 ![[StoreHelper Demo 44.png]]
 
 # Subscriptions
-We'll create an auto-renewable subscription (Apple discourages the use of the older non-renewing subscriptions) for a "VIP Home Plant Care Visit". The subscription offers three different levels of service: Gold, Silver and Bronze.
+Subscriptions are an important class of in-app purchase that are becoming more and more widely used by developers. 
 
-Open the `Products.storekit` file and click the **+** to add a new auto-renewable subscription:
+In our demo app we'll create a group of auto-renewable subscriptions (Apple discourages the use of the older non-renewing subscriptions) for a "VIP Home Plant Care Visit". The subscription offers three different levels of service: Gold, Silver and Bronze.
+
+Open `Products.storekit` and click the **+** to add a new auto-renewable subscription:
 
 ![](./readme-assets/StoreHelperDemo34.png)
 
@@ -1401,7 +1139,7 @@ You can then define your products within the group:
 
 ![](./readme-assets/StoreHelperDemo36.png)
 
-To create subsequent products, click the **+** to add a new auto-renewable subscription. You'll then be offered the choice of adding a new product within the existing group or creating a new group. Select the "VIP Home Visits" group:
+To create subsequent products, click the **+** to add a new auto-renewable subscription. You'll then be offered the choice of adding a new product within the existing group or creating a new group. Select the "VIP" group:
 
 ![](./readme-assets/StoreHelperDemo37.png)
 
@@ -1411,7 +1149,13 @@ Finally, create the third subscription:
 
 ![](./readme-assets/StoreHelperDemo39.png)
 
-Update `Products.plist`:
+The **order** in which products are defined in both `Products.storekit` and `Products.plist` is important. As we'll discuss shortly, we need to be able to distinguish the service level of a product within a subscription group. For this reason, the product with the highest service level is defined at the top of the group, with products of decreasing service level placed below it.
+
+Here's how our products should look in `Products.storekit`. Notice the "gold" product is at the top of the list and we've assigned a level value of 1 to it.
+
+![[StoreHelper Demo 47.png]]
+
+Update `Products.plist` with the same product ids and order:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1503,7 +1247,7 @@ We can now modify all calls to child views where we've been directly passing in 
 
 > One point to remember is that an the SwiftUI environment is intended to provide an `ObservableObject` to a ***view*** hierarchy. 
 > 
-> This means that an `ObservableObject` referenced with `@EnvironmentObject` in a `View` **will NOT** be automatically passed to that view's `ViewModel`. In this case you need to pass (inject) the object dependency to the ViewModel's initializer. See `PriveView` and `PriceViewModel`.
+> This means that an `ObservableObject` referenced with `@EnvironmentObject` in a `View` **will NOT** be automatically passed to that view's `ViewModel`. In this case you need to pass (inject) the object dependency to the ViewModel's initializer. See `PriceView` and `PriceViewModel`.
 
 After adding some image assets for the new subscriptions, the app looks like this:
 
@@ -1517,19 +1261,128 @@ And subscription purchasing works correctly too:
 
 Notice that when we purchase the "Gold" subscription we can see that we'll be charged a trial rate of $9.99 for two months, a then $19.99 per month thereafter.
 
-However, there are a few things missing:
-
-- How does the user cancel a subscription?
-- How does the user up/downgrade a subscription?
-- Once a purchase has been made there's no information displayed on trials, how long a subscription lasts, when it renews and how much it costs
+However, there are a few things missing, For example, once a purchase has been completed there's no information displayed on when the purchase was made, and in the case of a subscription, how long does it last, when does it renew and how much does it cost? Also, how does the user upgrade, downgrade or cancel a subscription?
 
 Let's fix that. 
 
-TODO
+# Displaying Purchase information
+To display information on non-consumable purchases we'll refactor things slightly by moving the various purchasing state variables (`purchasing`, `cancelled`, etc.) from `PurchaseButton` to `ProductView` (and `ConsumableView`). This moves the creation of state nearer the top of the view hierarchy so that we can then inject binding dependencies into child views. To make things neater and more self-contained we'll keep state related to purchasing in a new `PurchaseState` enum:
 
-# Displaying detailed Subscription information
+```swift
+public enum PurchaseState { 
+	case notStarted, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown 
+}
+```
 
-TODO
+`StoreHelper` will use a private instance of `PurchaseState` internally, and `ProductView` will create a `purchaseState` state variable and pass this down to child views.
+
+A new `PurchaseInfoView` and `PurchaseInfoViewModel` handle the display of non-consumable purchase and subscription data:
+
+```swift
+/// Displays purchase or subscription information.
+struct PurchaseInfoView: View {
+    
+    @EnvironmentObject var storeHelper: StoreHelper
+    @State var purchaseInfoText = ""
+    var productId: ProductId
+    
+    var body: some View {
+        
+        let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
+        
+        VStack(alignment: .leading) {
+            Text(purchaseInfoText)
+                .font(.footnote)
+                .foregroundColor(.blue)
+                .padding(.leading)
+        }
+        .onAppear {
+            Task.init { purchaseInfoText = await viewModel.info(for: productId) }
+        }
+    }
+}
+```
+
+```swift
+import StoreKit
+import SwiftUI
+
+/// ViewModel for `PurchaseInfoView`. Enables gathering of purchase or subscription information.
+struct PurchaseInfoViewModel {
+    
+    @ObservedObject var storeHelper: StoreHelper
+    var productId: ProductId
+    
+    /// Provides text information on the purchase of a non-consumable product or auto-renewing subscription.
+    /// - Parameter productId: The `ProductId` of the product or subscription.
+    /// - Returns: Returns text information on the purchase of a non-consumable product or auto-renewing subscription.
+    func info(for productId: ProductId) async -> String {
+        
+        guard let product = storeHelper.product(from: productId) else { return "No purchase info available." }
+        guard product.type != .consumable, product.type != .nonRenewable else { return "" }
+        
+        // Get detail purchase/subscription info on the product
+        guard let info = await storeHelper.purchaseInfo(for: product) else { return "" }
+        
+        var text: String
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMM y"
+        
+        if info.product.type == .nonConsumable {
+            guard let transaction = info.verifiedTransaction else { return "" }
+            
+            text = "Purchased on \(dateFormatter.string(from: transaction.purchaseDate))."
+            if transaction.revocationDate != nil {
+                text += " Purchase revoked on \(dateFormatter.string(from: transaction.revocationDate!))."
+            }
+            
+            return text
+        }
+		:
+	}
+}
+```
+
+```swift
+public class StoreHelper: ObservableObject {
+	:
+    @MainActor public func purchaseInfo(for product: Product) async -> PurchaseInfo? {
+        
+        guard product.type != .consumable && product.type != .nonRenewable else { return nil }
+        var purchaseInfo = PurchaseInfo(product: product)
+        guard let unverifiedTransaction = await product.latestTransaction else { return purchaseInfo }
+        let transactionResult = checkVerificationResult(result: unverifiedTransaction)
+        guard transactionResult.verified else { return purchaseInfo }
+        
+        if product.type == .nonConsumable {
+            purchaseInfo.verifiedTransaction = transactionResult.transaction
+            return purchaseInfo
+        }
+		:
+	}
+}
+```
+
+We also introduce a "hamburger menu" that allows us to display various useful options:
+
+![[StoreHelper Demo 48.png]]
+
+# Displaying Subscription information
+Displaying information on what product a user is subscribed to, when it renews, how much it costs, and so on is not quite as straightforward as it first appears.
+
+Most important to note is that a user can be subscribed to **multiple products** in the same subscription group! This can happen when the user is automatically entitled to one level of service through family sharing and then pays for a subscription to another product at a higher level of service in the same group. 
+
+Also, what happens when a user is subscribed to one level of service and then purchases a higher service level product? The user will expect immediate access to a higher level of service, but how can we tell which subscription is "current" and at what date and time will the switch happen? And how is the price increase handled?
+
+Finally, how does the user cancel a subscription?
+
+Let's take a more detailed look at the various entangled rules that govern subscriptions!
+
+
+
+
+
+![[Pasted image 20210730194317.png]]
 
 ---
 
@@ -1537,6 +1390,4 @@ TODO
 I'll be updating this demo shortly to add support for:
 
 - Automatically handling customer **refunds**
-- Exploring detailed **transaction information and history**
-- Sandbox improvements
 

@@ -9,21 +9,34 @@ import SwiftUI
 
 struct OptionsViewRow: View {
     
+    @EnvironmentObject var storeHelper: StoreHelper
+    
+    var option: OptionCommand
     var imageName: String
     var text: String
     
     var body: some View {
+        
+        let optionsViewModel = OptionsViewModel(storeHelper: storeHelper)
+        
         HStack {
-            Image(systemName: imageName)
-                .resizable()
-                .frame(width: 30, height: 30)
-                .imageScale(.large)
-                .foregroundColor(.white)
-                .padding(.trailing)
-            
-            Text(text)
-                .font(.title2)
-                .foregroundColor(.white)
+            Button(action: {
+                
+                optionsViewModel.command(cmd: option)
+                
+            }) {
+                
+                Image(systemName: imageName)
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .imageScale(.large)
+                    .foregroundColor(.white)
+                    .padding(.trailing)
+                
+                Text(text)
+                    .font(.title2)
+                    .foregroundColor(.white)
+            }
             
             Spacer()
         }
@@ -33,7 +46,7 @@ struct OptionsViewRow: View {
 
 struct OptionsViewRow_Previews: PreviewProvider {
     static var previews: some View {
-        OptionsViewRow(imageName: "trash", text: "test")
+        OptionsViewRow(option: .resetConsumables, imageName: "trash", text: "test")
             .preferredColorScheme(.dark)
     }
 }

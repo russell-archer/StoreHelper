@@ -19,11 +19,11 @@ struct ProductListViewRow: View {
             if let p = products.first {
                 if p.type == .consumable {
                     ForEach(products, id: \.id) { product in
-                        ConsumableView(productId: product.id, displayName: product.displayName, price: product.displayPrice)
+                        ConsumableView(productId: product.id, displayName: product.displayName, description: product.description, price: product.displayPrice)
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
-                        ProductView(productId: product.id, displayName: product.displayName, price: product.displayPrice)
+                        ProductView(productId: product.id, displayName: product.displayName, description: product.description, price: product.displayPrice)
                     }
                 }
             }

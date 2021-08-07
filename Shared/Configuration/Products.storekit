@@ -87,7 +87,7 @@
     "_locale" : "en_US",
     "_storefront" : "USA",
     "_storeKitError" : 0,
-    "_timeRate" : 1
+    "_timeRate" : 0
   },
   "subscriptionGroups" : [
     {
@@ -113,14 +113,14 @@
           },
           "localizations" : [
             {
-              "description" : "Get expert care for your plants every week.",
-              "displayName" : "Gold. Weekly Home Visits",
+              "description" : "Weekly home visits by an expert",
+              "displayName" : "Gold",
               "locale" : "en_US"
             }
           ],
           "productID" : "com.rarcher.subscription.vip.gold",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Gold. Weekly Home Visits",
+          "referenceName" : "Gold",
           "subscriptionGroupID" : "8126C4BB",
           "type" : "RecurringSubscription"
         },
@@ -130,19 +130,19 @@
           ],
           "displayPrice" : "11.99",
           "familyShareable" : false,
-          "groupNumber" : 1,
+          "groupNumber" : 2,
           "internalID" : "B8897679",
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "Get expert care for your plants twice a month",
-              "displayName" : "Silver. Visits twice a month",
+              "description" : "Visits twice a month by an expert",
+              "displayName" : "Silver",
               "locale" : "en_US"
             }
           ],
           "productID" : "com.rarcher.subscription.vip.silver",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Silver. Twice Monthly Home Visits",
+          "referenceName" : "Silver",
           "subscriptionGroupID" : "8126C4BB",
           "type" : "RecurringSubscription"
         },
@@ -152,19 +152,19 @@
           ],
           "displayPrice" : "4.99",
           "familyShareable" : false,
-          "groupNumber" : 1,
+          "groupNumber" : 3,
           "internalID" : "59041E8B",
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "Get expert care for your plants every month",
-              "displayName" : "Bronze. Monthly home visits",
+              "description" : "Monthly home visits by an expert",
+              "displayName" : "Bronze",
               "locale" : "en_US"
             }
           ],
           "productID" : "com.rarcher.subscription.vip.bronze",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Bronze. Monthly Home Visits",
+          "referenceName" : "Bronze",
           "subscriptionGroupID" : "8126C4BB",
           "type" : "RecurringSubscription"
         }

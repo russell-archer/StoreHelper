@@ -9,41 +9,55 @@
 import StoreKit
 import OrderedCollections
 
-/// StoreHelper helper class methods releated to subscriptions.
+/// Helper class for subscriptions.
 ///
-/// The methods in this class require that auto-renewing subscription product ids adopt
-/// a naming convention with the format: "com.{author}.subscription.{subscription-name}.{product-name}".
+/// The methods in this class require that auto-renewing subscription product ids adopt the naming
+/// convention: "com.{author}.subscription.{subscription-name}.{product-name}".
 /// For example, "com.rarcher.subscription.vip.bronze".
+///
+/// Also, service level relies on the ordering of product ids within a subscription group in the
+/// Products.plist file. A product appearing higher (towards the top of the group) will have a higher
+/// service level than one appearing lower down. If a group has three subscription products then the
+/// highest service level product will have a service level of 2, while the third product will have
+/// a service level of 0.
 public struct SubscriptionHelper {
+    
+    weak public var storeHelper: StoreHelper?
     
     private static let productIdSubscriptionName = "subscription"
     private static let productIdSeparator = "."
     
-    /// Determines the group name(s) present in an `OrderedSet`.
-    /// - Parameter productIds: `OrderedSet` of `ProductId`.
-    /// - Returns: Returns the group name(s) present in an `OrderedSet` of `ProductId`.
-    public static func groups(productIds: OrderedSet<ProductId>) -> OrderedSet<String>? {
+    /// Determines the group name(s) present in the set of subscription product ids defined in Products.plist.
+    /// - Returns: Returns the group name(s) present in the `OrderedSet` of subscription product ids held by `StoreHelper`.
+    public func groups() -> OrderedSet<String>? {
         
+        guard let store = storeHelper else { return nil }
         var subscriptionGroups = OrderedSet<String>()
-        productIds.forEach { productId in
-            if let group = SubscriptionHelper.groupName(from: productId) {
-                subscriptionGroups.append(group)
+        
+        if let spids = store.subscriptionProductIds {
+            spids.forEach { productId in
+                if let group = groupName(from: productId) {
+                    subscriptionGroups.append(group)
+                }
             }
         }
         
         return subscriptionGroups.count > 0 ? subscriptionGroups : nil
     }
     
-    /// Given a super-set of product ids, returns the set of product ids that belong to a named subscription group in order of value.
+    /// Returns the set of product ids that belong to a named subscription group in order of value.
     /// - Parameter group: The group name.
-    /// - Parameter productIds: An `OrderedSet` of `ProductId`
     /// - Returns: Returns the set of product ids that belong to a named subscription group in order of value.
-    public static func products(in group: String, with productIds: OrderedSet<ProductId>) -> OrderedSet<ProductId>? {
+    public func subscriptions(in group: String) -> OrderedSet<ProductId>? {
         
+        guard let store = storeHelper else { return nil }
         var matchedProductIds = OrderedSet<ProductId>()
-        productIds.forEach { productId in
-            if let matchedGroup = SubscriptionHelper.groupName(from: productId), matchedGroup.lowercased() == group.lowercased() {
-                matchedProductIds.append(productId)
+        
+        if let spids = store.subscriptionProductIds {
+            spids.forEach { productId in
+                if let matchedGroup = groupName(from: productId), matchedGroup.lowercased() == group.lowercased() {
+                    matchedProductIds.append(productId)
+                }
             }
         }
         
@@ -53,11 +67,11 @@ public struct SubscriptionHelper {
     /// Extracts the name of the subscription group present in the `ProductId`.
     /// - Parameter productId: The `ProductId` from which to extract a subscription group name.
     /// - Returns: Returns the name of the subscription group present in the `ProductId`.
-    public static func groupName(from productId: ProductId) -> String? {
+    public func groupName(from productId: ProductId) -> String? {
         
-        let components = productId.components(separatedBy: productIdSeparator)
+        let components = productId.components(separatedBy: SubscriptionHelper.productIdSeparator)
         for i in 0...components.count-1 {
-            if components[i].lowercased() == productIdSubscriptionName {
+            if components[i].lowercased() == SubscriptionHelper.productIdSubscriptionName {
                 if i+1 < components.count { return components[i+1] }
             }
         }
@@ -65,21 +79,19 @@ public struct SubscriptionHelper {
         return nil
     }
     
-    /// Provides the relative value index for a `ProductId` in a subscription group.
+    /// Provides the service level for a `ProductId` in a subscription group.
     ///
-    /// The value index is simply the placing of a `ProductId` in a subscription group in the Products.plist file.
-    /// A product appearing higher (towards the top of the file) will have a higher value than one appearing subsequently.
-    /// If a group has three subscription products then the highest value product will have an index value of 2, while
-    /// the third product will have an index of 0.
+    /// Service level relies on the ordering of product ids within a subscription group in the Products.plist file.
+    /// A product appearing higher (towards the top of the group) will have a higher service level than one appearing
+    /// lower down. If a group has three subscription products then the highest service level product will have a
+    /// service level of 2, while the third product will have a service level of 0.
     /// - Parameters:
     ///   - group: The subscription group name.
-    ///   - productId: The `ProductId` who's value you require.
-    ///   - productIds: A super- set of product ids which contains the required `ProductId`.
-    /// - Returns: Returns the relative value index for a `ProductId` in a subscription group, or -1 if the `ProductId` cannot
-    /// be found in the `OrderedSet<ProductId>`.
-    public static func productValueIndex(in group: String, for productId: ProductId, with productIds: OrderedSet<ProductId>) -> Int {
+    ///   - productId: The `ProductId` who's service level you require.
+    /// - Returns: The service level for a `ProductId` in a subscription group, or -1 if `ProductId` cannot be found.
+    public func subscriptionServiceLevel(in group: String, for productId: ProductId) -> Int {
 
-        guard let products = SubscriptionHelper.products(in: group, with: productIds) else { return -1 }
+        guard let products = subscriptions(in: group) else { return -1 }
         
         var index = products.count-1
         for i in 0...products.count-1 {

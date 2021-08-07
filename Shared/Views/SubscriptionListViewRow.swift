@@ -1,0 +1,65 @@
+//
+//  SubscriptionListViewRow.swift
+//  SubscriptionListViewRow
+//
+//  Created by Russell Archer on 07/08/2021.
+//
+
+import SwiftUI
+import StoreKit
+import OrderedCollections
+
+struct SubscriptionListViewRow: View {
+    
+    @EnvironmentObject var storeHelper: StoreHelper
+    @State private var subscriptionGroups: OrderedSet<String>?
+    @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
+    var products: [Product]
+    var headerText: String
+    
+    var body: some View {
+        Section(header: Text(headerText)) {
+            ForEach(products, id: \.id) { product in
+                SubscriptionView(productId: product.id,
+                                 displayName: product.displayName,
+                                 description: product.description,
+                                 price: product.displayPrice,
+                                 subscriptionInfo: subscriptionInformation(for: product))
+            }
+        }
+        .onAppear { getGrouSubscriptionInfo() }
+        .onChange(of: storeHelper.purchasedProducts) { _ in getGrouSubscriptionInfo() }
+    }
+    
+    func getGrouSubscriptionInfo() {
+        subscriptionGroups = storeHelper.subscriptionHelper.groups()
+        if let groups = subscriptionGroups {
+            subscriptionInfo = OrderedSet<SubscriptionInfo>()
+            Task.init {
+                for group in groups {
+                    if let hslp = await storeHelper.subscriptionInfo(for: group) { subscriptionInfo!.append(hslp) }
+                }
+            }
+        }
+    }
+    
+    /// Gets `SubscriptionInfo` for a product.
+    /// - Parameter product: The product.
+    /// - Returns: Returns `SubscriptionInfo` for the product if it is the highest service level product
+    /// in the group the user is subscribed to. If the user is not subscribed to the product, or it's
+    /// not the highest service level product in the group then nil is returned.
+    func subscriptionInformation(for product: Product) -> SubscriptionInfo? {
+        if let subsInfo = subscriptionInfo {
+            for subInfo in subsInfo {
+                if let p = subInfo.product, p.id == product.id { return subInfo }
+            }
+        }
+        
+        return nil
+    }
+}
+
+// Get all the subscription groups from the list of subscription products.
+// For each group, get the highest subscription level product.
+// For each product in the group, display the row using SubscriptionView().
+// If the product is the highest subscription level then pass SubscriptionInfo to SubscriptionView().

@@ -16,12 +16,12 @@ struct PriceViewModel {
     
     /// Purchase a product using StoreHelper and StoreKit2.
     /// - Parameter product: The `Product` to purchase
-    func purchase(product: Product) async {
+    @MainActor func purchase(product: Product) async {
 
         do {
             
             let purchaseResult = try await storeHelper.purchase(product)
-            purchaseState = purchaseResult.purchaseState
+            withAnimation { purchaseState = purchaseResult.purchaseState }
             
         } catch { purchaseState = .failed }  // The purchase or validation failed
     }

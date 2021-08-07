@@ -8,7 +8,7 @@
 import SwiftUI
 import StoreKit
 
-/// Displays purchase or subscription information.
+/// Displays information on a consumable or non-consumable purchase.
 struct PurchaseInfoView: View {
     
     @EnvironmentObject var storeHelper: StoreHelper
@@ -19,11 +19,13 @@ struct PurchaseInfoView: View {
         
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
         
-        VStack(alignment: .leading) {
+        HStack(alignment: .center) {
             Text(purchaseInfoText)
                 .font(.footnote)
                 .foregroundColor(.blue)
-                .padding(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(1)
         }
         .onAppear {
             Task.init { purchaseInfoText = await viewModel.info(for: productId) }

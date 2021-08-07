@@ -7,14 +7,19 @@
 
 import SwiftUI
 
+enum OptionCommand { case resetConsumables, requestRefund, restorePurchases }
+
 struct OptionsView: View {
+    
+    @EnvironmentObject var storeHelper: StoreHelper
     
     var body: some View {
         VStack {
-            OptionsViewRow(imageName: "trash",          text: "Reset Consumables")
-            OptionsViewRow(imageName: "cart.circle",    text: "Request Refund")
-            OptionsViewRow(imageName: "purchased",      text: "Restore Purchases")
             
+            OptionsViewRow(option: .resetConsumables, imageName: "trash", text: "Reset Consumables")
+            OptionsViewRow(option: .requestRefund, imageName: "cart.circle", text: "Request Refund")
+            OptionsViewRow(option: .restorePurchases, imageName: "purchased", text: "Restore Purchases")
+
             Spacer()
         }
         .padding()
