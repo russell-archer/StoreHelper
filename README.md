@@ -15,6 +15,9 @@ Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13, Swift 5.
 > See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original `StoreKit1` in iOS 14 and lower.
 
 # Xcode 13 Beta Changes
+- Beta 5
+	- Modified `StoreHelper.checkVerificationResult(result:)` to return `UnwrappedVerificationResult`. 
+    This includes a new `VerificationResult<T>.VerificationError` that is provided by StoreKit2 when the unwrapped transaction is unverified
 - Beta 4
 	- None required
 - Beta 3

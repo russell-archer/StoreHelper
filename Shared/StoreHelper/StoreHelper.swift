@@ -13,6 +13,18 @@ public typealias ProductId = String
 /// The state of a purchase.
 public enum PurchaseState { case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
 
+/// Information on the result of unwrapping a transaction `VerificationResult`.
+public struct UnwrappedVerificationResult<T> {
+    /// The verified or unverified transaction.
+    let transaction: T
+    
+    /// True if the transaction was successfully verified by StoreKit.
+    let verified: Bool
+    
+    /// If `verified` is false then `verificationError` will hold the verification error, nil otherwise.
+    let verificationError: VerificationResult<T>.VerificationError?
+}
+
 @available(iOS 15.0, macOS 12.0, *)
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 public class StoreHelper: ObservableObject {
@@ -402,15 +414,18 @@ public class StoreHelper: ObservableObject {
     /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.
     ///
     /// - Parameter result: The transaction VerificationResult to check.
-    /// - Returns: A tuple containing the verified/unverified transaction and a boolean flag indicating success or failure.
-    @MainActor public func checkVerificationResult<T>(result: VerificationResult<T>) -> (transaction: T, verified: Bool) {
-        
+    /// - Returns: Returns an `UnwrappedVerificationResult<T>` where `verified` is true if the transaction was
+    /// successfully verified by StoreKit. When `verified` is false `verificationError` will be non-nil.
+    @MainActor public func checkVerificationResult<T>(result: VerificationResult<T>) -> UnwrappedVerificationResult<T> {
+
         switch result {
-            case .unverified(let unverifiedTransaction):
-                return (transaction: unverifiedTransaction, verified: false)  // StoreKit failed to automatically validate the transaction
+            case .unverified(let unverifiedTransaction, let error):
+                // StoreKit failed to automatically validate the transaction
+                return UnwrappedVerificationResult(transaction: unverifiedTransaction, verified: false, verificationError: error)
                 
             case .verified(let verifiedTransaction):
-                return (transaction: verifiedTransaction, verified: true)  // StoreKit successfully automatically validated the transaction
+                // StoreKit successfully automatically validated the transaction
+                return UnwrappedVerificationResult(transaction: verifiedTransaction, verified: true, verificationError: nil)
         }
     }
     
