@@ -158,14 +158,13 @@ public struct KeychainHelper {
     /// - Returns: Returns true if the `ProductId` was deleted, false otherwise.
     @MainActor public static func delete(_ consumableProduct: ConsumableProductId) -> Bool {
         
-        // Create a query of what we want to search for
-        let query = [kSecClass as String : kSecClassGenericPassword,
-                     kSecAttrAccount as String : consumableProduct.productId,
-                     kSecValueData as String: String(consumableProduct.count).data(using: String.Encoding.utf8)!,
-                     kSecMatchLimit as String: kSecMatchLimitOne] as CFDictionary
+        // Create a query for what we want to change in the keychain
+        let query: [String : Any] = [kSecClass as String : kSecClassGenericPassword,
+                                     kSecAttrAccount as String : consumableProduct.productId,
+                                     kSecValueData as String : String(consumableProduct.count).data(using: String.Encoding.utf8) as Any]
         
         // Search for the item in the keychain
-        let status = SecItemDelete(query)
+        let status = SecItemDelete(query as CFDictionary)
         return status == errSecSuccess
     }
     
@@ -174,7 +173,7 @@ public struct KeychainHelper {
     /// For example, Task.init { await updatePurchasedIdentifiers(productId, insert: false) }.
     /// - Parameter consumableProductIds: An array of consumable `ProductId`.
     /// - Returns: Returns an array of `ProductId` that has been deleted from the keychain.
-    @MainActor public func resetKeychainConsumables(for consumableProductIds: [ProductId]) -> [ProductId]? {
+    @MainActor public static func resetKeychainConsumables(for consumableProductIds: [ProductId]) -> [ProductId]? {
         
         guard let cids = KeychainHelper.all(productIds: Set(consumableProductIds)) else { return nil }
         var deletedPids = [ProductId]()

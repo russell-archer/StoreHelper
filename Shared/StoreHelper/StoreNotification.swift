@@ -34,6 +34,7 @@ public enum StoreNotification: Error, Equatable {
     case requestProductsSuccess
     case requestProductsFailure
     
+    case purchaseUserCannotMakePayments
     case purchaseAlreadyInProgress
     case purchaseInProgress
     case purchaseCancelled
@@ -47,6 +48,8 @@ public enum StoreNotification: Error, Equatable {
     case transactionFailure
     case transactionSuccess
     case transactionRevoked
+    case transactionRefundRequested
+    case transactionRefundFailed
     
     case consumableSavedInKeychain
     case consumableKeychainError
@@ -65,6 +68,7 @@ public enum StoreNotification: Error, Equatable {
             case .requestProductsSuccess:          return "Request products from the App Store success"
             case .requestProductsFailure:          return "Request products from the App Store failure"
                 
+            case .purchaseUserCannotMakePayments:  return "Purchase failed because the user cannot make payments"
             case .purchaseAlreadyInProgress:       return "Purchase already in progress"
             case .purchaseInProgress:              return "Purchase in progress"
             case .purchasePending:                 return "Purchase in progress. Awaiting authorization"
@@ -78,6 +82,8 @@ public enum StoreNotification: Error, Equatable {
             case .transactionFailure:              return "Transaction failure"
             case .transactionSuccess:              return "Transaction success"
             case .transactionRevoked:              return "Transaction was revoked (refunded) by the App Store"
+            case .transactionRefundRequested:      return "Transaction refund successfully requested"
+            case .transactionRefundFailed:         return "Transaction refund request failed"
                 
             case .consumableSavedInKeychain:       return "Consumable purchase successfully saved to the keychain"
             case .consumableKeychainError:         return "Keychain error"

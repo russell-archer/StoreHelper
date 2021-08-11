@@ -25,14 +25,15 @@ struct BadgeView: View {
     
     func badgeOptions() -> (badgeName: String, fgColor: Color)? {
         switch purchaseState {
-            case .notStarted:         return nil
-            case .inProgress:         return (badgeName: "hourglass", Color.cyan)
-            case .purchased:          return (badgeName: "checkmark", Color.green)
-            case .pending:            return (badgeName: "hourglass", Color.orange)
-            case .cancelled:          return (badgeName: "person.crop.circle.fill.badge.xmark", Color.blue)
-            case .failed:             return (badgeName: "hand.raised.slash", Color.red)
-            case .failedVerification: return (badgeName: "hand.thumbsdown.fill", Color.red)
-            case .unknown:            return nil
+            case .notStarted:               return nil
+            case .userCannotMakePayments:   return (badgeName: "nosign", Color.red)
+            case .inProgress:               return (badgeName: "hourglass", Color.cyan)
+            case .purchased:                return (badgeName: "checkmark", Color.green)
+            case .pending:                  return (badgeName: "hourglass", Color.orange)
+            case .cancelled:                return (badgeName: "person.crop.circle.fill.badge.xmark", Color.blue)
+            case .failed:                   return (badgeName: "hand.raised.slash", Color.red)
+            case .failedVerification:       return (badgeName: "hand.thumbsdown.fill", Color.red)
+            case .unknown:                  return nil
         }
     }
 }
@@ -41,6 +42,7 @@ struct PurchasedView_Previews: PreviewProvider {
     
     static var previews: some View {
         VStack {
+            BadgeView(purchaseState: .constant(.userCannotMakePayments))
             BadgeView(purchaseState: .constant(.inProgress))
             BadgeView(purchaseState: .constant(.purchased))
             BadgeView(purchaseState: .constant(.pending))

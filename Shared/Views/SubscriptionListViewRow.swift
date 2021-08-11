@@ -19,6 +19,8 @@ struct SubscriptionListViewRow: View {
     
     var body: some View {
         Section(header: Text(headerText)) {
+            // For each product in the group, display as a row using SubscriptionView().
+            // If the product is the highest subscription level then pass SubscriptionInfo to SubscriptionView().
             ForEach(products, id: \.id) { product in
                 SubscriptionView(productId: product.id,
                                  displayName: product.displayName,
@@ -31,6 +33,8 @@ struct SubscriptionListViewRow: View {
         .onChange(of: storeHelper.purchasedProducts) { _ in getGrouSubscriptionInfo() }
     }
     
+    /// Gets all the subscription groups from the list of subscription products.
+    /// For each group, gets the highest subscription level product.
     func getGrouSubscriptionInfo() {
         subscriptionGroups = storeHelper.subscriptionHelper.groups()
         if let groups = subscriptionGroups {
@@ -59,7 +63,4 @@ struct SubscriptionListViewRow: View {
     }
 }
 
-// Get all the subscription groups from the list of subscription products.
-// For each group, get the highest subscription level product.
-// For each product in the group, display the row using SubscriptionView().
-// If the product is the highest subscription level then pass SubscriptionInfo to SubscriptionView().
+

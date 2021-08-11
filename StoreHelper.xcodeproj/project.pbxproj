@@ -50,6 +50,8 @@
 		68AF013426A9D59200F75F9C /* HamburgerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AF013226A9D59200F75F9C /* HamburgerMenu.swift */; };
 		68AF013626A9E9CE00F75F9C /* OptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AF013526A9E9CE00F75F9C /* OptionsView.swift */; };
 		68AF013726A9E9CE00F75F9C /* OptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AF013526A9E9CE00F75F9C /* OptionsView.swift */; };
+		68B1729226C2CF3C00E12C21 /* OptionsViewRowSubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B1729126C2CF3C00E12C21 /* OptionsViewRowSubs.swift */; };
+		68B1729326C2CF3C00E12C21 /* OptionsViewRowSubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B1729126C2CF3C00E12C21 /* OptionsViewRowSubs.swift */; };
 		68C084BA26A8C017002EE9A0 /* PurchaseInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C084B926A8C017002EE9A0 /* PurchaseInfoViewModel.swift */; };
 		68C084BB26A8C017002EE9A0 /* PurchaseInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C084B926A8C017002EE9A0 /* PurchaseInfoViewModel.swift */; };
 		68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CE0D8626B35F2700CE9CC4 /* PurchaseInfo.swift */; };
@@ -124,6 +126,7 @@
 		68ACE6882680D95D00AA9895 /* BadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
 		68AF013226A9D59200F75F9C /* HamburgerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HamburgerMenu.swift; sourceTree = "<group>"; };
 		68AF013526A9E9CE00F75F9C /* OptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsView.swift; sourceTree = "<group>"; };
+		68B1729126C2CF3C00E12C21 /* OptionsViewRowSubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsViewRowSubs.swift; sourceTree = "<group>"; };
 		68B1A30C26BAEACA00C3D1C5 /* StoreHelperDemo48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo48.png; sourceTree = "<group>"; };
 		68B1A30D26BAEACA00C3D1C5 /* StoreHelperDemo16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo16.png; sourceTree = "<group>"; };
 		68B1A30E26BAEACA00C3D1C5 /* StoreHelperDemo41.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo41.png; sourceTree = "<group>"; };
@@ -403,6 +406,7 @@
 				68AF013226A9D59200F75F9C /* HamburgerMenu.swift */,
 				68AF013526A9E9CE00F75F9C /* OptionsView.swift */,
 				6848F1F226AAF8D40000F0AC /* OptionsViewRow.swift */,
+				68B1729126C2CF3C00E12C21 /* OptionsViewRowSubs.swift */,
 				68ACE6852680D94300AA9895 /* PriceView.swift */,
 				6848F1EF26AAF6730000F0AC /* ProductListView.swift */,
 				6848F1F526AAF9C70000F0AC /* ProductListViewRow.swift */,
@@ -646,6 +650,7 @@
 				6866FAAE26BEC7F100FDA4C6 /* SubscriptionInfoView.swift in Sources */,
 				68A440D2269897DD00D2408B /* ConsumableView.swift in Sources */,
 				6848F1F626AAF9C70000F0AC /* ProductListViewRow.swift in Sources */,
+				68B1729226C2CF3C00E12C21 /* OptionsViewRowSubs.swift in Sources */,
 				688252CA26BE9E1B00892FB6 /* SubscriptionView.swift in Sources */,
 				68ACE6802680D90800AA9895 /* PurchaseButton.swift in Sources */,
 				68ACE6892680D95D00AA9895 /* BadgeView.swift in Sources */,
@@ -685,6 +690,7 @@
 				6866FAAF26BEC7F100FDA4C6 /* SubscriptionInfoView.swift in Sources */,
 				68A440D3269897DD00D2408B /* ConsumableView.swift in Sources */,
 				6848F1F726AAF9C70000F0AC /* ProductListViewRow.swift in Sources */,
+				68B1729326C2CF3C00E12C21 /* OptionsViewRowSubs.swift in Sources */,
 				688252CB26BE9E1B00892FB6 /* SubscriptionView.swift in Sources */,
 				68ACE6812680D90800AA9895 /* PurchaseButton.swift in Sources */,
 				68ACE68A2680D95D00AA9895 /* BadgeView.swift in Sources */,

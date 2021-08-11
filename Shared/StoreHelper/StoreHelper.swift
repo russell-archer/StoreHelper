@@ -11,7 +11,7 @@ import OrderedCollections
 public typealias ProductId = String
 
 /// The state of a purchase.
-public enum PurchaseState { case notStarted, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
+public enum PurchaseState { case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
 
 @available(iOS 15.0, macOS 12.0, *)
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
@@ -191,6 +191,11 @@ public class StoreHelper: ObservableObject {
     /// describing the state of the purchase.
     @MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
   
+        guard AppStore.canMakePayments else {
+            StoreLog.event(.purchaseUserCannotMakePayments)
+            return (nil, .userCannotMakePayments)
+        }
+        
         guard purchaseState != .inProgress else {
             StoreLog.exception(.purchaseInProgressException, productId: product.id)
             throw StoreException.purchaseInProgressException
@@ -353,12 +358,12 @@ public class StoreHelper: ObservableObject {
 
         for status in statusCollection {
             
+            // If the user's not subscribed to this product then keep looking
+            guard status.state == .subscribed else { continue }
+            
             // Check the transaction verification
             let statusTransactionResult = checkVerificationResult(result: status.transaction)
             guard statusTransactionResult.verified else { continue }
-            
-            // If the user's not subscribed to this product then keep looking
-            guard status.state == .subscribed else { continue }
             
             // Check the renewal info verification
             let renewalInfoResult = checkVerificationResult(result: status.renewalInfo)

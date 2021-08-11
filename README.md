@@ -3,6 +3,8 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 
 See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the `StoreKit1` in iOS 14 and lower.
 
+---
+
 # Description
 ![](./readme-assets/StoreHelperDemo0.png)
 
@@ -27,11 +29,15 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 	- `Transaction.listener` is now `Transaction.updates`
 	- `Product.request(with:)` is now `Product.products(for:)`
 
+---
+
 # Source Code
 See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) for source code. 
 
 > **Disclaimer**. The source code presented here is for educational purposes. 
 > You may freely reuse and amend this code for use in your own apps. However, you do so entirely at your own risk.
+
+---
 
 # Contents
 - [References](#References)
@@ -59,8 +65,12 @@ See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) f
 - [Use the Receipt Luke](#Use-the-Receipt-Luke)
 - [Consumables](#Consumables)
 - [Subscriptions](#Subscriptions)
-- [Displaying detailed Subscription information](#Displaying-detailed-Subscription-information)
-- [What Next](#What-Next)   
+- [Displaying Purchase Information](#Displaying-Purchase-information)
+- [Displaying Subscription Information](#Displaying-Subscription-Information)
+- [Upgrades](#Upgrades)
+- [Managing Subscriptions](#Managing-Subscriptions)   
+- [Refunds](Refunds)
+---
 
 # References
 - https://developer.apple.com/in-app-purchase/
@@ -255,13 +265,10 @@ To help us read the property list we'll create a `Configuration` struct with a s
 ```swift
 import Foundation
 
-/// Provides static methods for reading plist configuration files.
 public struct Configuration {
     
     private init() {}
     
-    /// Read the contents of the product definition property list.
-    /// - Returns: Returns a set of ProductId if the list was read, nil otherwise.
     public static func readConfigFile() -> Set<ProductId>? {
         
         guard let result = Configuration.readPropertyFile(filename: StoreConstants.ConfigFile) else {
@@ -271,7 +278,6 @@ public struct Configuration {
         return Set<ProductId>(values.compactMap { $0 })
     }
     
-    /// Read a plist property file and return a dictionary of values
     private static func readPropertyFile(filename: String) -> [String : AnyObject]? {
         
         if let path = Bundle.main.path(forResource: filename, ofType: "plist") {
@@ -299,49 +305,21 @@ So that we have some products to display, we'll create a minimal version of the 
 
 ```swift
 import StoreKit
-
 public typealias ProductId = String
 
-/// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
 @available(iOS 15.0, macOS 12.0, *)
 class StoreHelper: ObservableObject {
     
-    /// List of `Product` retrieved from the App Store and available for purchase.
     @Published private(set) var products: [Product]?
     
-    /// True if we have a list of `Product` returned to us by the App Store.
-    public var hasProducts: Bool {
-        guard products != nil else { return false }
-        return products!.count > 0 ? true : false
-    }
-    
-    /// StoreHelper enables support for working with in-app purchases and StoreKit2 using the async/await pattern.
     init() {
-        
-        // Read our list of product ids
         if let productIds = Configuration.readConfigFile() {
-            
             // Get localized product info from the App Store
-            StoreLog.event(.requestProductsStarted)
-            Task.init {
-                
-                products = await requestProductsFromAppStore(productIds: productIds)
-                
-                if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } else {
-                    StoreLog.event(.requestProductsSuccess)
-                }
-            }
+            Task.init { products = await requestProductsFromAppStore(productIds: productIds) }
         }
     }
     
-    /// Request localized product info from the App Store for a set of ProductId.
-    ///
-    /// This method runs on the main thread because it will result in updates to the UI.
-    /// - Parameter productIds: The product ids that you want localized information for.
-    /// - Returns: Returns an array of `Product`, or nil if no product information is
-    /// returned by the App Store.
     @MainActor public func requestProductsFromAppStore(productIds: Set<ProductId>) async -> [Product]? {
-        
         try? await Product.products(for: productIds)
     }
 }
@@ -353,9 +331,7 @@ We also have a `@Published` array of `Product`. This array gets updated during t
 
 ```swift
 // Get localized product info from the App Store
-Task.init { 
-	products = await requestProductsFromAppStore(productIds: productIds) 
-}
+Task.init { products = await requestProductsFromAppStore(productIds: productIds) }
 ```
 
 The array of products is marked as `@Published` so we can use it to cause our UI to be updated when the array changes.
@@ -373,11 +349,9 @@ Here's our first attempt at a UI to display our products:
 import SwiftUI
 
 struct ContentView: View {
-    
     @StateObject var storeHelper = StoreHelper()
     
     var body: some View {
-        
         if storeHelper.hasProducts {
             List(storeHelper.products!) { product in
                 HStack {
@@ -407,12 +381,6 @@ struct ContentView: View {
                 .font(.title)
                 .foregroundColor(.red)
         }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
     }
 }
 ```
@@ -519,123 +487,7 @@ init() {
 internal func handleTransactions() -> Task<Void, Error> { ... }
 ```
 
-Here's the code for `StoreHelper`. For brevity, all comments and logging statements have been removed. 
-You can [browse the full code for `StoreHelper` here on GitHub](https://github.com/russell-archer/StoreHelper/blob/main/Shared/StoreHelper/StoreHelper.swift).
-
-```swift
-import StoreKit
-
-public typealias ProductId = String
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-public class StoreHelper: ObservableObject {
-    @Published private(set) var products: [Product]?
-    @Published private(set) var purchasedProducts = Set<ProductId>()
-    public private(set) var purchaseState: PurchaseState = .notStarted
-    public enum PurchaseState { case notStarted, inProgress, complete, pending, cancelled, failed, failedVerification, unknown }
-    internal var transactionListener: Task<Void, Error>? = nil
-    
-    init() {
-        transactionListener = handleTransactions()
-        if let productIds = Configuration.readConfigFile() {
-            Task.init {
-                products = await requestProductsFromAppStore(productIds: productIds)    
-                if products == nil, products?.count == 0 { StoreLog.event(.requestProductsFailure) } 
-            }
-        }
-    }
-
-    @MainActor public func requestProductsFromAppStore(productIds: Set<ProductId>) async -> [Product]? {
-        try? await Product.products(for: productIds)
-    }
-    
-    public func isPurchased(product: Product) async throws -> Bool {
-        guard let mostRecentTransaction = await product.latestTransaction else { return false }
-        
-        let checkResult = checkTransactionVerificationResult(result: mostRecentTransaction)
-        if !checkResult.verified { throw StoreException.transactionVerificationFailed }
-
-        let validatedTransaction = checkResult.transaction
-        await updatePurchasedIdentifiers(validatedTransaction)
-
-        return validatedTransaction.revocationDate == nil && !validatedTransaction.isUpgraded
-    }
-    
-    public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
-        guard purchaseState != .inProgress else { throw StoreException.purchaseInProgressException }
-        
-        purchaseState = .inProgress
-        guard let result = try? await product.purchase() else {
-            purchaseState = .failed
-            throw StoreException.purchaseException
-        }
-
-        switch result {
-            case .success(let verificationResult):
-                let checkResult = checkTransactionVerificationResult(result: verificationResult)
-                if !checkResult.verified {
-                    purchaseState = .failedVerification
-                    throw StoreException.transactionVerificationFailed
-                }
-                
-                let validatedTransaction = checkResult.transaction
-                await updatePurchasedIdentifiers(validatedTransaction)
-                await validatedTransaction.finish()
-                purchaseState = .complete
-                return (transaction: validatedTransaction, purchaseState: .complete)
-                
-            case .userCancelled:
-                purchaseState = .cancelled
-                return (transaction: nil, .cancelled)
-                
-            case .pending:
-                purchaseState = .pending
-                return (transaction: nil, .pending)
-                
-            default:
-                purchaseState = .unknown
-                return (transaction: nil, .unknown)
-        }
-    }
-    
-    public func product(from productId: ProductId) -> Product? {
-        guard products != nil else { return nil }
-        let matchingProduct = products!.filter { product in 
-			product.id == productId
-        }
-        
-        guard matchingProduct.count == 1 else { return nil }
-        return matchingProduct.first
-    }
-    
-    internal func handleTransactions() -> Task<Void, Error> {
-        return Task.detached {
-            for await verificationResult in Transaction.listener {
-                let checkResult = self.checkTransactionVerificationResult(result: verificationResult)
-
-                if checkResult.verified {
-                    let validatedTransaction = checkResult.transaction
-                    await self.updatePurchasedIdentifiers(validatedTransaction)
-                    await validatedTransaction.finish()
-                    
-                }
-            }
-        }
-    }
-
-    @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
-        if transaction.revocationDate == nil { purchasedProducts.insert(transaction.productID) } 
-		else { purchasedProducts.remove(transaction.productID) }
-    }
-    
-    internal func checkTransactionVerificationResult(result: VerificationResult<Transaction>) -> (transaction: Transaction, verified: Bool) {
-        switch result {
-            case .unverified(let unverifiedTransaction): return (transaction: unverifiedTransaction, verified: false) 
-            case .verified(let verifiedTransaction): return (transaction: verifiedTransaction, verified: true)
-        }
-    }
-}
-```
+You can [browse the full code for `StoreHelper` on GitHub](https://github.com/russell-archer/StoreHelper/blob/main/Shared/StoreHelper/StoreHelper.swift).
 
 We also need to add a **ViewModel** for `PriceView` named `PriceViewModel`:
 
@@ -654,19 +506,19 @@ struct PriceViewModel {
     func purchase(product: Product) async {
         do {
             let purchaseResult = try await storeHelper.purchase(product)
-            if purchaseResult.transaction != nil { updatePurchaseState(newState: purchaseResult.purchaseState) } 
-			else { updatePurchaseState(newState: purchaseResult.purchaseState)  // The user cancelled, or it's pending approval }
+            if purchaseResult.transaction != nil { 
+				// Purchase appears to have been a success (we need to validate it)
+				updatePurchaseState(newState: purchaseResult.purchaseState) } 
+			else { 
+				// The user cancelled, or it's pending approval
+				updatePurchaseState(newState: purchaseResult.purchaseState) }
         } catch {            
             updatePurchaseState(newState: .failed)  // The purchase or validation failed
         }
     }
     
     private func updatePurchaseState(newState: StoreHelper.PurchaseState) {
-        purchasing  = false
-        cancelled   = newState == .cancelled
-        pending     = newState == .pending
-        failed      = newState == .failed
-        purchased   = newState == .complete
+    	:
     }
 }
 ```
@@ -771,7 +623,7 @@ This is a change from how things worked previously with `StoreKit1` where, in or
 
 - `StoreKit2`
 	- The receipt is a **SQLite database** (`receipts.db`)
-	- Contains all of the user's transactions, with one row per transaction
+	- Contains all of the user's transactions
 
 So, just out of interest, where is the receipt database and can we look at its contents?!
 
@@ -870,15 +722,10 @@ Now we'll update the UI in `ContentView`:
 
 ```swift
 struct ContentView: View {
-    
     @StateObject var storeHelper = StoreHelper()
-    
     var body: some View {
-        
         if storeHelper.hasProducts {
-            
             List {
-                
                 if let nonConsumables = storeHelper.nonConsumableProducts {
                     Section(header: Text("Products")) {
                         ForEach(nonConsumables, id: \.id) { product in
@@ -889,7 +736,6 @@ struct ContentView: View {
                         }
                     }
                 }
-                
                 if let consumables = storeHelper.consumableProducts {
                     Section(header: Text("Services")) {
                         ForEach(consumables, id: \.id) { product in
@@ -904,7 +750,6 @@ struct ContentView: View {
             .listStyle(.insetGrouped)
             
         } else {
-            
             Text("No products available")
                 .font(.title)
                 .foregroundColor(.red)
@@ -976,12 +821,6 @@ public struct KeychainHelper {
 We also need to make a few changes in `StoreHelper:`
 
 ```swift
-/// Requests the most recent transaction for a product from the App Store and determines if it 
-/// has been previously purchased.
-///
-/// May throw an exception of type `StoreException.transactionVerificationFailed`.
-/// - Parameter productId: The `ProductId` of the product.
-/// - Returns: Returns true if the product has been purchased, false otherwise.
 public func isPurchased(productId: ProductId) async throws -> Bool {
     guard let product = product(from: productId) else { return false }
     
@@ -1016,12 +855,6 @@ public func isPurchased(productId: ProductId) async throws -> Bool {
 }
 
 extension StoreHelper {
-    
-    /// Gives the count for purchases for a consumable product. Not applicable to nonconsumables 
-	/// and subscriptions.
-    /// - Parameter productId: The `ProductId` of a consumable product.
-    /// - Returns: The count for purchases for a consumable product (a consumable may be 
-	/// purchased multiple times).
     public func count(for productId: ProductId) -> Int {
         if let product = product(from: productId) {
             if product.type != .consumable { return 0 }
@@ -1031,7 +864,6 @@ extension StoreHelper {
         return 0
     }
     
-    /// Removes all `ProductId` entries in the keychain associated with consumable product purchases.
     public func resetKeychainConsumables() {
         guard products != nil else { return }
         
@@ -1052,10 +884,7 @@ We also introduce a `ConsumableView` that displays a count of the number of unex
 import SwiftUI
 import StoreKit
 
-/// Displays a single row of product information for the main content List.
 struct ConsumableView: View {
-    
-    // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
     @State var count: Int = 0
     
@@ -1120,7 +949,7 @@ If you purchase a consumable the app now looks like this:
 
 And if you purchase the product again:
 
-![[StoreHelper Demo 44.png]]
+![](./readme-assets/StoreHelperDemo44.png)
 
 # Subscriptions
 Subscriptions are an important class of in-app purchase that are becoming more and more widely used by developers. 
@@ -1131,29 +960,34 @@ Open `Products.storekit` and click the **+** to add a new auto-renewable subscri
 
 ![](./readme-assets/StoreHelperDemo34.png)
 
-The first thing you need to do is define a subscription group:
+The first thing you need to do is define a subscription group. We'll name our group "VIP":
 
 ![](./readme-assets/StoreHelperDemo35.png)
 
-You can then define your products within the group:
+You can then define the products within the group. 
+Notice how we adopt the following naming convention for our subscription products:
 
-![](./readme-assets/StoreHelperDemo36.png)
+```xml
+com.{developer}.subscription.{subscription-group-name}.{product-name}"
+```
+
+![](./readme-assets/StoreHelperDemo53.png)
 
 To create subsequent products, click the **+** to add a new auto-renewable subscription. You'll then be offered the choice of adding a new product within the existing group or creating a new group. Select the "VIP" group:
 
 ![](./readme-assets/StoreHelperDemo37.png)
 
-![](./readme-assets/StoreHelperDemo38.png)
+![](./readme-assets/StoreHelperDemo51.png)
 
 Finally, create the third subscription:
 
-![](./readme-assets/StoreHelperDemo39.png)
+![](./readme-assets/StoreHelperDemo52.png)
 
 The **order** in which products are defined in both `Products.storekit` and `Products.plist` is important. As we'll discuss shortly, we need to be able to distinguish the service level of a product within a subscription group. For this reason, the product with the highest service level is defined at the top of the group, with products of decreasing service level placed below it.
 
-Here's how our products should look in `Products.storekit`. Notice the "gold" product is at the top of the list and we've assigned a level value of 1 to it.
+Here's how our products should look in `Products.storekit`. Notice the "gold" product is at the top of the list and we've assigned a level value of 1 to it:
 
-![[StoreHelper Demo 47.png]]
+![](./readme-assets/StoreHelperDemo54.png)
 
 Update `Products.plist` with the same product ids and order:
 
@@ -1169,9 +1003,9 @@ Update `Products.plist` with the same product ids and order:
         <string>com.rarcher.nonconsumable.roses-large</string>
         <string>com.rarcher.nonconsumable.chocolates-small</string>
         <string>com.rarcher.consumable.plant-installation</string>
-        <string>com.rarcher.subscription.gold</string>
-        <string>com.rarcher.subscription.silver</string>
-        <string>com.rarcher.subscription.bronze</string>
+        <string>com.rarcher.subscription.vip.gold</string>
+        <string>com.rarcher.subscription.vip.silver</string>
+        <string>com.rarcher.subscription.vip.bronze</string>
     </array>
 </dict>
 </plist>
@@ -1190,7 +1024,6 @@ public var subscriptionProducts: [Product]? {
 
 ```swift
 struct ContentView: View {
-    
     @StateObject var storeHelper = StoreHelper()
     var body: some View {
         if storeHelper.hasProducts {
@@ -1221,7 +1054,6 @@ At this point it's probably also a good idea to stop creating an instance of `St
 ```swift
 @main
 struct StoreHelperApp: App {
-    
     // Create the StoreHelper object that will be shared throughout the View hierarchy...
     @StateObject var storeHelper = StoreHelper()
     
@@ -1251,13 +1083,13 @@ We can now modify all calls to child views where we've been directly passing in 
 
 After adding some image assets for the new subscriptions, the app looks like this:
 
-![](./readme-assets/StoreHelperDemo45.png)
+![[StoreHelper Demo 45.png]]
 
 And subscription purchasing works correctly too:
 
-![](./readme-assets/StoreHelperDemo41.png)
+![[StoreHelper Demo 41.png]]
 
-![](./readme-assets/StoreHelperDemo46.png)
+![[StoreHelper Demo 46.png]]
 
 Notice that when we purchase the "Gold" subscription we can see that we'll be charged a trial rate of $9.99 for two months, a then $19.99 per month thereafter.
 
@@ -1265,36 +1097,78 @@ However, there are a few things missing, For example, once a purchase has been c
 
 Let's fix that. 
 
-# Displaying Purchase information
-To display information on non-consumable purchases we'll refactor things slightly by moving the various purchasing state variables (`purchasing`, `cancelled`, etc.) from `PurchaseButton` to `ProductView` (and `ConsumableView`). This moves the creation of state nearer the top of the view hierarchy so that we can then inject binding dependencies into child views. To make things neater and more self-contained we'll keep state related to purchasing in a new `PurchaseState` enum:
+# Displaying Non-Consumable Purchase Information
+Getting purchase information for non-consumables is very straightforward. The `latestTransaction` property of a `Product` gives you a `VerificationResult<Transaction>` for the most recent transaction on the product:
 
 ```swift
-public enum PurchaseState { 
-	case notStarted, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown 
+// If nil the product has never been purchased
+guard let unverifiedTransaction = await product.latestTransaction else { ... }
+```
+
+`VerificationResult<Transaction>` is the result of StoreKit's attempt to verify the transaction. You can unwrap it and gain access to the `Transaction` object with a call to `StoreHelper.checkVerificationResult(result:)`:
+
+```swift
+let transactionResult = checkVerificationResult(result: unverifiedTransaction)
+guard transactionResult.verified else { ... }
+```
+
+If `StoreKit2` verified the transaction then we can access the date when the purchase was made:
+
+```swift
+if product.type == .nonConsumable {    
+    let datePurchased = transactionResult.transaction.purchaseDate
 }
 ```
 
-`StoreHelper` will use a private instance of `PurchaseState` internally, and `ProductView` will create a `purchaseState` state variable and pass this down to child views.
-
-A new `PurchaseInfoView` and `PurchaseInfoViewModel` handle the display of non-consumable purchase and subscription data:
+The `StoreHelper.purchaseInfo(for:)` method is used to gather the required purchase information:
 
 ```swift
-/// Displays purchase or subscription information.
+public class StoreHelper: ObservableObject {
+	:
+    @MainActor public func purchaseInfo(for product: Product) async -> PurchaseInfo? {
+        guard product.type == .nonConsumable else { return nil }
+        var purchaseInfo = PurchaseInfo(product: product)
+        guard let unverifiedTransaction = await product.latestTransaction else { return nil }
+        let transactionResult = checkVerificationResult(result: unverifiedTransaction)
+        guard transactionResult.verified else { return nil }
+        
+        purchaseInfo.latestVerifiedTransaction = transactionResult.transaction
+        return purchaseInfo
+    }
+}
+```
+
+The struct returned by `StoreHelper.purchaseInfo(for:)` is used to neatly package purchase information in a read-to-use format:
+
+```swift
+public struct PurchaseInfo {
+    /// The product.
+    var product: Product
+
+    /// The most recent unwrapped StoreKit-verified transaction for a non-consumable. 
+	/// nil if verification failed.
+    var latestVerifiedTransaction: Transaction?
+}
+```
+
+A new `PurchaseInfoView` and `PurchaseInfoViewModel` handles the display of non-consumable purchase data:
+
+```swift
 struct PurchaseInfoView: View {
-    
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseInfoText = ""
     var productId: ProductId
     
     var body: some View {
-        
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
         
-        VStack(alignment: .leading) {
+        HStack(alignment: .center) {
             Text(purchaseInfoText)
                 .font(.footnote)
                 .foregroundColor(.blue)
-                .padding(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(1)
         }
         .onAppear {
             Task.init { purchaseInfoText = await viewModel.info(for: productId) }
@@ -1304,90 +1178,243 @@ struct PurchaseInfoView: View {
 ```
 
 ```swift
-import StoreKit
-import SwiftUI
-
-/// ViewModel for `PurchaseInfoView`. Enables gathering of purchase or subscription information.
 struct PurchaseInfoViewModel {
     
     @ObservedObject var storeHelper: StoreHelper
     var productId: ProductId
     
-    /// Provides text information on the purchase of a non-consumable product or auto-renewing subscription.
-    /// - Parameter productId: The `ProductId` of the product or subscription.
-    /// - Returns: Returns text information on the purchase of a non-consumable product or auto-renewing subscription.
-    func info(for productId: ProductId) async -> String {
-        
-        guard let product = storeHelper.product(from: productId) else { return "No purchase info available." }
+    @MainActor func info(for productId: ProductId) async -> String {
+        guard let product = storeHelper.product(from: productId) else { 
+			return "No purchase info available." 
+		}
+		
         guard product.type != .consumable, product.type != .nonRenewable else { return "" }
         
         // Get detail purchase/subscription info on the product
         guard let info = await storeHelper.purchaseInfo(for: product) else { return "" }
         
-        var text: String
+        var text = ""
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM y"
         
         if info.product.type == .nonConsumable {
-            guard let transaction = info.verifiedTransaction else { return "" }
+            guard let transaction = info.latestVerifiedTransaction else { return "" }
             
             text = "Purchased on \(dateFormatter.string(from: transaction.purchaseDate))."
             if transaction.revocationDate != nil {
-                text += " Purchase revoked on \(dateFormatter.string(from: transaction.revocationDate!))."
+                text += " Revoked on \(dateFormatter.string(from: transaction.revocationDate!))."
             }
-            
-            return text
         }
-		:
-	}
-}
-```
-
-```swift
-public class StoreHelper: ObservableObject {
-	:
-    @MainActor public func purchaseInfo(for product: Product) async -> PurchaseInfo? {
         
-        guard product.type != .consumable && product.type != .nonRenewable else { return nil }
-        var purchaseInfo = PurchaseInfo(product: product)
-        guard let unverifiedTransaction = await product.latestTransaction else { return purchaseInfo }
-        let transactionResult = checkVerificationResult(result: unverifiedTransaction)
-        guard transactionResult.verified else { return purchaseInfo }
-        
-        if product.type == .nonConsumable {
-            purchaseInfo.verifiedTransaction = transactionResult.transaction
-            return purchaseInfo
-        }
-		:
-	}
+        return text
+    }
 }
 ```
 
 We also introduce a "hamburger menu" that allows us to display various useful options:
 
-![[StoreHelper Demo 48.png]]
+![](./readme-assets/StoreHelperDemo55.png)
 
 # Displaying Subscription information
-Displaying information on what product a user is subscribed to, when it renews, how much it costs, and so on is not quite as straightforward as it first appears.
+Displaying information on what product a user is subscribed to, when it renews, how much it costs, and so on is not *quite* as straightforward as it first appears. For example, what happens when a user is subscribed to one level of service and then purchases a higher service level product? The user will expect immediate access to a higher level of service, but how can we tell which subscription is "current"? 
 
-Most important to note is that a user can be subscribed to **multiple products** in the same subscription group! This can happen when the user is automatically entitled to one level of service through family sharing and then pays for a subscription to another product at a higher level of service in the same group. 
+Let's walk through the flow of gathering subscription data.
 
-Also, what happens when a user is subscribed to one level of service and then purchases a higher service level product? The user will expect immediate access to a higher level of service, but how can we tell which subscription is "current" and at what date and time will the switch happen? And how is the price increase handled?
+The key point to note is that, unlike getting purchase info about a non-consumable product, with subscriptions you have to consider the entire subscription **group** of products as a whole. This is because a user can be subscribed to **multiple products** at the same time in the same subscription group! 
 
-Finally, how does the user cancel a subscription?
+For example, this can happen when the user is automatically entitled to one level of service through family sharing, and then pays for a subscription to another product at a higher level of service in the same group. 
 
-Let's take a more detailed look at the various entangled rules that govern subscriptions!
+`StoreKit2` provides a collection of subscription statuses (`[Product.SubscriptionInfo.Status]`) for the subscription group which contains all the information we need. We can access this collection via the `product.subscription.status` property of *any* `Product` in the subscription group (it's the same array in each product). 
 
+Essentially, we enumerate all the statuses in order to find the subscription product that the user's subscribed to which has the highest service level. That is, we find "the best" subscription product the user's entitled to.
 
+The `StoreHelper.subscriptionInfo(for:)` method performs the required processing and returns a `SubscriptionInfo` struct the summarizes the information we need to display to the user:
 
+![](./readme-assets/StoreHelperDemo56.png)
 
+We return the data in a `SubscriptionInfo` object that neatly packages everything required in one easy-to-use `struct`:
 
-![[Pasted image 20210730194317.png]]
+```swift
+/// Information about the highest service level product in a subscription group a user 
+/// is subscribed to.
+public struct SubscriptionInfo: Hashable {
+    /// The product.
+    var product: Product?
+    
+    /// The name of the subscription group `product` belongs to.
+    var subscriptionGroup: String?
+    
+    /// The most recent StoreKit-verified purchase transaction for the subscription. 
+	/// nil if verification failed.
+    var latestVerifiedTransaction: Transaction?
+    
+    /// The StoreKit-verified transaction for a subscription renewal.
+	/// nil if verification failed.
+    var verifiedSubscriptionRenewalInfo:  Product.SubscriptionInfo.RenewalInfo?
+    
+    /// Info on the subscription.
+    var subscriptionStatus: Product.SubscriptionInfo.Status?
+}
+```
 
----
+Of course, we could just return the highest `Product.SubscriptionInfo.Status` we find in the subscription group. However, this would mean the caller would have to re-check and unwrap the transaction and renewal information.
 
-# What Next?
-I'll be updating this demo shortly to add support for:
+The key objects accessible via `SubscriptionInfo` are as follows:
 
-- Automatically handling customer **refunds**
+- `SubscriptionInfo.subscriptionStatus.state`
+An enum that tells you if the subscription is `.subscribed`, `.revoked`, `.expired`, etc.
+
+- `SubscriptionInfo.product.subscription`
+Provides access to `subscriptionPeriod.unit` and `subscriptionPeriod.value` which enables you to work out how often the subscription renews.
+
+- `SubscriptionInfo.verifiedSubscriptionRenewalInfo`
+Allows you to see if the subscription will auto-renew, if the current product will be renewed or the user upgraded/downgraded the product so that a different product will be renewed at the end of the current subscription period, the `expirationDate` of subscription, etc.
+
+- `SubscriptionInfo.latestVerifiedTransaction`
+Tells you if the product has been upgraded, the purchase date, etc. 
+
+We introduce `SubscriptionListViewRow`, `SubscriptionView`, `SubscriptionViewModel` and `SubscriptionInfoView`. As you can see from the arrangement of views in schematic below, `SubscriptionListViewRow` gathers all the subscription data and then uses `SubscriptionView` to display each subscription. `SubscriptionViewModel` is used to format text for display using the raw `SubscriptionInfo` data:
+
+![](./readme-assets/StoreHelperDemo57.png)
+
+```swift
+import SwiftUI
+import StoreKit
+import OrderedCollections
+
+struct SubscriptionListViewRow: View {
+    @EnvironmentObject var storeHelper: StoreHelper
+    @State private var subscriptionGroups: OrderedSet<String>?
+    @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
+    var products: [Product]
+    var headerText: String
+    
+    var body: some View {
+        Section(header: Text(headerText)) {
+            // For each product in the group, display as a row using SubscriptionView().
+            // If the product is the highest subscription level then pass SubscriptionInfo to SubscriptionView().
+            ForEach(products, id: \.id) { product in
+                SubscriptionView(productId: product.id,
+                                 displayName: product.displayName,
+                                 description: product.description,
+                                 price: product.displayPrice,
+                                 subscriptionInfo: subscriptionInformation(for: product))
+            }
+        }
+        .onAppear { getGrouSubscriptionInfo() }
+        .onChange(of: storeHelper.purchasedProducts) { _ in getGrouSubscriptionInfo() }
+    }
+    
+    /// Gets all the subscription groups from the list of subscription products.
+    /// For each group, gets the highest subscription level product.
+    func getGrouSubscriptionInfo() {
+        subscriptionGroups = storeHelper.subscriptionHelper.groups()
+        if let groups = subscriptionGroups {
+            subscriptionInfo = OrderedSet<SubscriptionInfo>()
+            Task.init {
+                for group in groups {
+                    if let hslp = await storeHelper.subscriptionInfo(for: group) { subscriptionInfo!.append(hslp) }
+                }
+            }
+        }
+    }
+    
+    /// Gets `SubscriptionInfo` for a product.
+    /// - Parameter product: The product.
+    /// - Returns: Returns `SubscriptionInfo` for the product if it is the highest service level product
+    /// in the group the user is subscribed to. If the user is not subscribed to the product, or it's
+    /// not the highest service level product in the group then nil is returned.
+    func subscriptionInformation(for product: Product) -> SubscriptionInfo? {
+        if let subsInfo = subscriptionInfo {
+            for subInfo in subsInfo {
+                if let p = subInfo.product, p.id == product.id { return subInfo }
+            }
+        }
+        
+        return nil
+    }
+}
+```
+
+# Upgrades
+So, what happens when the user attempts to upgrade?
+
+![[StoreHelper Demo 49.gif]]
+
+When the user upgrades from the "Silver" subscription to "Gold" StoreKit and the App Store:
+
+- Flag the latest silver transaction as upgraded (which is why it doesn't show up as purchased any more - see `isPurchased(productId:)`
+- Provide a refund to the user for the remaining time left on the upgraded silver subscription
+- Create a new transaction for the subscription to gold
+
+If required, we could display a note in the silver product that it had been upgraded.
+
+# Managing Subscriptions
+If a you wants to see what subscriptions you have you can do so via **Settings > AppleID > Subscriptions**. From here you can view, upgrade, downgrade, or cancel subscriptions.
+
+![[StoreHelper Demo 50.png]]
+
+You can also manage subscriptions from your Mac using the **App Store** app. See https://support.apple.com/en-us/HT202039 for more details. 
+
+However, the problem with this approach is that many user's don't think to look in settings to cancel a subscription. It seems that a commonly held belief is that if you simply delete an app from your phone this will automatically cancel any associated subscriptions.
+
+What's required is some way of managing subscriptions from *within* the app.
+
+With iOS 15 we can now display the same subscriptions sheet using the `.manageSubscriptionsSheet(isPresented:)` view modifier. This will show the current subscriptions for your app:
+
+```swift
+struct OptionsView: View {
+    @State private var showManageSubscriptions = false
+    var body: some View {
+        VStack { ... }
+        .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)  
+		// *** DOESN'T WORK WITH XCODE STOREKIT TESTING. MUST USE SANDBOX ***
+    }
+}
+```
+
+The only drawback with this approach is that it doesn't (yet) work with StoreKit testing in Xcode, so you have to test it in the sandbox environment. See [Human Interface Guidelines - Helping People Manage Their Subscriptions](https://developer.apple.com/design/human-interface-guidelines/in-app-purchase/overview/auto-renewable-subscriptions/#helping-people-manage-their-subscriptions) for more details.
+
+# Refunds
+Another issue that has been a source of annoyance for many years is the ability to issue users with a refund. The only resources available for developers are App Store support, via a [support article](https://support.apple.com/en-us/HT204084), or Apple's [dedicated refund website](https://reportaproblem.apple.com/?s=6).
+
+In iOS 15 we now have the ability to display a refund request sheet from within our apps. The refund sheet shows the user’s transaction details, along with a list of "why I want a refund" codes for the customer to choose from. 
+
+> Note that developers don't have the ability to ***grant*** the user a refund, but simply the means to *initiate* the refund request process with Apple on the user's behalf.
+
+The following shows how you'd display the refund request sheet:
+
+```swift
+    /// Presents the refund request sheet for a transaction in a window scene.
+    ///
+    /// Note that this will not work in the Xcode StoreKit Testing environment:
+    /// you must use the sandbox environment.
+    /// - Parameter productId: The `ProductId` for which the user wants to request a refund.
+    func requestRefund(productId: ProductId) {
+        guard let keyWindow = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .map({$0 as? UIWindowScene})
+                .compactMap({$0})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first,
+              let scene = keyWindow.windowScene else { return }
+
+        Task.init {
+            if let result = await Transaction.latest(for: productId) {
+                let verificationResult = storeHelper.checkVerificationResult(result: result)
+                if verificationResult.verified {
+                    if let status = try? await verificationResult.transaction.beginRefundRequest(in: scene), status == .success {
+                        StoreLog.event(.transactionRefundRequested)
+                    } else {
+                        StoreLog.event(.transactionRefundFailed)
+                    }
+                }
+            }
+        }
+    }
+```
+
+Apple normally responds to the user within 48 hours of a refund request.
+
+More details are available in the WWDC21 video [Support customers and handle refunds](https://developer.apple.com/videos/play/wwdc2021/10175/#:~:text=We%20are%20now%20introducing%20a,notification%20from%20the%20App%20Store).
 
