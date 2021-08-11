@@ -12,7 +12,7 @@ Implementing and testing In-App Purchases with `StoreKit2` and `StoreHelper` in 
 
 > This app requires `StoreKit2`, Swift 5.5, Xcode 13 and iOS 15. 
 > 
-> See [[In-App Purchases with Xcode 12 and iOS 14]] for details of working with the original `StoreKit1` in iOS 14 and lower.
+> See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original `StoreKit1` in iOS 14 and lower.
 
 # Xcode 13 Beta Changes
 - Beta 4
@@ -69,7 +69,7 @@ See [StoreHelperDemo on GitHub](https://github.com/russell-archer/StoreHelper) f
 - [Displaying Subscription Information](#Displaying-Subscription-Information)
 - [Upgrades](#Upgrades)
 - [Managing Subscriptions](#Managing-Subscriptions)   
-- [Refunds](Refunds)
+- [Refunds](#Refunds)
 ---
 
 # References
@@ -1083,13 +1083,13 @@ We can now modify all calls to child views where we've been directly passing in 
 
 After adding some image assets for the new subscriptions, the app looks like this:
 
-![[StoreHelper Demo 45.png]]
+![](./readme-assets/StoreHelperDemo45.png)
 
 And subscription purchasing works correctly too:
 
-![[StoreHelper Demo 41.png]]
+![](./readme-assets/StoreHelperDemo41.png)
 
-![[StoreHelper Demo 46.png]]
+![](./readme-assets/StoreHelperDemo46.png)
 
 Notice that when we purchase the "Gold" subscription we can see that we'll be charged a trial rate of $9.99 for two months, a then $19.99 per month thereafter.
 
@@ -1339,7 +1339,7 @@ struct SubscriptionListViewRow: View {
 # Upgrades
 So, what happens when the user attempts to upgrade?
 
-![[StoreHelper Demo 49.gif]]
+![](./readme-assets/StoreHelperDemo49.gif)
 
 When the user upgrades from the "Silver" subscription to "Gold" StoreKit and the App Store:
 
@@ -1352,7 +1352,7 @@ If required, we could display a note in the silver product that it had been upgr
 # Managing Subscriptions
 If a you wants to see what subscriptions you have you can do so via **Settings > AppleID > Subscriptions**. From here you can view, upgrade, downgrade, or cancel subscriptions.
 
-![[StoreHelper Demo 50.png]]
+![](./readme-assets/StoreHelperDemo50.png)
 
 You can also manage subscriptions from your Mac using the **App Store** app. See https://support.apple.com/en-us/HT202039 for more details. 
 
