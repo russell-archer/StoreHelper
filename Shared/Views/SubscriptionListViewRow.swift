@@ -29,13 +29,13 @@ struct SubscriptionListViewRow: View {
                                  subscriptionInfo: subscriptionInformation(for: product))
             }
         }
-        .onAppear { getGrouSubscriptionInfo() }
+        .onAppear { getGroupSubscriptionInfo() }
         .onChange(of: storeHelper.purchasedProducts) { _ in getGrouSubscriptionInfo() }
     }
     
     /// Gets all the subscription groups from the list of subscription products.
     /// For each group, gets the highest subscription level product.
-    func getGrouSubscriptionInfo() {
+    func getGroupSubscriptionInfo() {
         subscriptionGroups = storeHelper.subscriptionHelper.groups()
         if let groups = subscriptionGroups {
             subscriptionInfo = OrderedSet<SubscriptionInfo>()
