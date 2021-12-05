@@ -210,7 +210,9 @@ The type of product (Non-Consumable, Consumable, Non-Renewing, Auto-Renewing).
 A short descriptive reference for the product. Not visible to users.
 
 - **Product ID** 
-The unique code used to identify an IAP product. This same ID will be used in App Store Connect when setting up in-app purchases for production. Note that Product ID is a string that, by convention, uses the format *com.developer.product-type.product-name*, although it can be anything you like. Not visible to users.
+The unique code used to identify an IAP product. This same ID will be used in App Store Connect when setting up in-app purchases for production. 
+Note that Product ID is a string that, by convention, uses the format *com.developer.product-type.product-name*, although it can be anything you like. 
+Not visible to users.
 
 - **Price** 
 A hard-coded price for the product. In production your app will request localized price (and other) information from the App Store. Visible to users.
@@ -243,7 +245,11 @@ You'll need to do this for both targets (iOS and macOS).
 Should you wish to disable StoreKit testing then repeat the above steps and remove the StoreKit configuration file from the **StoreKit Configuration** list.
 
 # Creating a Production Product List
-We'll see shortly how one of the first things our app has to do on starting is request localized product information from the App Store. This is the case both when using the local StoreKit test environment and the App Store release environment. This requires a list of our product identifiers. We've defined our products in the StoreKit configuration file, so it seems obvious that we should use that as the repository for our IAP data. Retrieving config data at runtime isn't difficult (it's `JSON`). However, the StoreKit configuration file is intended for use *when testing* and it's not a good idea to use it for production too. It would be all too easy to allow "test products" to make it into the release build!
+We'll see shortly how one of the first things our app has to do on starting is request localized product information from the App Store. This is the case both when 
+using the local StoreKit test environment and the App Store release environment. This requires a list of our product identifiers. We've defined our products in the 
+StoreKit configuration file, so it seems obvious that we should use that as the repository for our IAP data. Retrieving config data at runtime isn't difficult 
+(it's `JSON`). However, the StoreKit configuration file is intended for use *when testing* and it's not a good idea to use it for production too. It would be all 
+too easy to allow "test products" to make it into the release build!
 
 So, we'll define a list of our product identifiers in a property list.
 
@@ -263,7 +269,8 @@ Create a new property list named "**Products.plist**", save it to the `Shared/Co
 </plist>
 ```
 
-To help us read the property list we'll create a `Configuration` struct with a single `public static` method. Save the `Configuration.swift` file in the `Shared/Configuration` folder:
+To help us read the property list we'll create a `Configuration` struct with a single `public static` method. Save the `Configuration.swift` file in 
+the `Shared/Configuration` folder:
 
 ```swift
 import Foundation
@@ -404,7 +411,7 @@ Request products from the App Store success
 
 Let's be clear about what happens when the app starts:
 
-- Our `StoreHelper` provides `StoreKit2` with a list of product ids and asks it to get *localized* product information (notice that prices are in US dollars) for us asynchronously from the App Store
+- Our `StoreHelper` provides `StoreKit2` with a list of product ids and asks it to get *localized* product information asynchronously from the App Store
 - The App Store returns the requested product info as a `[Product]` and `StoreHelper` saves this in its `@Published` `products` array
 - Because our `ContentView` holds `StoreHelper` as a `@StateObject`, when `StoreHelper.products` is updated this causes `ContentView` to be re-rendered and display the product list
 
@@ -435,9 +442,9 @@ Our `ContentView` already has a list of products that it's enumerating in a `Lis
 List(storeHelper.products!) { product in
 
 	Button(action: {
- 		Task.init { let result = try? await product.purchase() }
+        Task.init { let result = try? await product.purchase() }
  	}) {
-		Text("Purchase")
+        Text("Purchase")
  	}	
 }
 ```
@@ -484,7 +491,6 @@ internal var transactionListener: Task<Void, Error>? = nil
 
 init() {
     transactionListener = handleTransactions()
-
 }
 
 internal func handleTransactions() -> Task<Void, Error> { ... }
@@ -1137,8 +1143,7 @@ public struct PurchaseInfo {
     /// The product.
     var product: Product
 
-    /// The most recent unwrapped StoreKit-verified transaction for a non-consumable. 
-	/// nil if verification failed.
+    /// The most recent unwrapped StoreKit-verified transaction for a non-consumable. nil if verification failed.
     var latestVerifiedTransaction: Transaction?
 }
 ```
@@ -1176,10 +1181,7 @@ struct PurchaseInfoViewModel {
     var productId: ProductId
     
     @MainActor func info(for productId: ProductId) async -> String {
-        guard let product = storeHelper.product(from: productId) else { 
-			return "No purchase info available." 
-		}
-		
+        guard let product = storeHelper.product(from: productId) else { return "No purchase info available." }
         guard product.type != .consumable, product.type != .nonRenewable else { return "" }
         
         // Get detail purchase/subscription info on the product
@@ -1382,11 +1384,11 @@ The following shows how you'd display the refund request sheet:
     /// - Parameter productId: The `ProductId` for which the user wants to request a refund.
     func requestRefund(productId: ProductId) {
         guard let keyWindow = UIApplication.shared.connectedScenes
-                .filter({$0.activationState == .foregroundActive})
-                .map({$0 as? UIWindowScene})
-                .compactMap({$0})
-                .first?.windows
-                .filter({$0.isKeyWindow}).first,
+                                                  .filter({$0.activationState == .foregroundActive})
+                                                  .map({$0 as? UIWindowScene})
+                                                  .compactMap({$0})
+                                                  .first?.windows
+                                                  .filter({$0.isKeyWindow}).first,
               let scene = keyWindow.windowScene else { return }
 
         Task.init {
