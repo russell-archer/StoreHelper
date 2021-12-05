@@ -277,7 +277,7 @@ public struct Configuration {
         guard let result = Configuration.readPropertyFile(filename: StoreConstants.ConfigFile) else {
             return nil
         }
-		:
+
         return Set<ProductId>(values.compactMap { $0 })
     }
     
@@ -433,7 +433,7 @@ Our `ContentView` already has a list of products that it's enumerating in a `Lis
 
 ```swift
 List(storeHelper.products!) { product in
-	:
+
 	Button(action: {
  		Task.init { let result = try? await product.purchase() }
  	}) {
@@ -481,12 +481,12 @@ public func purchase(_ product: Product) async throws -> (transaction: Transacti
 ```swift
 /// Handle for App Store transactions.
 internal var transactionListener: Task<Void, Error>? = nil
-:
+
 init() {
     transactionListener = handleTransactions()
-	:
+
 }
-:
+
 internal func handleTransactions() -> Task<Void, Error> { ... }
 ```
 
@@ -510,18 +510,17 @@ struct PriceViewModel {
         do {
             let purchaseResult = try await storeHelper.purchase(product)
             if purchaseResult.transaction != nil { 
-				// Purchase appears to have been a success (we need to validate it)
-				updatePurchaseState(newState: purchaseResult.purchaseState) } 
-			else { 
-				// The user cancelled, or it's pending approval
-				updatePurchaseState(newState: purchaseResult.purchaseState) }
+                // Purchase appears to have been a success (we need to validate it)
+                updatePurchaseState(newState: purchaseResult.purchaseState) } 
+            else { 
+                // The user cancelled, or it's pending approval
+                updatePurchaseState(newState: purchaseResult.purchaseState) }
         } catch {            
             updatePurchaseState(newState: .failed)  // The purchase or validation failed
         }
     }
     
     private func updatePurchaseState(newState: StoreHelper.PurchaseState) {
-    	:
     }
 }
 ```
@@ -715,8 +714,6 @@ public class StoreHelper: ObservableObject {
     
     public var consumableProducts: [Product]? { products?.filter { $0.type == .consumable }}
     public var nonConsumableProducts: [Product]? { products?.filter { $0.type == .nonConsumable }}
-	:
-	:
 ```
 
 As you can see we filter the `products` array to return only products of a specific type using `Product.type`.
@@ -774,8 +771,6 @@ public func isPurchased(productId: ProductId) async throws -> Bool {
     guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
         return false  // There's no transaction for the product, so it hasn't been purchased
     }
-    :
-	:
 }
 ```
 
@@ -788,7 +783,6 @@ The reason is simple and non-obvious:
 The rationale for this from Apple's perspective is that consumables are "ephemeral". To quote Apple's documentation (https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements) for `Transaction.currentEntitlement(for:)`:
 
 > The current entitlements sequence emits the latest transaction for each product the user is currently entitled to, specifically: 
-> - :
 > - A transaction for each consumable in-app purchase that you have not finished by calling `finish()`
 
 In tests I've done transactions for consumables do not remain in the receipt, even if you omit to call `finish()`.
@@ -827,15 +821,13 @@ We also need to make a few changes in `StoreHelper:`
 public func isPurchased(productId: ProductId) async throws -> Bool {
     guard let product = product(from: productId) else { return false }
     
-    // We need to treat consumables differently because their transaction are NOT stored 
-	// in the receipt.
+    // We need to treat consumables differently because their transaction are NOT stored in the receipt.
     if product.type == .consumable {
         await updatePurchasedIdentifiers(productId, insert: true)
         return KeychainHelper.count(for: productId) > 0
     }
-	:
 }
-:
+
 @MainActor private func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) async {
     guard let product = product(from: productId) else { return }
     
@@ -1020,7 +1012,7 @@ We can now update `StoreHelper` and `ContentView`:
 /// Computed property that returns all the auto-renewing subscription products 
 /// in the `products` array.
 public var subscriptionProducts: [Product]? {
-	guard products != nil else { return nil }
+    guard products != nil else { return nil }
     return products!.filter { product in product.type == .autoRenewable }
 }
 ```
@@ -1031,7 +1023,7 @@ struct ContentView: View {
     var body: some View {
         if storeHelper.hasProducts {
             List {
-				:
+
                 if let subscriptions = storeHelper.subscriptionProducts {
                     Section(header: Text("Subscriptions")) {
                         ForEach(subscriptions, id: \.id) { product in
@@ -1045,9 +1037,7 @@ struct ContentView: View {
             }
             .listStyle(.insetGrouped)
             
-        } else {
-			:
-        }
+        } else { ... }
     }
 }
 ```
@@ -1075,7 +1065,6 @@ Now in views we reference the instance of `StoreHelper` using `@EnvironmentObjec
 struct ContentView: View {
     // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
-	:
 ```
 
 We can now modify all calls to child views where we've been directly passing in `storeHelper` and add `@EnvironmentObject var storeHelper: StoreHelper` to each child view that requires it. 
@@ -1127,7 +1116,7 @@ The `StoreHelper.purchaseInfo(for:)` method is used to gather the required purch
 
 ```swift
 public class StoreHelper: ObservableObject {
-	:
+
     @MainActor public func purchaseInfo(for product: Product) async -> PurchaseInfo? {
         guard product.type == .nonConsumable else { return nil }
         var purchaseInfo = PurchaseInfo(product: product)
@@ -1247,12 +1236,10 @@ public struct SubscriptionInfo: Hashable {
     /// The name of the subscription group `product` belongs to.
     var subscriptionGroup: String?
     
-    /// The most recent StoreKit-verified purchase transaction for the subscription. 
-	/// nil if verification failed.
+    /// The most recent StoreKit-verified purchase transaction for the subscription. nil if verification failed.
     var latestVerifiedTransaction: Transaction?
     
-    /// The StoreKit-verified transaction for a subscription renewal.
-	/// nil if verification failed.
+    /// The StoreKit-verified transaction for a subscription renewal. nil if verification failed.
     var verifiedSubscriptionRenewalInfo:  Product.SubscriptionInfo.RenewalInfo?
     
     /// Info on the subscription.
@@ -1371,7 +1358,7 @@ struct OptionsView: View {
     var body: some View {
         VStack { ... }
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)  
-		// *** DOESN'T WORK WITH XCODE STOREKIT TESTING. MUST USE SANDBOX ***
+        // *** DOESN'T WORK WITH XCODE STOREKIT TESTING. MUST USE SANDBOX ***
     }
 }
 ```
