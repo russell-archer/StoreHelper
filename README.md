@@ -441,9 +441,7 @@ Our `ContentView` already has a list of products that it's enumerating in a `Lis
 ```swift
 List(storeHelper.products!) { product in
 
-	Button(action: {
-        Task.init { let result = try? await product.purchase() }
- 	}) {
+    Button(action: { Task.init { let result = try? await product.purchase() }}) {
         Text("Purchase")
  	}	
 }
