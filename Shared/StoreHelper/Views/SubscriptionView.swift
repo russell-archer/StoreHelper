@@ -38,6 +38,7 @@ struct SubscriptionView: View {
             
             Text(description)
                 .font(.subheadline)
+                .multilineTextAlignment(.center)
                 .foregroundColor(.gray)
                 .lineLimit(2)
             

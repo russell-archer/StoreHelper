@@ -10,8 +10,8 @@ import StoreKit
 
 /// Displays a product price and a button that enables purchasing.
 struct PriceView: View {
-    
     @EnvironmentObject var storeHelper: StoreHelper
+    @State private var canMakePayments: Bool = false
     @Binding var purchaseState: PurchaseState
     
     var productId: ProductId
@@ -27,17 +27,28 @@ struct PriceView: View {
             Button(action: {
                 purchaseState = .inProgress
                 Task.init { await priceViewModel.purchase(product: product) }
-                
             }) {
-                Text(price)
-                    .font(.body)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(height: 40)
-                    .background(Color.blue)
-                    .cornerRadius(25)
+                if canMakePayments {
+                    Text(price)
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(height: 40)
+                        .background(Color.blue)
+                        .cornerRadius(25)
+                } else {
+                    Text("Disabled")
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(height: 40)
+                        .background(Color.blue)
+                        .cornerRadius(25)
+                }
             }
+            .disabled(!canMakePayments)
         }
+        .onAppear { canMakePayments = AppStore.canMakePayments }
     }
 }
 

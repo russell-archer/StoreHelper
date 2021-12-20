@@ -62,8 +62,8 @@ public class StoreHelper: ObservableObject {
     
     /// True if we have a list of `Product` returned to us by the App Store.
     public var hasProducts: Bool {
-        guard products != nil else { return false }
-        return products!.count > 0 ? true : false
+        guard let p = products else { return false }
+        return p.count > 0 ? true : false
     }
     
     // MARK: - Private properties
@@ -74,7 +74,10 @@ public class StoreHelper: ObservableObject {
     /// The current internal state of StoreHelper. If `purchaseState == inProgress` then an attempt to start
     /// a new purchase will result in a `purchaseInProgressException` being thrown by `purchase(_:)`.
     private var purchaseState: PurchaseState = .unknown
-
+    
+    /// Support for App Store IAP promotions and StoreKit1. Only used for purchase of IAPs direct from the App Store.
+    private var appStoreHelper: AppStoreHelper?
+    
     // MARK: - Initialization
     
     /// StoreHelper enables support for working with in-app purchases and StoreKit2 using the async/await pattern.
@@ -85,23 +88,26 @@ public class StoreHelper: ObservableObject {
     /// - Request localized product info from the App Store.
     @MainActor init() {
         
+        // Add a helper for StoreKit1-based direct purchases from the app store (IAP promotions)
+        appStoreHelper = AppStoreHelper(storeHelper: self)
+        
         // Initialize our subscription helper
         subscriptionHelper = SubscriptionHelper(storeHelper: self)
-                
+        
         // Listen for App Store transactions
         transactionListener = handleTransactions()
         
         // Read our list of product ids
-        productIds = Configuration.readConfigFile()
-        guard productIds != nil else { return }
+        productIds = StoreConfiguration.readConfigFile()
+        guard let pids = productIds else { return }
         
         // Get localized product info from the App Store
         StoreLog.event(.requestProductsStarted)
-
+        
         Task.init {
-
-            products = await requestProductsFromAppStore(productIds: productIds!)
-
+            
+            products = await requestProductsFromAppStore(productIds: pids)
+            
             // As currently coded the app will never know if new products are added to the App Store.
             // We should probably add the ability to periodically re-fetch the product list.
             guard products != nil else {
@@ -134,15 +140,22 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns true if the product has been purchased, false otherwise.
     @MainActor public func isPurchased(productId: ProductId) async throws -> Bool {
         
-        guard let product = product(from: productId) else { return false }
+        var purchased = false
+        guard let product = product(from: productId) else {
+            AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
+            return purchased
+        }
         
-        // We need to treat consumables differently because their transaction are NOT stored in the receipt.
+        // We need to treat consumables differently because their transactions are NOT stored in the receipt.
         if product.type == .consumable {
             await updatePurchasedIdentifiers(productId, insert: true)
-            return KeychainHelper.count(for: productId) > 0
+            purchased = KeychainHelper.count(for: productId) > 0
+            AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
+            return purchased
         }
         
         guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
+            AppGroupSupport.syncPurchase(productId: productId, purchased: false)
             return false  // There's no transaction for the product, so it hasn't been purchased
         }
         
@@ -156,9 +169,17 @@ public class StoreHelper: ObservableObject {
         // Make sure our internal set of purchase pids is in-sync with the App Store
         await updatePurchasedIdentifiers(result.transaction)
         
-        // See if the App Store has revoked the users access to the product (e.g. because of a refund).
+        // See if the App Store has revoked the user's access to the product (e.g. because of a refund).
         // If this transaction represents a subscription, see if the user upgraded to a higher-level subscription.
-        return result.transaction.revocationDate == nil && !result.transaction.isUpgraded
+        purchased = result.transaction.revocationDate == nil && !result.transaction.isUpgraded
+        
+        // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
+        // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
+        // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
+        // StoreKit is concerned.
+        AppGroupSupport.syncPurchase(productId: product.id, purchased: purchased)
+        
+        return purchased
     }
     
     /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
@@ -202,7 +223,7 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
     @MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
-  
+        
         guard AppStore.canMakePayments else {
             StoreLog.event(.purchaseUserCannotMakePayments)
             return (nil, .userCannotMakePayments)
@@ -258,12 +279,18 @@ public class StoreHelper: ObservableObject {
                 // Let the caller know the purchase succeeded and that the user should be given access to the product
                 purchaseState = .purchased
                 StoreLog.event(.purchaseSuccess, productId: product.id)
-                
+                                
                 if validatedTransaction.productType == .consumable {
                     // We need to treat consumables differently because their transactions are NOT stored in the receipt.
                     if KeychainHelper.purchase(product.id) { await updatePurchasedIdentifiers(product.id, insert: true) }
                     else { StoreLog.event(.consumableKeychainError) }
                 }
+                
+                // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
+                // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
+                // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
+                // StoreKit is concerned.
+                AppGroupSupport.syncPurchase(productId: product.id, purchased: true)
                 
                 return (transaction: validatedTransaction, purchaseState: .purchased)
                 
@@ -284,14 +311,25 @@ public class StoreHelper: ObservableObject {
         }
     }
     
+    /// Should be called only when a purchase is handled by the StoreKit1-based AppHelper.
+    /// This will be as a result of a user dirctly purchasing in IAP in the App Store ("IAP Promotion"), rather than in our app.
+    /// - Parameter product: The ProductId of the purchased product.
+    @MainActor public func productPurchased(_ productId: ProductId)  {
+        
+        Task.init { await updatePurchasedIdentifiers(productId, insert: true)}
+        purchaseState = .purchased
+        StoreLog.event(.purchaseSuccess, productId: productId)
+        AppGroupSupport.syncPurchase(productId: productId, purchased: true)
+    }
+    
     /// The `Product` associated with a `ProductId`.
     /// - Parameter productId: `ProductId`.
     /// - Returns: Returns the `Product` associated with a `ProductId`.
     public func product(from productId: ProductId) -> Product? {
         
-        guard products != nil else { return nil }
+        guard let p = products else { return nil }
         
-        let matchingProduct = products!.filter { product in
+        let matchingProduct = p.filter { product in
             product.id == productId
         }
         
@@ -367,7 +405,7 @@ public class StoreHelper: ObservableObject {
         var highestValueTransaction: Transaction?
         var highestValueStatus: Product.SubscriptionInfo.Status?
         var highestRenewalInfo: Product.SubscriptionInfo.RenewalInfo?
-
+        
         for status in statusCollection {
             
             // If the user's not subscribed to this product then keep looking
@@ -417,7 +455,7 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns an `UnwrappedVerificationResult<T>` where `verified` is true if the transaction was
     /// successfully verified by StoreKit. When `verified` is false `verificationError` will be non-nil.
     @MainActor public func checkVerificationResult<T>(result: VerificationResult<T>) -> UnwrappedVerificationResult<T> {
-
+        
         switch result {
             case .unverified(let unverifiedTransaction, let error):
                 // StoreKit failed to automatically validate the transaction

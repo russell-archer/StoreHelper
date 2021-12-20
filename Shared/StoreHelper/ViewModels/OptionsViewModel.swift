@@ -9,31 +9,14 @@ import SwiftUI
 import StoreKit
 
 struct OptionsViewModel {
-    
     @ObservedObject var storeHelper: StoreHelper
-    
-    func command(cmd: OptionCommand, productId: ProductId? = nil) {
-        #if DEBUG
-        switch cmd {
-                
-            case .requestRefund: requestRefund(productId: "com.rarcher.subscription.vip.silver")  // Example ProductId. Debug only.
-            case .resetConsumables: resetConsumables()
-            case .restorePurchases: restorePurchases()
-        }
-        #else
-        switch cmd {
-                
-            case .restorePurchases: restorePurchases()
-            @unknown default: break
-        }
-        #endif
-    }
     
     /// Presents the refund request sheet for a transaction in a window scene.
     ///
     /// Note that this will not work in the Xcode StoreKit Testing environment:
     /// you must use the sandbox environment.
     /// - Parameter productId: The `ProductId` for which the user wants to request a refund.
+    #if os(iOS)
     func requestRefund(productId: ProductId) {
         
         guard !Utils.isSimulator() else {
@@ -65,6 +48,7 @@ struct OptionsViewModel {
             }
         }
     }
+    #endif
     
     #if DEBUG
     /// Resets (deletes) all consumable product purchases from the keychain. Debug-only example.

@@ -31,9 +31,7 @@ struct PurchaseButton: View {
                 
                 if product!.type == .consumable {
                     
-                    if purchaseState != .purchased {
-                        withAnimation { BadgeView(purchaseState: $purchaseState) }
-                    }
+                    if purchaseState != .purchased { withAnimation { BadgeView(purchaseState: $purchaseState) }}
                     PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!)
                     
                 } else {

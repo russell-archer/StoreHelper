@@ -68,7 +68,7 @@
          </EnvironmentVariable>
       </EnvironmentVariables>
       <StoreKitConfigurationFileReference
-         identifier = "../../Shared/Configuration/Products.storekit">
+         identifier = "../../Shared/StoreHelper/Configuration/Products.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction

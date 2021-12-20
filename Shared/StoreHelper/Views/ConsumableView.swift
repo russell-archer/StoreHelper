@@ -14,6 +14,8 @@ struct ConsumableView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     @State var count: Int = 0
+    @Binding var productInfoProductId: ProductId?
+    @Binding var showProductInfoSheet: Bool
     
     var productId: ProductId
     var displayName: String
@@ -27,24 +29,45 @@ struct ConsumableView: View {
                     
                     Image(productId)
                         .resizable()
-                        .frame(width: 75, height: 80)
+                        .frame(width: 150, height: 150)
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
+                        .contentShape(Rectangle())
+                        #if !os(tvOS)
+                        .onTapGesture {
+                            productInfoProductId = productId
+                            showProductInfoSheet = true
+                        }
+                        #endif
                     
                 } else {
                     
                     Image(productId)
                         .resizable()
-                        .frame(width: 75, height: 80)
+                        .frame(width: 150, height: 150)
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
                         .overlay(ConsumableBadgeView(count: $count))
+                        .contentShape(Rectangle())
+                        #if !os(tvOS)
+                        .onTapGesture {
+                            productInfoProductId = productId
+                            showProductInfoSheet = true
+                        }
+                        #endif
                 }
                 
                 Text(displayName)
                     .font(.headline)
                     .padding()
                     .lineLimit(3)
+                    .contentShape(Rectangle())
+                    #if !os(tvOS)
+                    .onTapGesture {
+                        productInfoProductId = productId
+                        showProductInfoSheet = true
+                    }
+                    #endif
                 
                 Spacer()
                 
@@ -55,6 +78,15 @@ struct ConsumableView: View {
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .lineLimit(2)
+                .contentShape(Rectangle())
+                #if !os(tvOS)
+                .onTapGesture {
+                    productInfoProductId = productId
+                    showProductInfoSheet = true
+                }
+                #endif
+            
+            Divider()
         }
         .padding()
         .onAppear {
@@ -79,7 +111,9 @@ struct ConsumableView_Previews: PreviewProvider {
         
         @StateObject var storeHelper = StoreHelper()
         
-        return ConsumableView(productId: "com.rarcher.consumable.plant-installation",
+        return ConsumableView(productInfoProductId: .constant("com.rarcher.consumable.plant-installation"),
+                              showProductInfoSheet: .constant(false),
+                              productId: "com.rarcher.consumable.plant-installation",
                               displayName: "Plant Installation",
                               description: "Expert plant installation",
                               price: "£0.99")

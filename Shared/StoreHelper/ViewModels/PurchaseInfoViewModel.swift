@@ -32,9 +32,9 @@ struct PurchaseInfoViewModel {
         if info.product.type == .nonConsumable {
             guard let transaction = info.latestVerifiedTransaction else { return "" }
             
-            text = "Purchased on \(dateFormatter.string(from: transaction.purchaseDate))."
-            if transaction.revocationDate != nil {
-                text += " App Store revoked the purchase on \(dateFormatter.string(from: transaction.revocationDate!))."
+            text = "Purchased on \(dateFormatter.string(from: transaction.purchaseDate)). Thank you 😀"
+            if let revocationDate = transaction.revocationDate {
+                text += " App Store revoked the purchase on \(dateFormatter.string(from: revocationDate))."
             }
         }
         

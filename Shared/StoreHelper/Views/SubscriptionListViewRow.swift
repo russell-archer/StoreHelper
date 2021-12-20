@@ -14,6 +14,7 @@ struct SubscriptionListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
     @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
+    @Binding var productInfoProductId: ProductId?
     var products: [Product]
     var headerText: String
     
@@ -27,10 +28,14 @@ struct SubscriptionListViewRow: View {
                                  description: product.description,
                                  price: product.displayPrice,
                                  subscriptionInfo: subscriptionInformation(for: product))
+                    .contentShape(Rectangle())
+                    #if !os(tvOS)
+                    .onTapGesture { productInfoProductId = product.id }
+                    #endif
             }
         }
         .onAppear { getGroupSubscriptionInfo() }
-        .onChange(of: storeHelper.purchasedProducts) { _ in getGrouSubscriptionInfo() }
+        .onChange(of: storeHelper.purchasedProducts) { _ in getGroupSubscriptionInfo() }
     }
     
     /// Gets all the subscription groups from the list of subscription products.
@@ -39,6 +44,7 @@ struct SubscriptionListViewRow: View {
         subscriptionGroups = storeHelper.subscriptionHelper.groups()
         if let groups = subscriptionGroups {
             subscriptionInfo = OrderedSet<SubscriptionInfo>()
+            if subscriptionInfo == nil { return }
             Task.init {
                 for group in groups {
                     if let hslp = await storeHelper.subscriptionInfo(for: group) { subscriptionInfo!.append(hslp) }
@@ -62,5 +68,3 @@ struct SubscriptionListViewRow: View {
         return nil
     }
 }
-
-
