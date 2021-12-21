@@ -37,8 +37,10 @@ struct Purchases: View {
             }
         }
         .navigationBarTitle("Purchases", displayMode: .inline)
-        //        .toolbar { HamburgerMenu(showManageSubscriptions: $showManageSubscriptions) }  // TODO. Disabled because of Mac issues
-        //        .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)  // TODO. Disabled because of Mac issues
+        #if os(iOS)
+        .toolbar { HamburgerMenu(showManageSubscriptions: $showManageSubscriptions) }
+        .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
+        #endif
         .sheet(isPresented: $showProductInfoSheet) {
             VStack {
                 HStack {
@@ -52,8 +54,7 @@ struct Purchases: View {
                 Spacer()
                 
                 switch productInfoProductId {
-                        // TODO: Add views here that show product info
-                    default: Text("Unknown product. You should add views that provide an overview of the in-app purchase. See `Purchases.swift`")
+                    default: Text("This is the in-app purchase info page for the product \"\(productInfoProductId ?? "unknown product")\". You should add a view that provides an overview of the in-app purchase. See `Purchases.swift`")
                 }
             }
         }
