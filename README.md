@@ -14,13 +14,18 @@ Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13, Swift 5.
 > 
 > See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the original `StoreKit1` in iOS 14 and lower.
 
-# Xcode 13 Beta Changes
-- Beta 5
-	- Modified `StoreHelper.checkVerificationResult(result:)` to return `UnwrappedVerificationResult`. 
-    This includes a new `VerificationResult<T>.VerificationError` that is provided by StoreKit2 when the unwrapped transaction is unverified
-- Beta 4
+---
+
+# Recent Changes
+- 21 December, 2021
+	- Updated documentation to reflect refactoring changes
+- 20 December, 2021
+	- Refactored throughout so that this non-private version of StoreHelper is in-sync with private StoreHelper code used in an app released to the App Store
+- Xcode 13 Beta 5
+	- Modified `StoreHelper.checkVerificationResult(result:)` to return `UnwrappedVerificationResult`. This includes a new `VerificationResult<T>.VerificationError` that is provided by StoreKit2 when the unwrapped transaction is unverified
+- Xcode 13 Beta 4
 	- None required
-- Beta 3
+- Xcode 13 Beta 3
 	- The use of `Task.Handle` has been deprecated
 	- The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
 	- The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
@@ -28,7 +33,7 @@ Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13, Swift 5.
 	- The use of `detach` in `StoreHelper.handleTransactions()`  has been replaced with `Task.detached`
 	- The use of `async {}` blocks in a synchronous context has been deprecated
 	- All `async {}` blocks have been replaced with `Task.init {}`
-- Beta 2
+- Xcode 13 Beta 2
 	- `Transaction.listener` is now `Transaction.updates`
 	- `Product.request(with:)` is now `Product.products(for:)`
 
@@ -96,7 +101,7 @@ The basic premise for the demo is that we're creating an app for an on-line flor
 
 Specifically, in building the app we'll cover:
 
-- How to create a **multi-platform** SwiftUI app that allows users to purchase a range of products, including:
+- How to create a SwiftUI app that allows users to purchase a range of products, including:
 
 	- **consumable** (VIP plant installation service: lasts for one day)
 	- **non-consumable** (cut flowers, potted plants, chocolates, etc.)
@@ -152,18 +157,15 @@ The good news is that although there are two versions of the StoreKit, both fram
 The best way to get familiar with `StoreKit2` is to create a simple, but full-featured (from an in-app purchase perspective) demo app. I'll introduce features in an as-required manner as we build the app from it's simplest form to a fully-functional demo.
 
 # Get Started
-`StoreHelperDemo` was created using Xcode 13 (beta) and the multi-platform app template.
-
-To get started, here's the structure of the Xcode project after creating empty group folders but before we start adding files. Note that I moved `ContentView.swift` into the `Shared/Views` folder and `StoreHelperApp.swift` and the `Assets` catalog into the `Shared/Support` folder:
+`StoreHelperDemo` was created using Xcode 13. To get started, here's the structure of the Xcode project after creating empty group folders but before we start adding files. Note that I moved `ContentView.swift` into the `Shared/Views` folder and `StoreHelperApp.swift` and the `Assets` catalog into the `Shared/Support` folder:
 
 ![](./readme-assets/StoreHelperDemo1.png)
 
-Check that your iOS and macOS targets support iOS 15 and macOS 12 respectively:
+Check that your iOS target supports iOS 15:
 
 ![](./readme-assets/StoreHelperDemo3.png)
-![](./readme-assets/StoreHelperDemo4.png)
 
-For both targets, add the **In-App Purchase** capability. This will also add the `StoreKit` framework to your project:
+Add the **In-App Purchase** capability. This will also add the `StoreKit` framework to your project:
 
 ![](./readme-assets/StoreHelperDemo5.png)
 
@@ -185,9 +187,9 @@ Select **File > New > File** and choose the **StoreKit Configuration File** temp
 
 ![](./readme-assets/StoreHelperDemo6.png)
 
-Save the file as `Products.storekit` in the `Shared/Configuration` folder.
+Save the file as `Products.storekit` in the `Shared/StoreHelper/Configuration` folder.
 
-Open the Products configuration file and click **+** to add an in-app purchase. For example, select the **Add Non-Consumable In-App Purchase** option:
+Open the **Products** configuration file and click **+** to add an in-app purchase. For example, select the **Add Non-Consumable In-App Purchase** option:
 
 ![](./readme-assets/StoreHelperDemo7.png)
 
@@ -240,8 +242,6 @@ You can now select your configuration file from the **StoreKit Configuration** l
 
 ![](./readme-assets/StoreHelperDemo9.png)
 
-You'll need to do this for both targets (iOS and macOS).
-
 Should you wish to disable StoreKit testing then repeat the above steps and remove the StoreKit configuration file from the **StoreKit Configuration** list.
 
 # Creating a Production Product List
@@ -253,7 +253,7 @@ too easy to allow "test products" to make it into the release build!
 
 So, we'll define a list of our product identifiers in a property list.
 
-Create a new property list named "**Products.plist**", save it to the `Shared/Configuration` folder and add the product identifiers:
+Create a new property list named "**Products.plist**", save it to the `Shared/StoreHelper/Configuration` folder and add the product identifiers:
 
 ```xml
 <plist version="1.0">
@@ -269,27 +269,14 @@ Create a new property list named "**Products.plist**", save it to the `Shared/Co
 </plist>
 ```
 
-To help us read the property list we'll create a `Configuration` struct with a single `public static` method. Save the `Configuration.swift` file in 
-the `Shared/Configuration` folder:
+To help us read the property list we'll create a `PropertyFile` struct with a single `public static` method. Save the `PropertyFile.swift` file in 
+the `Shared/Util` folder:
 
 ```swift
-import Foundation
-
-public struct Configuration {
+struct PropertyFile {
     
-    private init() {}
-    
-    public static func readConfigFile() -> Set<ProductId>? {
-        
-        guard let result = Configuration.readPropertyFile(filename: StoreConstants.ConfigFile) else {
-            return nil
-        }
-
-        return Set<ProductId>(values.compactMap { $0 })
-    }
-    
-    private static func readPropertyFile(filename: String) -> [String : AnyObject]? {
-        
+    /// Read a plist property file and return a dictionary of values
+    static func read(filename: String) -> [String : AnyObject]? {
         if let path = Bundle.main.path(forResource: filename, ofType: "plist") {
             if let contents = NSDictionary(contentsOfFile: path) as? [String : AnyObject] {
                 return contents
@@ -311,7 +298,7 @@ If running on the simulator, select the machine the simulator is running on. Typ
 When running the app on a real device that's not attached to the Xcode debugger, dynamic strings (i.e. the error, event or message parameter you send to the event() function) will not be publicly viewable. They're automatically redacted with the word "private" in the console. This prevents the accidental logging of potentially sensitive user data. Because we know in advance that `StoreNotificaton` enums do not contain sensitive information, we let the unified logging system know it's OK to log these strings through the use of the "%{public}s" keyword. However, we don't know what the event(message:) function will be used to display, so its logs will be redacted.
 
 # StoreHelper
-So that we have some products to display, we'll create a minimal version of the `StoreHelper` class before we focus on the UI. Save the `StoreHelper.swift` file in `Shared/StoreHelper`:
+So that we have some products to display, we'll create a minimal version of the `StoreHelper` class before we focus on the UI. Save the `StoreHelper.swift` file in `Shared/StoreHelper/StoreHelper`:
 
 ```swift
 import StoreKit
@@ -323,7 +310,7 @@ class StoreHelper: ObservableObject {
     @Published private(set) var products: [Product]?
     
     init() {
-        if let productIds = Configuration.readConfigFile() {
+        if let productIds = StoreConfiguration.readConfigFile() {
             // Get localized product info from the App Store
             Task.init { products = await requestProductsFromAppStore(productIds: productIds) }
         }
@@ -358,7 +345,7 @@ Here's our first attempt at a UI to display our products:
 ```swift
 import SwiftUI
 
-struct ContentView: View {
+struct Purchases: View {
     @StateObject var storeHelper = StoreHelper()
     
     var body: some View {
@@ -395,6 +382,19 @@ struct ContentView: View {
 }
 ```
 
+You'll need to change `StoreHelperApp` as follows to display the `Purchases` view:
+
+```swift
+@main
+struct StoreHelperApp: App {
+    var body: some Scene {
+        WindowGroup {
+			Purchases()
+        }
+    }
+}
+```
+
 We create our `StoreHelper` as a `@StateObject` and check if `storeHelper.hasProducts`. When it does we enumerate `storeHelper.products` in a `List`. 
 
 Running the app's iOS target produces:
@@ -413,7 +413,7 @@ Let's be clear about what happens when the app starts:
 
 - Our `StoreHelper` provides `StoreKit2` with a list of product ids and asks it to get *localized* product information asynchronously from the App Store
 - The App Store returns the requested product info as a `[Product]` and `StoreHelper` saves this in its `@Published` `products` array
-- Because our `ContentView` holds `StoreHelper` as a `@StateObject`, when `StoreHelper.products` is updated this causes `ContentView` to be re-rendered and display the product list
+- Because our `Purchases` view holds `StoreHelper` as a `@StateObject`, when `StoreHelper.products` is updated this causes `Purchases` to be re-rendered and display the product list
 
 The above process works in *exactly* the same way when the app is running in a live production environment and accessing the "real" App Store.
 
@@ -436,7 +436,7 @@ The `Product` struct is a an important object in `StoreKit2`. We've seen how the
 ## Designing the UI
 Let's add the ability to purchase products. This means calling the `purchase()` method on the `Product` object that represents the product we want to purchase.
 
-Our `ContentView` already has a list of products that it's enumerating in a `List`. So, essentially all we need to is add a `Button` and call the product's `purchase(_:)` method:
+Our `Purchases` view already has a list of products that it's enumerating in a `List`. So, essentially all we need to is add a `Button` and call the product's `purchase(_:)` method:
 
 ```swift
 List(storeHelper.products!) { product in
@@ -447,13 +447,13 @@ List(storeHelper.products!) { product in
 }
 ```
 
-Notice how we need to add an `Task.init {...}` block to our button's action closure. This allows us to run async code in a "synchronous context" (the `ContentView`).
+Notice how we need to add an `Task.init {...}` block to our button's action closure. This allows us to run async code in a "synchronous context" (the `Purchases` view).
 
 To keep the size and complexity of views manageable, I split the various parts of the UI into separate views like this:
 
 ![](./readme-assets/StoreHelperDemo15.png)
 
-- The `ContentView` has a `List` which contains a collection of `ProductView` objects
+- The `Purchases` view has a `List` which contains a collection of `ProductView` objects
 - Each `ProductView` has an image of the product, the name of the product and a `PurchaseButton` 
 - `PurchaseButton` contains a `BadgeView` and a `PriceView`
 - `BadgeView` displays a small image showing the state of the purchase state of the product (i.e. purchased, failed, etc.)
@@ -567,8 +567,6 @@ The simplified purchase process flow (showing mainly the "success" path) is as f
 11. ... the collection of purchase product ids is updated to add the newly purchased product
 12. `StoreHelper` tells `StoreKit2` the `Transaction` is finished and returns the `Transaction` object to `PriceViewModel`. It sets `@State` variables to show the purchase was a success and the UI is re-rendered
 
-![](./readme-assets/StoreHelperDemo24.gif)
-
 If we run the app we can now make purchases:
 
 ![](./readme-assets/StoreHelperDemo20.gif)
@@ -665,7 +663,7 @@ The `receipt` column is a plain text field where the contents are clearly encryp
 So, because we know an up-to-date version of the receipts database will always be present, we can always use it (via `StoreKit2`) to find out a user's product entitlements.
 
 # Consumables
-Now we have the basics of the app working we can move onto adding another type of product: consumables.
+Now we have the basics of the app working we can move onto adding another type of product: **consumables**.
 
 Consumables are products that are used once, or for a limited time and then expire. If the user wants to use the product again they need to re-purchase. A typical consumable product would be a token in game that temporarily gives you more lives or higher powers. Once the token's used up the user would lose the abilities it confers.
 
@@ -679,7 +677,7 @@ We define the product like this:
 
 ![](./readme-assets/StoreHelperDemo30.png)
 
-Now add the new product to Products.plist:
+Now add the new product to **Products.plist**:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -722,7 +720,7 @@ public class StoreHelper: ObservableObject {
 
 As you can see we filter the `products` array to return only products of a specific type using `Product.type`.
 
-Now we'll update the UI in `ContentView`:
+Now we'll update the UI in `Purchases`:
 
 ```swift
 struct ContentView: View {
@@ -741,7 +739,7 @@ struct ContentView: View {
                     }
                 }
                 if let consumables = storeHelper.consumableProducts {
-                    Section(header: Text("Services")) {
+                    Section(header: Text("VIP Services")) {
                         ForEach(consumables, id: \.id) { product in
                             ProductView(storeHelper: storeHelper,
                                         productId: product.id,
@@ -1010,7 +1008,7 @@ Update `Products.plist` with the same product ids and order:
 </plist>
 ```
 
-We can now update `StoreHelper` and `ContentView`:
+We can now update `StoreHelper` and `Purchases`:
 
 ```swift
 /// Computed property that returns all the auto-renewing subscription products 
@@ -1022,7 +1020,7 @@ public var subscriptionProducts: [Product]? {
 ```
 
 ```swift
-struct ContentView: View {
+struct Purchases: View {
     @StateObject var storeHelper = StoreHelper()
     var body: some View {
         if storeHelper.hasProducts {
@@ -1046,18 +1044,20 @@ struct ContentView: View {
 }
 ```
 
-At this point it's probably also a good idea to stop creating an instance of `StoreHelper` in `ContentView` and manually passing it down to child views. Instead, we'll create it in the `App` and use the environment to automatically pass the object down through the view hierarchy:
+At this point it's probably also a good idea to stop creating an instance of `StoreHelper` in `Purchases` and manually passing it down to child views. Instead, we'll create it in the `App` and use the environment to automatically pass the object down through the view hierarchy:
 
 ```swift
 @main
 struct StoreHelperApp: App {
-    // Create the StoreHelper object that will be shared throughout the View hierarchy...
+    
+    // Create the StoreHelper object that will be shared throughout the View hierarchy
     @StateObject var storeHelper = StoreHelper()
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(storeHelper)  // ...and add it to ContentView
+            ScrollView {
+                Purchases().environmentObject(storeHelper)
+            }
         }
     }
 }
@@ -1066,7 +1066,7 @@ struct StoreHelperApp: App {
 Now in views we reference the instance of `StoreHelper` using `@EnvironmentObject`:
 
 ```swift
-struct ContentView: View {
+struct Purchases: View {
     // Access the storeHelper object that has been created by @StateObject in StoreHelperApp
     @EnvironmentObject var storeHelper: StoreHelper
 ```
@@ -1203,7 +1203,7 @@ struct PurchaseInfoViewModel {
 }
 ```
 
-We also introduce a "hamburger menu" that allows us to display various useful options:
+If we wrap the `Purchase` view content in a `ScrollView` and `NavigationView`, we can introduce a "hamburger menu" that allows us to display various useful options:
 
 ![](./readme-assets/StoreHelperDemo55.png)
 

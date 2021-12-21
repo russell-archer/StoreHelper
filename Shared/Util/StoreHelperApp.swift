@@ -15,9 +15,7 @@ struct StoreHelperApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ScrollView {
-                Purchases().environmentObject(storeHelper)
-            }
+            Purchases().environmentObject(storeHelper)
         }
     }
 }
