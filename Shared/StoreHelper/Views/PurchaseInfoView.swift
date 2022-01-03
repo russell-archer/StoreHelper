@@ -21,11 +21,17 @@ struct PurchaseInfoView: View {
         
         HStack(alignment: .center) {
             Text(purchaseInfoText)
+                #if os(iOS)
                 .font(.footnote)
+                #endif
                 .foregroundColor(.blue)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
+                #if os(iOS)
                 .padding(1)
+                #elseif os(macOS)
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
+                #endif
         }
         .onAppear {
             Task.init { purchaseInfoText = await viewModel.info(for: productId) }

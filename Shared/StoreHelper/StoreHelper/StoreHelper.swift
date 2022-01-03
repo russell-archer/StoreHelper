@@ -44,6 +44,14 @@ public class StoreHelper: ObservableObject {
     /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
     @Published private(set) var purchasedProducts = [ProductId]()
     
+    /// List of purchased product ids. This list is used as a fallback when the App Store in unavailable.
+    /// The public `isPurchased(product:)` method will use this list when `products` is nil and `isAppStoreAvailable` is false.
+    /// This collection is updated with live App Store data when calls are made to `isPurchased(product:)`.
+    public var purchasedProductsFallback = [ProductId]()
+    
+    /// Set to true if we successfully retrieve a list of available products from the App Store.
+    public private(set) var isAppStoreAvailable = false
+    
     /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
     /// product ids are defined in the property list file is maintained in the set.
     public private(set) var productIds: OrderedSet<ProductId>?
@@ -99,38 +107,47 @@ public class StoreHelper: ObservableObject {
         
         // Read our list of product ids
         productIds = StoreConfiguration.readConfigFile()
-        guard let pids = productIds else { return }
+        
+        // Get the fallback list of purchased products in case the App Store's not available
+        purchasedProductsFallback = readPurchasedProductsFallbackList()
         
         // Get localized product info from the App Store
-        StoreLog.event(.requestProductsStarted)
-        
-        Task.init {
-            
-            products = await requestProductsFromAppStore(productIds: pids)
-            
-            // As currently coded the app will never know if new products are added to the App Store.
-            // We should probably add the ability to periodically re-fetch the product list.
-            guard products != nil else {
-                StoreLog.event(.requestProductsFailure)
-                return
-            }
-            
-            StoreLog.event(.requestProductsSuccess)
-        }
+        refreshProductsFromAppStore()
     }
     
     deinit { transactionListener?.cancel() }
     
     // MARK: - Public methods
     
+    /// Request refreshed localized product info from the App Store. In general, use this method
+    /// in preference to `requestProductsFromAppStore(productIds:)` as you don't need to supply
+    /// an ordered set of App Store-defined product ids.
+    /// This method runs on the main thread because it may result in updates to the UI.
+    @MainActor func refreshProductsFromAppStore() {
+        Task.init {
+            isAppStoreAvailable = false
+            guard let pids = productIds else { return }
+            products = await requestProductsFromAppStore(productIds: pids)
+        }
+    }
+    
     /// Request localized product info from the App Store for a set of ProductId.
     ///
-    /// This method runs on the main thread because it will result in updates to the UI.
+    ///
+    /// This method runs on the main thread because it may result in updates to the UI.
     /// - Parameter productIds: The product ids that you want localized information for.
     /// - Returns: Returns an array of `Product`, or nil if no product information is returned by the App Store.
     @MainActor public func requestProductsFromAppStore(productIds: OrderedSet<ProductId>) async -> [Product]? {
+        StoreLog.event(.requestProductsStarted)
+        guard let localizedProducts = try? await Product.products(for: productIds) else {
+            isAppStoreAvailable = false
+            StoreLog.event(.requestProductsFailure)
+            return nil
+        }
         
-        return try? await Product.products(for: productIds)
+        isAppStoreAvailable = true
+        StoreLog.event(.requestProductsSuccess)
+        return localizedProducts
     }
     
     /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
@@ -141,22 +158,33 @@ public class StoreHelper: ObservableObject {
     @MainActor public func isPurchased(productId: ProductId) async throws -> Bool {
         
         var purchased = false
+        
+        guard isAppStoreAvailable, hasProducts else {
+            // The App Store is not available, or it didn't return a list of localized products
+            // so we use the temporary fallback list of purchased products
+            return purchasedProductsFallback.contains(productId)
+        }
+        
         guard let product = product(from: productId) else {
-            AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
-            return purchased
+            updatePurchasedProductsFallbackList(for: productId, purchased: false)
+            AppGroupSupport.syncPurchase(productId: productId, purchased: false)
+            return false
         }
         
         // We need to treat consumables differently because their transactions are NOT stored in the receipt.
         if product.type == .consumable {
             await updatePurchasedIdentifiers(productId, insert: true)
             purchased = KeychainHelper.count(for: productId) > 0
+            updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
             AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
             return purchased
         }
         
         guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
+            // There's no transaction for the product, so it hasn't been purchased
             AppGroupSupport.syncPurchase(productId: productId, purchased: false)
-            return false  // There's no transaction for the product, so it hasn't been purchased
+            updatePurchasedProductsFallbackList(for: productId, purchased: false)
+            return false
         }
         
         // See if the transaction passed StoreKit's automatic verification
@@ -178,6 +206,9 @@ public class StoreHelper: ObservableObject {
         // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
         // StoreKit is concerned.
         AppGroupSupport.syncPurchase(productId: product.id, purchased: purchased)
+        
+        // Update and persist our fallback list of purchased products
+        updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
         
         return purchased
     }
@@ -550,6 +581,45 @@ public class StoreHelper: ObservableObject {
                 }
             }
         }
+    }
+    
+    /// Read the list of fallback purchased products from storage.
+    /// - Returns: Returns the list of fallback product ids, or nil if none is available.
+    private func readPurchasedProductsFallbackList() -> [ProductId] {
+        if let collection = UserDefaults.standard.object(forKey: StoreConstants.PurchasedProductsFallbackKey) as? [ProductId] {
+            return collection
+        }
+        
+        return [ProductId]()
+    }
+    
+    /// Saves the fallback collection of purchased product ids.
+    private func savePurchasedProductsFallbackList() {
+        UserDefaults.standard.set(purchasedProductsFallback, forKey: StoreConstants.PurchasedProductsFallbackKey)
+    }
+    
+    /// Add a ProductId from the list of fallback purchased product ids. The list is then persisted to UserDefaults.
+    /// - Parameter productId: The ProductId to add.
+    private func addToPurchasedProductsFallbackList(productId: ProductId) {
+        if purchasedProductsFallback.contains(productId) { return }
+        purchasedProductsFallback.append(productId)
+        savePurchasedProductsFallbackList()
+    }
+    
+    /// Remove a ProductId from the list of fallback purchased product ids. The list is then persisted to UserDefaults.
+    /// - Parameter productId: The ProductId to remove.
+    private func removeFromPurchasedProductsFallbackList(productId: ProductId) {
+        purchasedProductsFallback.removeAll(where: { $0 == productId })
+        savePurchasedProductsFallbackList()
+    }
+    
+    /// Add or removes the ProductId to/from the list of fallback purchased product ids. The list is then persisted to UserDefaults.
+    /// - Parameters:
+    ///   - productId: The ProductId to add or remove.
+    ///   - purchased: true if the product was purchased, false otherwise.
+    private func updatePurchasedProductsFallbackList(for productId: ProductId, purchased: Bool) {
+        if purchased { addToPurchasedProductsFallbackList(productId: productId)}
+        else { removeFromPurchasedProductsFallbackList(productId: productId)}
     }
 }
 

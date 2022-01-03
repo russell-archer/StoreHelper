@@ -47,6 +47,9 @@ struct PriceView: View {
                 }
             }
             .disabled(!canMakePayments)
+            #if os(macOS)
+            .macOSStyle()
+            #endif
         }
         .onAppear { canMakePayments = AppStore.canMakePayments }
     }

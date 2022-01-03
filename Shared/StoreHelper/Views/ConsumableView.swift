@@ -33,12 +33,10 @@ struct ConsumableView: View {
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
                         .contentShape(Rectangle())
-                        #if !os(tvOS)
                         .onTapGesture {
                             productInfoProductId = productId
                             showProductInfoSheet = true
                         }
-                        #endif
                     
                 } else {
                     
@@ -49,12 +47,10 @@ struct ConsumableView: View {
                         .cornerRadius(25)
                         .overlay(ConsumableBadgeView(count: $count))
                         .contentShape(Rectangle())
-                        #if !os(tvOS)
                         .onTapGesture {
                             productInfoProductId = productId
                             showProductInfoSheet = true
                         }
-                        #endif
                 }
                 
                 Text(displayName)
@@ -62,12 +58,10 @@ struct ConsumableView: View {
                     .padding()
                     .lineLimit(3)
                     .contentShape(Rectangle())
-                    #if !os(tvOS)
                     .onTapGesture {
                         productInfoProductId = productId
                         showProductInfoSheet = true
                     }
-                    #endif
                 
                 Spacer()
                 
@@ -79,12 +73,10 @@ struct ConsumableView: View {
                 .foregroundColor(.gray)
                 .lineLimit(2)
                 .contentShape(Rectangle())
-                #if !os(tvOS)
                 .onTapGesture {
                     productInfoProductId = productId
                     showProductInfoSheet = true
                 }
-                #endif
             
             Divider()
         }

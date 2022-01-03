@@ -22,23 +22,19 @@ struct ProductListViewRow: View {
                     ForEach(products, id: \.id) { product in
                         ConsumableView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, productId: product.id, displayName: product.displayName, description: product.description, price: product.displayPrice)
                             .contentShape(Rectangle())
-                            #if !os(tvOS)
                             .onTapGesture {
                                 productInfoProductId = product.id
                                 showProductInfoSheet = true
                             }
-                            #endif
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
                         ProductView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, productId: product.id, displayName: product.displayName, description: product.description, price: product.displayPrice)
                             .contentShape(Rectangle())
-                            #if !os(tvOS)
                             .onTapGesture {
                                 productInfoProductId = product.id
                                 showProductInfoSheet = true
                             }
-                            #endif
                     }
                 }
             }

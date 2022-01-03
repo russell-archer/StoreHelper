@@ -29,9 +29,7 @@ struct SubscriptionListViewRow: View {
                                  price: product.displayPrice,
                                  subscriptionInfo: subscriptionInformation(for: product))
                     .contentShape(Rectangle())
-                    #if !os(tvOS)
                     .onTapGesture { productInfoProductId = product.id }
-                    #endif
             }
         }
         .onAppear { getGroupSubscriptionInfo() }
