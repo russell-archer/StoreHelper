@@ -133,16 +133,7 @@ struct ProductView: View {
             Button(action: {
                 productInfoProductId = productId
                 showProductInfoSheet = true
-            }) {
-                VStack {
-                    Image(systemName: "info.circle")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .aspectRatio(contentMode: .fit)
-                    Text("More Info").font(.subheadline)
-                }
-            }
-            .macOSStyle()
+            }) { Label("More Info on \"\(displayName)\"", systemImage: "info.circle")}.macOSStyle()
             
             Text(description)
                 .multilineTextAlignment(.center)

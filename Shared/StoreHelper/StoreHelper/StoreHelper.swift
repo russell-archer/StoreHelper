@@ -498,6 +498,18 @@ public class StoreHelper: ObservableObject {
         }
     }
     
+    /// Gets the unique transaction id for the product's most recent transaction.
+    /// - Parameter productId: The product's unique App Store id.
+    /// - Returns: Returns the unique transaction id for the product's most recent transaction, or nil if the product's never been purchased.
+    @MainActor public func mostRecentTransactionId(for productId: ProductId) async -> UInt64? {
+        if let result = await Transaction.latest(for: productId) {
+            let verificationResult = checkVerificationResult(result: result)
+            if verificationResult.verified { return verificationResult.transaction.id }
+        }
+        
+        return nil
+    }
+    
     // MARK: - Internal methods
     
     /// Update our list of purchased product identifiers (see `purchasedProducts`).
