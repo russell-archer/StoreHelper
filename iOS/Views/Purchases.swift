@@ -43,10 +43,7 @@ struct Purchases: View {
                     }
                 }
                 .navigationBarTitle("Purchases", displayMode: .inline)
-                #if os(iOS)
-                .toolbar { HamburgerMenu(showManageSubscriptions: $showManageSubscriptions) }
-                .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
-                #endif
+	        .toolbar { PurchaseManagement() }
                 .sheet(isPresented: $showProductInfoSheet) {
                     VStack {
                         HStack {

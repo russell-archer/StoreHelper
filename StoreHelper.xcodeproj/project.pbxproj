@@ -18,6 +18,7 @@
 		688252C726BE953500892FB6 /* SubscriptionListViewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */; };
 		688252CA26BE9E1B00892FB6 /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688252C926BE9E1B00892FB6 /* SubscriptionView.swift */; };
 		688252CD26BEA2D200892FB6 /* SubscriptionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688252CC26BEA2D200892FB6 /* SubscriptionInfo.swift */; };
+		689C72FB2784C38900355CBA /* PurchaseManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 689C72FA2784C38900355CBA /* PurchaseManagement.swift */; };
 		689EF8AA26A878FF00EAE26D /* ConsumableBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 689EF8A926A878FF00EAE26D /* ConsumableBadgeView.swift */; };
 		68A440CF26986F6D00D2408B /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A440CE26986F6D00D2408B /* KeychainHelper.swift */; };
 		68A440D2269897DD00D2408B /* ConsumableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A440D1269897DD00D2408B /* ConsumableView.swift */; };
@@ -26,7 +27,6 @@
 		68ACE6832680D92700AA9895 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE6822680D92700AA9895 /* ProductView.swift */; };
 		68ACE6862680D94300AA9895 /* PriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE6852680D94300AA9895 /* PriceView.swift */; };
 		68ACE6892680D95D00AA9895 /* BadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE6882680D95D00AA9895 /* BadgeView.swift */; };
-		68AF013326A9D59200F75F9C /* HamburgerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AF013226A9D59200F75F9C /* HamburgerMenu.swift */; };
 		68C084BA26A8C017002EE9A0 /* PurchaseInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C084B926A8C017002EE9A0 /* PurchaseInfoViewModel.swift */; };
 		68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CE0D8626B35F2700CE9CC4 /* PurchaseInfo.swift */; };
 		68D7F2012770DCF5008EBC09 /* Purchases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D7F2002770DCF5008EBC09 /* Purchases.swift */; };
@@ -62,6 +62,7 @@
 		688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionListViewRow.swift; sourceTree = "<group>"; };
 		688252C926BE9E1B00892FB6 /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
 		688252CC26BEA2D200892FB6 /* SubscriptionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionInfo.swift; sourceTree = "<group>"; };
+		689C72FA2784C38900355CBA /* PurchaseManagement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseManagement.swift; sourceTree = "<group>"; };
 		689EF8A926A878FF00EAE26D /* ConsumableBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsumableBadgeView.swift; sourceTree = "<group>"; };
 		68A440CE26986F6D00D2408B /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		68A440D1269897DD00D2408B /* ConsumableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsumableView.swift; sourceTree = "<group>"; };
@@ -70,7 +71,6 @@
 		68ACE6822680D92700AA9895 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		68ACE6852680D94300AA9895 /* PriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceView.swift; sourceTree = "<group>"; };
 		68ACE6882680D95D00AA9895 /* BadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
-		68AF013226A9D59200F75F9C /* HamburgerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HamburgerMenu.swift; sourceTree = "<group>"; };
 		68B1A30C26BAEACA00C3D1C5 /* StoreHelperDemo48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo48.png; sourceTree = "<group>"; };
 		68B1A30D26BAEACA00C3D1C5 /* StoreHelperDemo16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo16.png; sourceTree = "<group>"; };
 		68B1A30E26BAEACA00C3D1C5 /* StoreHelperDemo41.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo41.png; sourceTree = "<group>"; };
@@ -330,13 +330,13 @@
 				68ACE6882680D95D00AA9895 /* BadgeView.swift */,
 				689EF8A926A878FF00EAE26D /* ConsumableBadgeView.swift */,
 				68A440D1269897DD00D2408B /* ConsumableView.swift */,
-				68AF013226A9D59200F75F9C /* HamburgerMenu.swift */,
 				68ACE6852680D94300AA9895 /* PriceView.swift */,
 				6848F1EF26AAF6730000F0AC /* ProductListView.swift */,
 				6848F1F526AAF9C70000F0AC /* ProductListViewRow.swift */,
 				68ACE6822680D92700AA9895 /* ProductView.swift */,
 				68ACE67F2680D90800AA9895 /* PurchaseButton.swift */,
 				6824DD1F26A5ED5A00E44F35 /* PurchaseInfoView.swift */,
+				689C72FA2784C38900355CBA /* PurchaseManagement.swift */,
 				68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */,
 				6866FAAD26BEC7F100FDA4C6 /* SubscriptionInfoView.swift */,
 				688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */,
@@ -470,9 +470,9 @@
 				688252CD26BEA2D200892FB6 /* SubscriptionInfo.swift in Sources */,
 				68ACE6862680D94300AA9895 /* PriceView.swift in Sources */,
 				68F493EE26B5BDC0002E3724 /* OptionsViewModel.swift in Sources */,
-				68AF013326A9D59200F75F9C /* HamburgerMenu.swift in Sources */,
 				68D7F2012770DCF5008EBC09 /* Purchases.swift in Sources */,
 				6824DD2026A5ED5A00E44F35 /* PurchaseInfoView.swift in Sources */,
+				689C72FB2784C38900355CBA /* PurchaseManagement.swift in Sources */,
 				68D7F2172771036D008EBC09 /* AppGroupSupport.swift in Sources */,
 				68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */,
 				68F773CF267A494500C3C670 /* Utils.swift in Sources */,

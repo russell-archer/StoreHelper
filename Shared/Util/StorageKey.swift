@@ -8,8 +8,17 @@
 import Foundation
 
 public enum StorageKey {
-    case appGroupBundleId   // The id for the container shared between the main app and widgets
-    case contactUsUrl       // A URL where the user can contact the app developer
+    case appGroupBundleId   // Not stored. Constant value. The id for the container shared between the main app and widgets
+    case contactUsUrl       // Not stored. Constant value. A URL where the user can contact the app developer.
+    case requestRefund      // Not stored. Constant value. A URL which users on macOS can use to request a refund for an IAP.
+
+    public func key() -> String {
+        switch self {
+            case .appGroupBundleId: return "appGroupBundleId"
+            case .contactUsUrl:     return "contactUsUrl"
+            case .requestRefund:    return "requestRefund"
+        }
+    }
     
     public func value() -> String? {
         switch self {
@@ -18,8 +27,12 @@ public enum StorageKey {
             // no shared data
             case .appGroupBundleId: return nil
                 
-            // A contact URL. Will be used in the purchases hamburger menu
-            case .contactUsUrl: return nil
+            // A contact URL. Will be used in the purchase management view
+            case .contactUsUrl: return ""
+                
+            // A URL which users on macOS can use to request a refund for an IAP
+            case .requestRefund: return "https://reportaproblem.apple.com/"
         }
     }
 }
+

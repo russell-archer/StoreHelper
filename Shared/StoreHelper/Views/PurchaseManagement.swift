@@ -85,10 +85,10 @@ struct PurchaseManagement: View {
                 }
             }
             .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
-            .refundRequestSheet(for: 0, isPresented: $showRefundSheet) { refundRequestStatus in
+            .refundRequestSheet(for: selectProductForRefund.transactionId, isPresented: $showRefundSheet) { refundRequestStatus in
                 switch(refundRequestStatus) {
-                    case .failure(_): print("")
-                    case .success(_): print("")
+                    case .failure(_): break
+                    case .success(_): break
                 }
             }
         }
