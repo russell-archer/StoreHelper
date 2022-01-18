@@ -23,14 +23,14 @@ struct Purchases: View {
     @State private var showRefundAlert: Bool = false
     @State private var refundAlertText: String = ""
     
+    #if os(macOS)
+    @State private var showManagePurchases = false
+    #endif
+    
     @ViewBuilder var body: some View {
         VStack {
-            ProductListView(productInfoProductId: $productInfoProductId,
-                            showProductInfoSheet: $showProductInfoSheet,
-                            showRefundSheet: $showRefundSheet,
-                            refundRequestTransactionId: $refundRequestTransactionId)
-            
-            Divider()
+            #if os(iOS)
+            ProductListView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId)
             Button(purchasesRestored ? "Purchases Restored" : "Restore Purchases") {
                 Task.init {
                     try? await AppStore.sync()
@@ -46,6 +46,13 @@ struct Purchases: View {
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                 .foregroundColor(.secondary)
             
+            #elseif os(macOS)
+            ProductListView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet)
+            DisclosureGroup(isExpanded: $showManagePurchases, content: { PurchaseManagement()}, label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
+                .onTapGesture { withAnimation { showManagePurchases.toggle()}}
+                .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+            #endif
+            
             if !canMakePayments {
                 Spacer()
                 Text("Purchases are not permitted on your device.")
@@ -53,10 +60,13 @@ struct Purchases: View {
                     .foregroundColor(.secondary)
             }
         }
+        #if os(iOS)
         .navigationBarTitle("Purchases", displayMode: .inline)
         .toolbar { PurchaseManagement() }
+        #endif
         .sheet(isPresented: $showProductInfoSheet) {
             VStack {
+                #if os(iOS)
                 HStack {
                     Spacer()
                     Button(action: { showProductInfoSheet = false }) {
@@ -66,11 +76,26 @@ struct Purchases: View {
                     .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
                 }
                 Spacer()
+                #elseif os(macOS)
+                HStack {
+                    Spacer()
+                    Image(systemName: "xmark.circle")
+                        .foregroundColor(.secondary)
+                        .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
+                        .onTapGesture { showProductInfoSheet = false }
+                }
+                Spacer()
+                #endif
                 
                 // Pull in text and images that explain the particular product identified by `productInfoProductId`
                 ProductPurchaseInfo(productInfoProductId: $productInfoProductId)
             }
+            #if os(macOS)
+            .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 700, idealHeight: 700, maxHeight: 700)
+            .fixedSize(horizontal: true, vertical: true)
+            #endif
         }
+        #if os(iOS)
         .refundRequestSheet(for: refundRequestTransactionId, isPresented: $showRefundSheet) { refundRequestStatus in
             switch(refundRequestStatus) {
                 case .failure(_): refundAlertText = "Refund request submission failed"
@@ -79,6 +104,7 @@ struct Purchases: View {
 
             showRefundAlert.toggle()
         }
+        #endif
         .alert(refundAlertText, isPresented: $showRefundAlert) {
             Button("OK") { showRefundAlert.toggle()}
         }

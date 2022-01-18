@@ -28,7 +28,7 @@ public enum StorageKey {
             case .appGroupBundleId: return nil
                 
             // A contact URL. Will be used in the purchase management view
-            case .contactUsUrl: return ""
+            case .contactUsUrl: return "https://russell-archer.github.io"
                 
             // A URL which users on macOS can use to request a refund for an IAP
             case .requestRefund: return "https://reportaproblem.apple.com/"

@@ -20,7 +20,7 @@ struct VersionInfo: View {
             
             HStack {
                 #if os(iOS)
-                Image("AppStoreIcon").bodyImage().frame(width: 75)
+                Image("ios-icon").bodyImage().frame(width: 75)
                 VStack {
                     Text("Version \(versionInfo)").font(.subheadline).foregroundColor(Color("GroupBoxText")).padding(1)
                     Text("Build \(buildInfo)").font(.subheadline).foregroundColor(Color("GroupBoxText")).padding(1)

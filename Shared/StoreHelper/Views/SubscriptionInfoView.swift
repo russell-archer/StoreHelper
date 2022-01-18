@@ -61,11 +61,11 @@ struct SubscriptionInfoView: View {
                 .lineLimit(nil)
         }
         .padding()
-        .onTapGesture { withAnimation { showPurchaseInfoSheet.toggle()}}
+        .onTapGesture { withAnimation { showSubscriptionInfoSheet.toggle()}}
         .onAppear {
-            Task.init { subscriptionInfoText = await viewModel.info() }
+            Task.init { subscriptionInfoText = await viewModel.shortInfo() }
         }
-        .sheet(isPresented: $showPurchaseInfoSheet) {
+        .sheet(isPresented: $showSubscriptionInfoSheet) {
             if let pid = subscriptionInfo.product?.id {
                 SubscriptionInfoSheet(showPurchaseInfoSheet: $showSubscriptionInfoSheet, productId: pid, viewModel: viewModel)
             }

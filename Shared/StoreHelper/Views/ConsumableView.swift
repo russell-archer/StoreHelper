@@ -81,7 +81,11 @@ struct ConsumableView: View {
             .padding()
 
             if purchaseState == .purchased {
+                #if os(iOS)
                 PurchaseInfoView(showRefundSheet: .constant(false), refundRequestTransactionId: .constant(UInt64.min), productId: productId)
+                #elseif os(macOS)
+                PurchaseInfoView(productId: productId)
+                #endif
             }
             else {
                 ProductInfoView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, productId: productId, displayName: displayName)

@@ -65,6 +65,8 @@ struct SubscriptionView: View {
             } else {
                 ProductInfoView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, productId: productId, displayName: displayName)
             }
+            
+            Divider()
         }
         .padding()
         .onAppear {
