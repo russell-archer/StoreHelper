@@ -18,17 +18,21 @@ struct ProductPurchaseInfo: View {
             HStack { Spacer() }
             ScrollView {
                 VStack {
-                        if let p = product {
-                            Text(p.displayName).font(.largeTitle).foregroundColor(.blue)
-                            Image(p.id)
-                                .resizable()
-                                .frame(maxWidth: 200, maxHeight: 200)
-                                .aspectRatio(contentMode: .fit)
-                                .cornerRadius(25)
-                        }
-                        
-                        Text("This is a product information sheet.").font(.title2).padding().multilineTextAlignment(.center)
-                        Text("Add text explaining your product here.").font(.title3).padding().multilineTextAlignment(.center)
+                    if let p = product {
+                        Text(p.displayName).font(.largeTitle).foregroundColor(.blue)
+                        Image(p.id)
+                            .resizable()
+                            .frame(maxWidth: 200, maxHeight: 200)
+                            .aspectRatio(contentMode: .fit)
+                            .cornerRadius(25)
+                    }
+                    
+                    // Pull in the text appropriate for the product
+                    switch productInfoProductId {
+                        case "com.rarcher.nonconsumable.flowers-large": ProductInfoFlowersLarge()
+                        case "com.rarcher.nonconsumable.flowers-small": ProductInfoFlowersSmall()
+                        default: ProductInfoDefault()
+                    }
                 }
                 .padding(.bottom)
             }
@@ -40,3 +44,25 @@ struct ProductPurchaseInfo: View {
         }
     }
 }
+
+struct ProductInfoFlowersLarge: View {
+    var body: some View {
+        Text("This is a information about the **Large Flowers** product.").font(.title2).padding().multilineTextAlignment(.center)
+        Text("Add text and images explaining this product here.").font(.title3).padding().multilineTextAlignment(.center)
+    }
+}
+
+struct ProductInfoFlowersSmall: View {
+    var body: some View {
+        Text("This is a information about the **Small Flowers** product.").font(.title2).padding().multilineTextAlignment(.center)
+        Text("Add text and images explaining this product here.").font(.title3).padding().multilineTextAlignment(.center)
+    }
+}
+
+struct ProductInfoDefault: View {
+    var body: some View {
+        Text("This is generic information about a product.").font(.title2).padding().multilineTextAlignment(.center)
+        Text("Add text and images explaining your product here.").font(.title3).padding().multilineTextAlignment(.center)
+    }
+}
+

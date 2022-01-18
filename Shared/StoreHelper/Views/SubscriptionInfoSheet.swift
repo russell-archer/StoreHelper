@@ -98,7 +98,7 @@ struct SubscriptionInfoSheet: View {
                     }) { Label("Manage Subscriptions", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)
                     #endif
                     
-                    Text("Managing your subscriptions requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")
+                    Text("Managing your subscriptions may require you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")
                         .font(.caption2)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)

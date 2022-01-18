@@ -30,6 +30,7 @@
 		68ACE6862680D94300AA9895 /* PriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE6852680D94300AA9895 /* PriceView.swift */; };
 		68ACE6892680D95D00AA9895 /* BadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68ACE6882680D95D00AA9895 /* BadgeView.swift */; };
 		68C084BA26A8C017002EE9A0 /* PurchaseInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C084B926A8C017002EE9A0 /* PurchaseInfoViewModel.swift */; };
+		68C26AA02796E187001D47F7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C26A9F2796E187001D47F7 /* ContentView.swift */; };
 		68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CE0D8626B35F2700CE9CC4 /* PurchaseInfo.swift */; };
 		68D7F2012770DCF5008EBC09 /* Purchases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D7F2002770DCF5008EBC09 /* Purchases.swift */; };
 		68D7F2052770DE14008EBC09 /* VersionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D7F2042770DE14008EBC09 /* VersionInfo.swift */; };
@@ -127,6 +128,7 @@
 		68B1A33B26BAEACB00C3D1C5 /* StoreHelperDemo20.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo20.gif; sourceTree = "<group>"; };
 		68B1A33C26BAEACB00C3D1C5 /* StoreHelperDemo32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo32.png; sourceTree = "<group>"; };
 		68C084B926A8C017002EE9A0 /* PurchaseInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseInfoViewModel.swift; sourceTree = "<group>"; };
+		68C26A9F2796E187001D47F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		68CE0D8626B35F2700CE9CC4 /* PurchaseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseInfo.swift; sourceTree = "<group>"; };
 		68D7F2002770DCF5008EBC09 /* Purchases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchases.swift; sourceTree = "<group>"; };
 		68D7F2042770DE14008EBC09 /* VersionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionInfo.swift; sourceTree = "<group>"; };
@@ -244,7 +246,7 @@
 		68D7F1FF2770DC92008EBC09 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				68D7F2002770DCF5008EBC09 /* Purchases.swift */,
+				68C26A9F2796E187001D47F7 /* ContentView.swift */,
 				68F5C98A2794A1B00054B2B1 /* ProductPurchaseInfo.swift */,
 			);
 			path = Views;
@@ -253,6 +255,7 @@
 		68D7F2032770DDF8008EBC09 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				68D7F2002770DCF5008EBC09 /* Purchases.swift */,
 				68D7F2042770DE14008EBC09 /* VersionInfo.swift */,
 			);
 			path = Views;
@@ -492,6 +495,7 @@
 				68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */,
 				68F773CF267A494500C3C670 /* Utils.swift in Sources */,
 				68706B892790588400A31888 /* PurchaseInfoSheet.swift in Sources */,
+				68C26AA02796E187001D47F7 /* ContentView.swift in Sources */,
 				6866FAB126BECA1600FDA4C6 /* SubscriptionInfoViewModel.swift in Sources */,
 				68D7F20C2770E10C008EBC09 /* AppStoreHelper.swift in Sources */,
 				68D7F20E2770E20A008EBC09 /* StoreConfiguration.swift in Sources */,
