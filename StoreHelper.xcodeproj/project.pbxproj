@@ -14,6 +14,8 @@
 		6848F1F626AAF9C70000F0AC /* ProductListViewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6848F1F526AAF9C70000F0AC /* ProductListViewRow.swift */; };
 		6866FAAE26BEC7F100FDA4C6 /* SubscriptionInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6866FAAD26BEC7F100FDA4C6 /* SubscriptionInfoView.swift */; };
 		6866FAB126BECA1600FDA4C6 /* SubscriptionInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6866FAB026BECA1600FDA4C6 /* SubscriptionInfoViewModel.swift */; };
+		68706B872790583F00A31888 /* ProductInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68706B862790583F00A31888 /* ProductInfoView.swift */; };
+		68706B892790588400A31888 /* PurchaseInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68706B882790588400A31888 /* PurchaseInfoSheet.swift */; };
 		687273A92683749300C37D94 /* PriceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687273A82683749300C37D94 /* PriceViewModel.swift */; };
 		688252C726BE953500892FB6 /* SubscriptionListViewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */; };
 		688252CA26BE9E1B00892FB6 /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688252C926BE9E1B00892FB6 /* SubscriptionView.swift */; };
@@ -38,6 +40,8 @@
 		68D7F2172771036D008EBC09 /* AppGroupSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D7F2162771036D008EBC09 /* AppGroupSupport.swift */; };
 		68D7F21927710612008EBC09 /* PropertyFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D7F21827710612008EBC09 /* PropertyFile.swift */; };
 		68F493EE26B5BDC0002E3724 /* OptionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F493ED26B5BDC0002E3724 /* OptionsViewModel.swift */; };
+		68F5C98B2794A1B00054B2B1 /* ProductPurchaseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F5C98A2794A1B00054B2B1 /* ProductPurchaseInfo.swift */; };
+		68F5C98D2794A8330054B2B1 /* SubscriptionInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F5C98C2794A8330054B2B1 /* SubscriptionInfoSheet.swift */; };
 		68F7739B267A43C400C3C670 /* StoreHelperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F77379267A43C300C3C670 /* StoreHelperApp.swift */; };
 		68F7739F267A43C400C3C670 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68F7737B267A43C400C3C670 /* Assets.xcassets */; };
 		68F773B9267A451E00C3C670 /* Products.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68F773B8267A451E00C3C670 /* Products.plist */; };
@@ -58,6 +62,8 @@
 		6848F1F526AAF9C70000F0AC /* ProductListViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListViewRow.swift; sourceTree = "<group>"; };
 		6866FAAD26BEC7F100FDA4C6 /* SubscriptionInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionInfoView.swift; sourceTree = "<group>"; };
 		6866FAB026BECA1600FDA4C6 /* SubscriptionInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionInfoViewModel.swift; sourceTree = "<group>"; };
+		68706B862790583F00A31888 /* ProductInfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductInfoView.swift; sourceTree = "<group>"; };
+		68706B882790588400A31888 /* PurchaseInfoSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseInfoSheet.swift; sourceTree = "<group>"; };
 		687273A82683749300C37D94 /* PriceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceViewModel.swift; sourceTree = "<group>"; };
 		688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionListViewRow.swift; sourceTree = "<group>"; };
 		688252C926BE9E1B00892FB6 /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
@@ -131,6 +137,8 @@
 		68D7F2162771036D008EBC09 /* AppGroupSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppGroupSupport.swift; sourceTree = "<group>"; };
 		68D7F21827710612008EBC09 /* PropertyFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyFile.swift; sourceTree = "<group>"; };
 		68F493ED26B5BDC0002E3724 /* OptionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsViewModel.swift; sourceTree = "<group>"; };
+		68F5C98A2794A1B00054B2B1 /* ProductPurchaseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductPurchaseInfo.swift; sourceTree = "<group>"; };
+		68F5C98C2794A8330054B2B1 /* SubscriptionInfoSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionInfoSheet.swift; sourceTree = "<group>"; };
 		68F77379267A43C300C3C670 /* StoreHelperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHelperApp.swift; sourceTree = "<group>"; };
 		68F7737B267A43C400C3C670 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		68F77380267A43C400C3C670 /* StoreHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoreHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -237,6 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				68D7F2002770DCF5008EBC09 /* Purchases.swift */,
+				68F5C98A2794A1B00054B2B1 /* ProductPurchaseInfo.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -331,13 +340,16 @@
 				689EF8A926A878FF00EAE26D /* ConsumableBadgeView.swift */,
 				68A440D1269897DD00D2408B /* ConsumableView.swift */,
 				68ACE6852680D94300AA9895 /* PriceView.swift */,
+				68706B862790583F00A31888 /* ProductInfoView.swift */,
 				6848F1EF26AAF6730000F0AC /* ProductListView.swift */,
 				6848F1F526AAF9C70000F0AC /* ProductListViewRow.swift */,
 				68ACE6822680D92700AA9895 /* ProductView.swift */,
 				68ACE67F2680D90800AA9895 /* PurchaseButton.swift */,
+				68706B882790588400A31888 /* PurchaseInfoSheet.swift */,
 				6824DD1F26A5ED5A00E44F35 /* PurchaseInfoView.swift */,
 				689C72FA2784C38900355CBA /* PurchaseManagement.swift */,
 				68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */,
+				68F5C98C2794A8330054B2B1 /* SubscriptionInfoSheet.swift */,
 				6866FAAD26BEC7F100FDA4C6 /* SubscriptionInfoView.swift */,
 				688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */,
 				688252C926BE9E1B00892FB6 /* SubscriptionView.swift */,
@@ -468,6 +480,9 @@
 				68ACE6832680D92700AA9895 /* ProductView.swift in Sources */,
 				689EF8AA26A878FF00EAE26D /* ConsumableBadgeView.swift in Sources */,
 				688252CD26BEA2D200892FB6 /* SubscriptionInfo.swift in Sources */,
+				68F5C98B2794A1B00054B2B1 /* ProductPurchaseInfo.swift in Sources */,
+				68F5C98D2794A8330054B2B1 /* SubscriptionInfoSheet.swift in Sources */,
+				68706B872790583F00A31888 /* ProductInfoView.swift in Sources */,
 				68ACE6862680D94300AA9895 /* PriceView.swift in Sources */,
 				68F493EE26B5BDC0002E3724 /* OptionsViewModel.swift in Sources */,
 				68D7F2012770DCF5008EBC09 /* Purchases.swift in Sources */,
@@ -476,6 +491,7 @@
 				68D7F2172771036D008EBC09 /* AppGroupSupport.swift in Sources */,
 				68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */,
 				68F773CF267A494500C3C670 /* Utils.swift in Sources */,
+				68706B892790588400A31888 /* PurchaseInfoSheet.swift in Sources */,
 				6866FAB126BECA1600FDA4C6 /* SubscriptionInfoViewModel.swift in Sources */,
 				68D7F20C2770E10C008EBC09 /* AppStoreHelper.swift in Sources */,
 				68D7F20E2770E20A008EBC09 /* StoreConfiguration.swift in Sources */,

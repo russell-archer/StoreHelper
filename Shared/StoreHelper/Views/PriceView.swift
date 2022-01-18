@@ -24,8 +24,9 @@ struct PriceView: View {
         
         HStack {
             
+            #if os(iOS)
             Button(action: {
-                purchaseState = .inProgress
+                withAnimation { purchaseState = .inProgress }
                 Task.init { await priceViewModel.purchase(product: product) }
             }) {
                 if canMakePayments {
@@ -33,22 +34,53 @@ struct PriceView: View {
                         .font(.body)
                         .foregroundColor(.white)
                         .padding()
-                        .frame(height: 40)
+                        .frame(width: 90, height: 40)
+                        .fixedSize()
                         .background(Color.blue)
                         .cornerRadius(25)
+                        .padding(.leading, 10)
                 } else {
                     Text("Disabled")
                         .font(.subheadline)
                         .foregroundColor(.white)
                         .padding()
-                        .frame(height: 40)
+                        .frame(width: 90, height: 40)
+                        .fixedSize()
                         .background(Color.blue)
                         .cornerRadius(25)
+                        .padding(.leading, 10)
                 }
             }
             .disabled(!canMakePayments)
-            #if os(macOS)
-            .macOSStyle()
+            #elseif os(macOS)
+            HStack {
+                if canMakePayments {
+                    Text(price)
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 90, height: 40)
+                        .fixedSize()
+                        .background(Color.blue)
+                        .cornerRadius(25)
+                        .padding(.leading, 10)
+                } else {
+                    Text("Disabled")
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 90, height: 40)
+                        .fixedSize()
+                        .background(Color.blue)
+                        .cornerRadius(25)
+                        .padding(.leading, 10)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation { purchaseState = .inProgress }
+                Task.init { await priceViewModel.purchase(product: product) }
+            }
             #endif
         }
         .onAppear { canMakePayments = AppStore.canMakePayments }

@@ -111,7 +111,7 @@ Specifically, in building the app we'll cover:
 - Requesting localized **product information** from the App Store
 - How to **purchase** a product and **validate the transaction**
 - Handling **pending ("ask to buy") transactions** where parental permission must be obtained before a purchase is completed
-- Handling **canceled** and **failed transactions**
+- Handling **cancelled** and **failed transactions**
 - Handling customer **refunds**
 - Exploring detailed **transaction information and history** for non-consumables and subscriptions
 - Testing purchases locally using **StoreKit configuration** files
@@ -133,13 +133,13 @@ See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-arche
 - Better still, transactions are now **automatically** validated by `StoreKit2`!!
 
 ## Async/Await support
-`StoreKit1` uses a closure-based method of working with async APIs and notifications:
+`StoreKit1` uses a delegate-based method of working with async APIs and notifications:
 
 - This leads to code that is difficult to read, with program flow being somewhat disjointed
 
 `StoreKit2` fully embraces the new `Async`/`Await` pattern introduced in Swift 5.5, Xcode 13 and iOS 15:
 
-- This makes working with async APIs much easier and results in a more "natural" flow to your code
+- This makes working with async APIs much easier and results in a more natural flow to your code
 
 ## Should I use StoreKit1 or StoreKit2?
 Working with in-app purchases using `StoreKit2` is a vastly superior experience over using `StoreKit1` and you should choose to use it if possible.
@@ -389,7 +389,7 @@ You'll need to change `StoreHelperApp` as follows to display the `Purchases` vie
 struct StoreHelperApp: App {
     var body: some Scene {
         WindowGroup {
-			Purchases()
+            Purchases()
         }
     }
 }
@@ -419,7 +419,7 @@ The above process works in *exactly* the same way when the app is running in a l
 
 ![](./readme-assets/StoreHelperDemo12.png)
 
-I mentioned above that prices were in US dollars. This is because, by default in test environment, the App Store `Storefront` is **United States (USD)** and the localization is **English (US)**. To support testing other locales you can change this. Make sure the `Products.storekit` file is open, then select **Editor > Default Storefront** and change this to another value. You can also changed the localization from **English (US**) with **Editor > Default Localization**.
+I mentioned above that prices were in US dollars. This is because, by default in a test environment, the App Store `Storefront` is **United States (USD)** and the localization is **English (US)**. To support testing other locales you can change this. Make sure the `Products.storekit` file is open, then select **Editor > Default Storefront** and change this to another value. You can also changed the localization from **English (US**) with **Editor > Default Localization**.
 
 Here I selected **United Kingdom (GBP)** as the storefront and **English (UK)** as the localization. Notice how prices are now in UK Pounds:
 
@@ -428,7 +428,7 @@ Here I selected **United Kingdom (GBP)** as the storefront and **English (UK)** 
 In the above screenshot you'll see that, unlike with the US storefront, the UK storefront isn't displaying the product's name. If you look at the `Product.storekit` file you'll see that the reason is because I haven't added localizations for the UK.
 
 # The Product type
-The `Product` struct is a an important object in `StoreKit2`. We've seen how the `static` `Product.products(for:)` method is used to request product information from the App Store. It's also used for several other key operations:
+The `Product` struct is an important object in `StoreKit2`. We've seen how the `static` `Product.products(for:)` method is used to request product information from the App Store. It's also used for several other key operations:
 
 ![](./readme-assets/StoreHelperDemo14.png)
 
@@ -443,11 +443,11 @@ List(storeHelper.products!) { product in
 
     Button(action: { Task.init { let result = try? await product.purchase() }}) {
         Text("Purchase")
- 	}	
+    }	
 }
 ```
 
-Notice how we need to add an `Task.init {...}` block to our button's action closure. This allows us to run async code in a "synchronous context" (the `Purchases` view).
+Notice how we need to add a `Task.init {...}` block to our button's action closure. This allows us to run async code in a "synchronous context" (the `Purchases` view).
 
 To keep the size and complexity of views manageable, I split the various parts of the UI into separate views like this:
 
@@ -1408,3 +1408,5 @@ Apple normally responds to the user within 48 hours of a refund request.
 
 More details are available in the WWDC21 video [Support customers and handle refunds](https://developer.apple.com/videos/play/wwdc2021/10175/#:~:text=We%20are%20now%20introducing%20a,notification%20from%20the%20App%20Store).
 
+TODO: Gotcha! Support for direct App Store purchase of in-app purchase products
+TODO: Fallback purchased product list for when there's no network connection

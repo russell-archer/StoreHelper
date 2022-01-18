@@ -4,65 +4,45 @@
 //
 //  Created by Russell Archer on 07/08/2021.
 //
+// View hierachy:
+// Non-Consumables: [Purchases].[ProductListView].[ProductListViewRow]......[ProductView]......[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Consumables:     [Purchases].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Subscriptions:   [Purchases].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
 import StoreKit
 import OrderedCollections
 
 struct SubscriptionListViewRow: View {
-    
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
     @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
     @Binding var productInfoProductId: ProductId?
+    @Binding var showProductInfoSheet: Bool
     var products: [Product]
     var headerText: String
     
     var body: some View {
         Section(header: Text(headerText)) {
             // For each product in the group, display as a row using SubscriptionView().
-            // If the product is the highest subscription level then pass SubscriptionInfo to SubscriptionView().
+            // If a product is the highest subscription level then pass its SubscriptionInfo to SubscriptionView().
             ForEach(products, id: \.id) { product in
-                SubscriptionView(productId: product.id,
+                SubscriptionView(productInfoProductId: $productInfoProductId,
+                                 showProductInfoSheet: $showProductInfoSheet,
+                                 productId: product.id,
                                  displayName: product.displayName,
                                  description: product.description,
                                  price: product.displayPrice,
-                                 subscriptionInfo: subscriptionInformation(for: product))
+                                 subscriptionInfo: storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionInfo))
                     .contentShape(Rectangle())
                     .onTapGesture { productInfoProductId = product.id }
             }
         }
-        .onAppear { getGroupSubscriptionInfo() }
-        .onChange(of: storeHelper.purchasedProducts) { _ in getGroupSubscriptionInfo() }
-    }
-    
-    /// Gets all the subscription groups from the list of subscription products.
-    /// For each group, gets the highest subscription level product.
-    func getGroupSubscriptionInfo() {
-        subscriptionGroups = storeHelper.subscriptionHelper.groups()
-        if let groups = subscriptionGroups {
-            subscriptionInfo = OrderedSet<SubscriptionInfo>()
-            if subscriptionInfo == nil { return }
-            Task.init {
-                for group in groups {
-                    if let hslp = await storeHelper.subscriptionInfo(for: group) { subscriptionInfo!.append(hslp) }
-                }
-            }
+        .onAppear {
+            Task.init { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
         }
-    }
-    
-    /// Gets `SubscriptionInfo` for a product.
-    /// - Parameter product: The product.
-    /// - Returns: Returns `SubscriptionInfo` for the product if it is the highest service level product
-    /// in the group the user is subscribed to. If the user is not subscribed to the product, or it's
-    /// not the highest service level product in the group then nil is returned.
-    func subscriptionInformation(for product: Product) -> SubscriptionInfo? {
-        if let subsInfo = subscriptionInfo {
-            for subInfo in subsInfo {
-                if let p = subInfo.product, p.id == product.id { return subInfo }
-            }
+        .onChange(of: storeHelper.purchasedProducts) { _ in
+            Task.init { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
         }
-        
-        return nil
     }
 }

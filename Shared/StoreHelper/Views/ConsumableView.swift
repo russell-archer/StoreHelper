@@ -4,9 +4,14 @@
 //
 //  Created by Russell Archer on 21/06/2021.
 //
+// View hierachy:
+// Non-Consumables: [Purchases].[ProductListView].[ProductListViewRow]......[ProductView]......[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Consumables:     [Purchases].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Subscriptions:   [Purchases].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
 import StoreKit
+import WidgetKit
 
 /// Displays a single row of product information for the main content List.
 struct ConsumableView: View {
@@ -24,12 +29,26 @@ struct ConsumableView: View {
     
     var body: some View {
         VStack {
+            Text(displayName).font(.largeTitle).padding(.bottom, 1)
+            Text(description)
+                #if os(iOS)
+                .font(.subheadline)
+                #endif
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    productInfoProductId = productId
+                    showProductInfoSheet = true
+                }
+            
             HStack {
                 if count == 0 {
                     
                     Image(productId)
                         .resizable()
-                        .frame(width: 150, height: 150)
+                        .frame(maxWidth: 250, maxHeight: 250)
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
                         .contentShape(Rectangle())
@@ -42,7 +61,7 @@ struct ConsumableView: View {
                     
                     Image(productId)
                         .resizable()
-                        .frame(width: 150, height: 150)
+                        .frame(maxWidth: 250, maxHeight: 250)
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
                         .overlay(ConsumableBadgeView(count: $count))
@@ -53,30 +72,20 @@ struct ConsumableView: View {
                         }
                 }
                 
-                Text(displayName)
-                    .font(.headline)
-                    .padding()
-                    .lineLimit(3)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        productInfoProductId = productId
-                        showProductInfoSheet = true
-                    }
-                
                 Spacer()
-                
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
-            
-            Text(description)
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .lineLimit(2)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    productInfoProductId = productId
-                    showProductInfoSheet = true
-                }
+            #if os(macOS)
+            .frame(width: 500)
+            #endif
+            .padding()
+
+            if purchaseState == .purchased {
+                PurchaseInfoView(showRefundSheet: .constant(false), refundRequestTransactionId: .constant(UInt64.min), productId: productId)
+            }
+            else {
+                ProductInfoView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, productId: productId, displayName: displayName)
+            }
             
             Divider()
         }
@@ -88,6 +97,7 @@ struct ConsumableView: View {
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init { await purchaseState(for: productId) }
             count = KeychainHelper.count(for: productId)
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
     

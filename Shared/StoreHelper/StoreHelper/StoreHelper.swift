@@ -61,19 +61,20 @@ public class StoreHelper: ObservableObject {
     
     // MARK: - Public helper properties
     
-    public var consumableProducts:      [Product]?   { products?.filter { $0.type == .consumable }}
-    public var nonConsumableProducts:   [Product]?   { products?.filter { $0.type == .nonConsumable }}
-    public var subscriptionProducts:    [Product]?   { products?.filter { $0.type == .autoRenewable }}
-    public var consumableProductIds:    [ProductId]? { products?.filter { $0.type == .consumable }.map { $0.id }}
-    public var nonConsumableProductIds: [ProductId]? { products?.filter { $0.type == .nonConsumable }.map { $0.id }}
-    public var subscriptionProductIds:  [ProductId]? { products?.filter { $0.type == .autoRenewable }.map { $0.id }}
-    
-    /// True if we have a list of `Product` returned to us by the App Store.
-    public var hasProducts: Bool {
-        guard let p = products else { return false }
-        return p.count > 0 ? true : false
-    }
-    
+    public var consumableProducts:          [Product]?   { products?.filter { $0.type == .consumable }}
+    public var nonConsumableProducts:       [Product]?   { products?.filter { $0.type == .nonConsumable }}
+    public var subscriptionProducts:        [Product]?   { products?.filter { $0.type == .autoRenewable }}
+    public var consumableProductIds:        [ProductId]? { products?.filter { $0.type == .consumable }.map { $0.id }}
+    public var nonConsumableProductIds:     [ProductId]? { products?.filter { $0.type == .nonConsumable }.map { $0.id }}
+    public var subscriptionProductIds:      [ProductId]? { products?.filter { $0.type == .autoRenewable }.map { $0.id }}
+    public var hasProducts:                 Bool         { products?.count ?? 0 > 0 ? true : false }
+    public var hasConsumableProducts:       Bool         { consumableProducts?.count ?? 0 > 0 ? true : false }
+    public var hasNonConsumableProducts:    Bool         { nonConsumableProducts?.count ?? 0 > 0 ? true : false }
+    public var hasSubscriptionProducts:     Bool         { subscriptionProducts?.count ?? 0 > 0 ? true : false }
+    public var hasConsumableProductIds:     Bool         { consumableProductIds?.count ?? 0 > 0 ? true : false }
+    public var hasNonConsumableProductIds:  Bool         { nonConsumableProductIds?.count ?? 0 > 0 ? true : false }
+    public var hasSubscriptionProductIds:   Bool         { subscriptionProductIds?.count ?? 0 > 0 ? true : false }
+
     // MARK: - Private properties
     
     /// Handle for App Store transactions.
@@ -173,8 +174,8 @@ public class StoreHelper: ObservableObject {
         
         // We need to treat consumables differently because their transactions are NOT stored in the receipt.
         if product.type == .consumable {
-            await updatePurchasedIdentifiers(productId, insert: true)
             purchased = KeychainHelper.count(for: productId) > 0
+            await updatePurchasedIdentifiers(productId, insert: purchased)
             updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
             AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
             return purchased
@@ -505,6 +506,18 @@ public class StoreHelper: ObservableObject {
         if let result = await Transaction.latest(for: productId) {
             let verificationResult = checkVerificationResult(result: result)
             if verificationResult.verified { return verificationResult.transaction.id }
+        }
+        
+        return nil
+    }
+    
+    /// Gets the most recent transaction for the product.
+    /// - Parameter productId: The product's unique App Store id.
+    /// - Returns: Returns the most recent transaction for the product, or nil if the product's never been purchased.
+    @MainActor public func mostRecentTransaction(for productId: ProductId) async -> Transaction? {
+        if let result = await Transaction.latest(for: productId) {
+            let verificationResult = checkVerificationResult(result: result)
+            if verificationResult.verified { return verificationResult.transaction }
         }
         
         return nil

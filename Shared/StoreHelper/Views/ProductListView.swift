@@ -4,6 +4,10 @@
 //
 //  Created by Russell Archer on 23/07/2021.
 //
+// View hierachy:
+// Non-Consumables: [Purchases].[ProductListView].[ProductListViewRow]......[ProductView]......[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Consumables:     [Purchases].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Subscriptions:   [Purchases].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
 
@@ -11,29 +15,33 @@ struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding var productInfoProductId: ProductId?
     @Binding var showProductInfoSheet: Bool
+    #if os(iOS)
+    @Binding var showRefundSheet: Bool
+    @Binding var refundRequestTransactionId: UInt64
+    #endif
     
     var body: some View {
         
         if storeHelper.hasProducts {
     
-            if let nonConsumables = storeHelper.nonConsumableProducts, nonConsumables.count > 0 {
-                ProductListViewRow(productInfoProductId: $productInfoProductId,
-                                   showProductInfoSheet: $showProductInfoSheet,
-                                   products: nonConsumables,
-                                   headerText: "Products")
+            if storeHelper.hasNonConsumableProducts, let nonConsumables = storeHelper.nonConsumableProducts {
+                #if os(iOS)
+                ProductListViewRow(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: nonConsumables, headerText: "Products")
+                #elseif os(macOS)
+                ProductListViewRow(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, products: nonConsumables, headerText: "Products")
+                #endif
             }
             
-            if let consumables = storeHelper.consumableProducts, consumables.count > 0 {
-                ProductListViewRow(productInfoProductId: $productInfoProductId,
-                                   showProductInfoSheet: $showProductInfoSheet,
-                                   products: consumables,
-                                   headerText: "VIP Services")
+            if storeHelper.hasConsumableProducts, let consumables = storeHelper.consumableProducts {
+                #if os(iOS)
+                ProductListViewRow(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: consumables, headerText: "VIP Services")
+                #elseif os(macOS)
+                ProductListViewRow(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, products: consumables, headerText: "VIP Services")
+                #endif
             }
             
-            if let subscriptions = storeHelper.subscriptionProducts, subscriptions.count > 0 {
-                SubscriptionListViewRow(productInfoProductId: $productInfoProductId,
-                                        products: subscriptions,
-                                        headerText: "Subscriptions")
+            if storeHelper.hasSubscriptionProducts, let subscriptions = storeHelper.subscriptionProducts {
+                SubscriptionListViewRow(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, products: subscriptions, headerText: "Subscriptions")
             }
             
         } else {

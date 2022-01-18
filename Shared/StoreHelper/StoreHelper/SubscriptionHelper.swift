@@ -8,6 +8,7 @@
 
 import StoreKit
 import OrderedCollections
+import SwiftUI
 
 /// Helper class for subscriptions.
 ///
@@ -100,6 +101,39 @@ public struct SubscriptionHelper {
         }
         
         return -1
+    }
+    
+    /// Gets all the subscription groups from the list of subscription products.
+    /// For each group, gets the highest subscription level product.
+    func groupSubscriptionInfo() async -> OrderedSet<SubscriptionInfo>? {
+        
+        guard let store = storeHelper else { return nil }
+        var subscriptionInfo = OrderedSet<SubscriptionInfo>()
+        let subscriptionGroups = store.subscriptionHelper.groups()
+        
+        if let groups = subscriptionGroups {
+            subscriptionInfo = OrderedSet<SubscriptionInfo>()
+            for group in groups {
+                if let hslp = await store.subscriptionInfo(for: group) { subscriptionInfo.append(hslp) }
+            }
+        }
+        
+        return subscriptionInfo
+    }
+    
+    /// Gets `SubscriptionInfo` for a product.
+    /// - Parameter product: The product.
+    /// - Returns: Returns `SubscriptionInfo` for a product if it is the highest service level product
+    /// in the group the user is subscribed to. If the user is not subscribed to the product, or it's
+    /// not the highest service level product in the group then nil is returned.
+    func subscriptionInformation(for product: Product, in subscriptionInfo: OrderedSet<SubscriptionInfo>?) -> SubscriptionInfo? {
+        if let si = subscriptionInfo {
+            for subInfo in si {
+                if let p = subInfo.product, p.id == product.id { return subInfo }
+            }
+        }
+        
+        return nil
     }
 }
 

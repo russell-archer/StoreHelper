@@ -4,6 +4,10 @@
 //
 //  Created by Russell Archer on 21/06/2021.
 //
+// View hierachy:
+// Non-Consumables: [Purchases].[ProductListView].[ProductListViewRow]......[ProductView]......[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Consumables:     [Purchases].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Subscriptions:   [Purchases].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
 import StoreKit
@@ -11,112 +15,39 @@ import WidgetKit
 
 /// Displays a single row of product information for the main content List.
 struct ProductView: View {
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    #endif
-    
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     @Binding var productInfoProductId: ProductId?
     @Binding var showProductInfoSheet: Bool
-    
+    #if os(iOS)
+    @Binding var showRefundSheet: Bool
+    @Binding var refundRequestTransactionId: UInt64
+    #endif
     var productId: ProductId
     var displayName: String
     var description: String
     var price: String
     
-    #if os(iOS)
     var body: some View {
         VStack {
-            Text(displayName).font(.largeTitle)
-            
-            if horizontalSizeClass == .compact {
-                HStack {
-                    Image(productId)
-                        .resizable()
-                        .frame(width: 150, height: 150)
-                        .aspectRatio(contentMode: .fit)
-                        .cornerRadius(25)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            productInfoProductId = productId
-                            showProductInfoSheet = true
-                        }
-                    
-                    Spacer()
-                    PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
-                }
-            } else {
-                HStack {
-                    Image(productId)
-                        .resizable()
-                        .frame(width: 250, height: 250)
-                        .aspectRatio(contentMode: .fit)
-                        .cornerRadius(25)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            productInfoProductId = productId
-                            showProductInfoSheet = true
-                        }
-                    
-                    Spacer()
-                    PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
-                }
-                .frame(width: 500)
-            }
-            
-            Button(action: {
-                productInfoProductId = productId
-                showProductInfoSheet = true
-            }) {
-                VStack {
-                    Image(systemName: "info.circle")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .aspectRatio(contentMode: .fit)
-                    Text("More Info").font(.subheadline)
-                }
-            }
-            
+            Text(displayName).font(.largeTitle).padding(.bottom, 1)
             Text(description)
+                #if os(iOS)
                 .font(.subheadline)
+                #endif
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
                 .multilineTextAlignment(.center)
-                .padding()
-                .foregroundColor(.gray)
-                .lineLimit(2)
+                .foregroundColor(.secondary)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     productInfoProductId = productId
                     showProductInfoSheet = true
                 }
             
-            if purchaseState == .purchased {
-                PurchaseInfoView(productId: productId)
-            }
-            
-            Divider()
-        }
-        .padding()
-        .onAppear {
-            Task.init { await purchaseState(for: productId) }
-        }
-        .onChange(of: storeHelper.purchasedProducts) { _ in
-            Task.init {
-                await purchaseState(for: productId)
-                WidgetCenter.shared.reloadAllTimelines()
-            }
-        }
-    }
-    #endif
-    
-    #if os(macOS)
-    var body: some View {
-        VStack {
-            Text(displayName).font(.largeTitle)
             HStack {
                 Image(productId)
                     .resizable()
-                    .frame(width: 250, height: 250)
+                    .frame(maxWidth: 250, maxHeight: 250)
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
@@ -128,26 +59,20 @@ struct ProductView: View {
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
+            #if os(macOS)
             .frame(width: 500)
-            
-            Button(action: {
-                productInfoProductId = productId
-                showProductInfoSheet = true
-            }) { Label("More Info on \"\(displayName)\"", systemImage: "info.circle")}.macOSStyle()
-            
-            Text(description)
-                .multilineTextAlignment(.center)
-                .padding(EdgeInsets(top: 5, leading: 5, bottom: 1, trailing: 5))
-                .foregroundColor(.gray)
-                .lineLimit(2)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    productInfoProductId = productId
-                    showProductInfoSheet = true
-                }
+            #endif
+            .padding()
             
             if purchaseState == .purchased {
+                #if os(iOS)
+                PurchaseInfoView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId)
+                #elseif os(macOS)
                 PurchaseInfoView(productId: productId)
+                #endif
+            }
+            else {
+                ProductInfoView(productInfoProductId: $productInfoProductId, showProductInfoSheet: $showProductInfoSheet, productId: productId, displayName: displayName)
             }
             
             Divider()
@@ -163,7 +88,6 @@ struct ProductView: View {
             }
         }
     }
-    #endif
     
     func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false

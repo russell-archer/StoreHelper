@@ -14,7 +14,7 @@ extension Image {
             .cornerRadius(15)
             .aspectRatio(contentMode: .fit)
         #if os(macOS)
-            .frame(maxWidth: 1000)
+            .frame(maxWidth: 1200)
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 20, trailing: 10))
         #endif
     }
@@ -31,7 +31,7 @@ extension Image {
             .resizable()
             .cornerRadius(15)
             .aspectRatio(contentMode: .fit)
-            .frame(maxWidth: width ?? 1000, maxHeight: height ?? .infinity)
+            .frame(maxWidth: width ?? 1200, maxHeight: height ?? .infinity)
             .padding()
     }
     
@@ -40,7 +40,14 @@ extension Image {
             .resizable()
             .cornerRadius(15)
             .aspectRatio(contentMode: .fit)
-            .frame(maxWidth: width ?? 1000, maxHeight: height ?? .infinity)
+            .frame(maxWidth: width ?? 1200, maxHeight: height ?? .infinity)
+    }
+    
+    func bodyImageConstrainedNoPaddingNoCorner(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
+        self
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(maxWidth: width ?? 1200, maxHeight: height ?? .infinity)
     }
     #endif
 }
