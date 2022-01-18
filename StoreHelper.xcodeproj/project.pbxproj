@@ -255,7 +255,6 @@
 		68D7F2032770DDF8008EBC09 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				68D7F2002770DCF5008EBC09 /* Purchases.swift */,
 				68D7F2042770DE14008EBC09 /* VersionInfo.swift */,
 			);
 			path = Views;
@@ -351,6 +350,7 @@
 				68706B882790588400A31888 /* PurchaseInfoSheet.swift */,
 				6824DD1F26A5ED5A00E44F35 /* PurchaseInfoView.swift */,
 				689C72FA2784C38900355CBA /* PurchaseManagement.swift */,
+				68D7F2002770DCF5008EBC09 /* Purchases.swift */,
 				68ACE67C2680D8DA00AA9895 /* StoreErrorView.swift */,
 				68F5C98C2794A8330054B2B1 /* SubscriptionInfoSheet.swift */,
 				6866FAAD26BEC7F100FDA4C6 /* SubscriptionInfoView.swift */,
