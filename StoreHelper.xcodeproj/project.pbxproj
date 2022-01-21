@@ -133,57 +133,53 @@
 		68ACE6822680D92700AA9895 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		68ACE6852680D94300AA9895 /* PriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceView.swift; sourceTree = "<group>"; };
 		68ACE6882680D95D00AA9895 /* BadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
-		68B1A30C26BAEACA00C3D1C5 /* StoreHelperDemo48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo48.png; sourceTree = "<group>"; };
 		68B1A30D26BAEACA00C3D1C5 /* StoreHelperDemo16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo16.png; sourceTree = "<group>"; };
-		68B1A30E26BAEACA00C3D1C5 /* StoreHelperDemo41.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo41.png; sourceTree = "<group>"; };
 		68B1A30F26BAEACB00C3D1C5 /* StoreHelperDemo21.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo21.png; sourceTree = "<group>"; };
 		68B1A31026BAEACB00C3D1C5 /* StoreHelperDemo7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo7.png; sourceTree = "<group>"; };
 		68B1A31126BAEACB00C3D1C5 /* StoreHelperDemo25.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo25.png; sourceTree = "<group>"; };
-		68B1A31226BAEACB00C3D1C5 /* StoreHelperDemo35.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo35.png; sourceTree = "<group>"; };
 		68B1A31326BAEACB00C3D1C5 /* StoreHelperDemo28.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo28.png; sourceTree = "<group>"; };
-		68B1A31426BAEACB00C3D1C5 /* StoreHelperDemo31.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo31.png; sourceTree = "<group>"; };
 		68B1A31526BAEACB00C3D1C5 /* StoreHelperDemo15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo15.png; sourceTree = "<group>"; };
 		68B1A31626BAEACB00C3D1C5 /* StoreHelperDemo43.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo43.png; sourceTree = "<group>"; };
 		68B1A31726BAEACB00C3D1C5 /* StoreHelperDemo18.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo18.png; sourceTree = "<group>"; };
-		68B1A31826BAEACB00C3D1C5 /* StoreHelperDemo37.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo37.png; sourceTree = "<group>"; };
 		68B1A31926BAEACB00C3D1C5 /* StoreHelperDemo27.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo27.png; sourceTree = "<group>"; };
 		68B1A31A26BAEACB00C3D1C5 /* StoreHelperDemo6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo6.png; sourceTree = "<group>"; };
 		68B1A31B26BAEACB00C3D1C5 /* StoreHelperDemo5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo5.png; sourceTree = "<group>"; };
 		68B1A31C26BAEACB00C3D1C5 /* StoreHelperDemo8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo8.png; sourceTree = "<group>"; };
 		68B1A31D26BAEACB00C3D1C5 /* StoreHelperDemo26.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo26.png; sourceTree = "<group>"; };
 		68B1A31E26BAEACB00C3D1C5 /* StoreHelperDemo45.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo45.png; sourceTree = "<group>"; };
-		68B1A31F26BAEACB00C3D1C5 /* StoreHelperDemo44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo44.png; sourceTree = "<group>"; };
 		68B1A32026BAEACB00C3D1C5 /* StoreHelperDemo23.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo23.png; sourceTree = "<group>"; };
-		68B1A32126BAEACB00C3D1C5 /* StoreHelperDemo39.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo39.png; sourceTree = "<group>"; };
 		68B1A32226BAEACB00C3D1C5 /* StoreHelperDemo12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo12.png; sourceTree = "<group>"; };
 		68B1A32326BAEACB00C3D1C5 /* StoreHelperDemo30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo30.png; sourceTree = "<group>"; };
 		68B1A32426BAEACB00C3D1C5 /* StoreHelperDemo19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo19.png; sourceTree = "<group>"; };
-		68B1A32526BAEACB00C3D1C5 /* StoreHelperDemo36.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo36.png; sourceTree = "<group>"; };
-		68B1A32626BAEACB00C3D1C5 /* StoreHelperDemo42.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo42.png; sourceTree = "<group>"; };
 		68B1A32726BAEACB00C3D1C5 /* StoreHelperDemo17.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo17.png; sourceTree = "<group>"; };
 		68B1A32826BAEACB00C3D1C5 /* StoreHelperDemo11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo11.png; sourceTree = "<group>"; };
 		68B1A32926BAEACB00C3D1C5 /* StoreHelperDemo9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo9.png; sourceTree = "<group>"; };
-		68B1A32A26BAEACB00C3D1C5 /* StoreHelperDemo38.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo38.png; sourceTree = "<group>"; };
 		68B1A32B26BAEACB00C3D1C5 /* StoreHelperDemo13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo13.png; sourceTree = "<group>"; };
 		68B1A32C26BAEACB00C3D1C5 /* StoreHelperDemo2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo2.png; sourceTree = "<group>"; };
-		68B1A32D26BAEACB00C3D1C5 /* StoreHelperDemo40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo40.png; sourceTree = "<group>"; };
 		68B1A32E26BAEACB00C3D1C5 /* StoreHelperDemo22.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo22.gif; sourceTree = "<group>"; };
-		68B1A32F26BAEACB00C3D1C5 /* StoreHelperDemo4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo4.png; sourceTree = "<group>"; };
-		68B1A33026BAEACB00C3D1C5 /* StoreHelperDemo24.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo24.gif; sourceTree = "<group>"; };
 		68B1A33126BAEACB00C3D1C5 /* StoreHelperDemo3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo3.png; sourceTree = "<group>"; };
-		68B1A33226BAEACB00C3D1C5 /* StoreHelperDemo47.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo47.png; sourceTree = "<group>"; };
-		68B1A33326BAEACB00C3D1C5 /* StoreHelperDemo34.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo34.png; sourceTree = "<group>"; };
-		68B1A33426BAEACB00C3D1C5 /* StoreHelperDemo29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo29.png; sourceTree = "<group>"; };
 		68B1A33526BAEACB00C3D1C5 /* StoreHelperDemo10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo10.png; sourceTree = "<group>"; };
 		68B1A33626BAEACB00C3D1C5 /* StoreHelperDemo46.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo46.png; sourceTree = "<group>"; };
-		68B1A33726BAEACB00C3D1C5 /* StoreHelperDemo33.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo33.png; sourceTree = "<group>"; };
 		68B1A33826BAEACB00C3D1C5 /* StoreHelperDemo1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo1.png; sourceTree = "<group>"; };
 		68B1A33926BAEACB00C3D1C5 /* StoreHelperDemo0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo0.png; sourceTree = "<group>"; };
 		68B1A33A26BAEACB00C3D1C5 /* StoreHelperDemo14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo14.png; sourceTree = "<group>"; };
-		68B1A33B26BAEACB00C3D1C5 /* StoreHelperDemo20.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo20.gif; sourceTree = "<group>"; };
-		68B1A33C26BAEACB00C3D1C5 /* StoreHelperDemo32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo32.png; sourceTree = "<group>"; };
 		68C084B926A8C017002EE9A0 /* PurchaseInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseInfoViewModel.swift; sourceTree = "<group>"; };
 		68C26A9F2796E187001D47F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		68C333B1279B4026002BFB08 /* StoreHelperDemo1b.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo1b.png; sourceTree = "<group>"; };
+		68C333B2279B403A002BFB08 /* StoreHelperDemo3b.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo3b.png; sourceTree = "<group>"; };
+		68C333B3279B4045002BFB08 /* StoreHelperDemo6b.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo6b.png; sourceTree = "<group>"; };
+		68C333B4279B40AF002BFB08 /* StoreHelperDemo58.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo58.png; sourceTree = "<group>"; };
+		68C333B5279B40AF002BFB08 /* StoreHelperDemo50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo50.png; sourceTree = "<group>"; };
+		68C333B6279B40AF002BFB08 /* StoreHelperDemo54.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo54.png; sourceTree = "<group>"; };
+		68C333B7279B40AF002BFB08 /* StoreHelperDemo46b.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo46b.png; sourceTree = "<group>"; };
+		68C333B8279B40AF002BFB08 /* StoreHelperDemo60.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo60.png; sourceTree = "<group>"; };
+		68C333B9279B40AF002BFB08 /* StoreHelperDemo53.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo53.png; sourceTree = "<group>"; };
+		68C333BA279B40AF002BFB08 /* StoreHelperDemo46c.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo46c.png; sourceTree = "<group>"; };
+		68C333BB279B40AF002BFB08 /* StoreHelperDemo59.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo59.png; sourceTree = "<group>"; };
+		68C333BC279B40AF002BFB08 /* StoreHelperDemo61.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo61.png; sourceTree = "<group>"; };
+		68C333BD279B40AF002BFB08 /* StoreHelperDemo49.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StoreHelperDemo49.gif; sourceTree = "<group>"; };
+		68C333BE279B40AF002BFB08 /* StoreHelperDemo56.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo56.png; sourceTree = "<group>"; };
+		68C333BF279B40AF002BFB08 /* StoreHelperDemo62.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StoreHelperDemo62.png; sourceTree = "<group>"; };
 		68CE0D8626B35F2700CE9CC4 /* PurchaseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseInfo.swift; sourceTree = "<group>"; };
 		68D7F2002770DCF5008EBC09 /* Purchases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchases.swift; sourceTree = "<group>"; };
 		68D7F2042770DE14008EBC09 /* VersionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionInfo.swift; sourceTree = "<group>"; };
@@ -233,11 +229,13 @@
 			children = (
 				68B1A33926BAEACB00C3D1C5 /* StoreHelperDemo0.png */,
 				68B1A33826BAEACB00C3D1C5 /* StoreHelperDemo1.png */,
+				68C333B1279B4026002BFB08 /* StoreHelperDemo1b.png */,
 				68B1A32C26BAEACB00C3D1C5 /* StoreHelperDemo2.png */,
 				68B1A33126BAEACB00C3D1C5 /* StoreHelperDemo3.png */,
-				68B1A32F26BAEACB00C3D1C5 /* StoreHelperDemo4.png */,
+				68C333B2279B403A002BFB08 /* StoreHelperDemo3b.png */,
 				68B1A31B26BAEACB00C3D1C5 /* StoreHelperDemo5.png */,
 				68B1A31A26BAEACB00C3D1C5 /* StoreHelperDemo6.png */,
+				68C333B3279B4045002BFB08 /* StoreHelperDemo6b.png */,
 				68B1A31026BAEACB00C3D1C5 /* StoreHelperDemo7.png */,
 				68B1A31C26BAEACB00C3D1C5 /* StoreHelperDemo8.png */,
 				68B1A32926BAEACB00C3D1C5 /* StoreHelperDemo9.png */,
@@ -251,35 +249,29 @@
 				68B1A32726BAEACB00C3D1C5 /* StoreHelperDemo17.png */,
 				68B1A31726BAEACB00C3D1C5 /* StoreHelperDemo18.png */,
 				68B1A32426BAEACB00C3D1C5 /* StoreHelperDemo19.png */,
-				68B1A33B26BAEACB00C3D1C5 /* StoreHelperDemo20.gif */,
 				68B1A30F26BAEACB00C3D1C5 /* StoreHelperDemo21.png */,
 				68B1A32E26BAEACB00C3D1C5 /* StoreHelperDemo22.gif */,
 				68B1A32026BAEACB00C3D1C5 /* StoreHelperDemo23.png */,
-				68B1A33026BAEACB00C3D1C5 /* StoreHelperDemo24.gif */,
 				68B1A31126BAEACB00C3D1C5 /* StoreHelperDemo25.png */,
 				68B1A31D26BAEACB00C3D1C5 /* StoreHelperDemo26.png */,
 				68B1A31926BAEACB00C3D1C5 /* StoreHelperDemo27.png */,
 				68B1A31326BAEACB00C3D1C5 /* StoreHelperDemo28.png */,
-				68B1A33426BAEACB00C3D1C5 /* StoreHelperDemo29.png */,
 				68B1A32326BAEACB00C3D1C5 /* StoreHelperDemo30.png */,
-				68B1A31426BAEACB00C3D1C5 /* StoreHelperDemo31.png */,
-				68B1A33C26BAEACB00C3D1C5 /* StoreHelperDemo32.png */,
-				68B1A33726BAEACB00C3D1C5 /* StoreHelperDemo33.png */,
-				68B1A33326BAEACB00C3D1C5 /* StoreHelperDemo34.png */,
-				68B1A31226BAEACB00C3D1C5 /* StoreHelperDemo35.png */,
-				68B1A32526BAEACB00C3D1C5 /* StoreHelperDemo36.png */,
-				68B1A31826BAEACB00C3D1C5 /* StoreHelperDemo37.png */,
-				68B1A32A26BAEACB00C3D1C5 /* StoreHelperDemo38.png */,
-				68B1A32126BAEACB00C3D1C5 /* StoreHelperDemo39.png */,
-				68B1A32D26BAEACB00C3D1C5 /* StoreHelperDemo40.png */,
-				68B1A30E26BAEACA00C3D1C5 /* StoreHelperDemo41.png */,
-				68B1A32626BAEACB00C3D1C5 /* StoreHelperDemo42.png */,
 				68B1A31626BAEACB00C3D1C5 /* StoreHelperDemo43.png */,
-				68B1A31F26BAEACB00C3D1C5 /* StoreHelperDemo44.png */,
 				68B1A31E26BAEACB00C3D1C5 /* StoreHelperDemo45.png */,
 				68B1A33626BAEACB00C3D1C5 /* StoreHelperDemo46.png */,
-				68B1A33226BAEACB00C3D1C5 /* StoreHelperDemo47.png */,
-				68B1A30C26BAEACA00C3D1C5 /* StoreHelperDemo48.png */,
+				68C333B7279B40AF002BFB08 /* StoreHelperDemo46b.png */,
+				68C333BA279B40AF002BFB08 /* StoreHelperDemo46c.png */,
+				68C333BD279B40AF002BFB08 /* StoreHelperDemo49.gif */,
+				68C333B5279B40AF002BFB08 /* StoreHelperDemo50.png */,
+				68C333B9279B40AF002BFB08 /* StoreHelperDemo53.png */,
+				68C333B6279B40AF002BFB08 /* StoreHelperDemo54.png */,
+				68C333BE279B40AF002BFB08 /* StoreHelperDemo56.png */,
+				68C333B4279B40AF002BFB08 /* StoreHelperDemo58.png */,
+				68C333BB279B40AF002BFB08 /* StoreHelperDemo59.png */,
+				68C333B8279B40AF002BFB08 /* StoreHelperDemo60.png */,
+				68C333BC279B40AF002BFB08 /* StoreHelperDemo61.png */,
+				68C333BF279B40AF002BFB08 /* StoreHelperDemo62.png */,
 			);
 			path = "readme-assets";
 			sourceTree = "<group>";
@@ -287,13 +279,21 @@
 		6841611F27971DAC0000188D /* Util */ = {
 			isa = PBXGroup;
 			children = (
-				6841612027971DAC0000188D /* StoreHelper-macOS.entitlements */,
 				6841612127971DAC0000188D /* PropertyFile.swift */,
 				6841612427971DAC0000188D /* StorageKey.swift */,
-				6841612327971DAC0000188D /* StoreHelperApp.swift */,
-				6841612227971DAC0000188D /* Assets.xcassets */,
+				68F773CE267A494500C3C670 /* Utils.swift */,
 			);
 			path = Util;
+			sourceTree = "<group>";
+		};
+		6870EE6A27987DF3001B339B /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6841612327971DAC0000188D /* StoreHelperApp.swift */,
+				6841612227971DAC0000188D /* Assets.xcassets */,
+				6841612027971DAC0000188D /* StoreHelper-macOS.entitlements */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		687273A72683744E00C37D94 /* ViewModels */ = {
@@ -312,14 +312,6 @@
 			children = (
 				68C26A9F2796E187001D47F7 /* ContentView.swift */,
 				68F5C98A2794A1B00054B2B1 /* ProductPurchaseInfo.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		68D7F2032770DDF8008EBC09 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				68D7F2042770DE14008EBC09 /* VersionInfo.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -356,9 +348,10 @@
 				680B0CAE267CFE79007F7518 /* README.md */,
 				680B0CAF267CFE7E007F7518 /* readme-assets */,
 				68D7F1FF2770DC92008EBC09 /* Views */,
+				6870EE6A27987DF3001B339B /* Support */,
 				68F77378267A43C300C3C670 /* Shared */,
-				68F77381267A43C400C3C670 /* Products */,
 				68F773D4267A4A3200C3C670 /* Frameworks */,
+				68F77381267A43C400C3C670 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -366,9 +359,6 @@
 			isa = PBXGroup;
 			children = (
 				68F773C4267A47B300C3C670 /* StoreHelper */,
-				68D7F2062770DE85008EBC09 /* Styles */,
-				6841611F27971DAC0000188D /* Util */,
-				68D7F2032770DDF8008EBC09 /* Views */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -380,14 +370,6 @@
 				684160D6279719080000188D /* StoreHelper (macOS).app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		68F773B5267A442700C3C670 /* Support */ = {
-			isa = PBXGroup;
-			children = (
-				68F773CE267A494500C3C670 /* Utils.swift */,
-			);
-			path = Support;
 			sourceTree = "<group>";
 		};
 		68F773B6267A444000C3C670 /* Views */ = {
@@ -411,6 +393,7 @@
 				6866FAAD26BEC7F100FDA4C6 /* SubscriptionInfoView.swift */,
 				688252C626BE953500892FB6 /* SubscriptionListViewRow.swift */,
 				688252C926BE9E1B00892FB6 /* SubscriptionView.swift */,
+				68D7F2042770DE14008EBC09 /* VersionInfo.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -430,7 +413,8 @@
 			children = (
 				68F773B7267A44D000C3C670 /* Configuration */,
 				68D7F2092770DEEB008EBC09 /* StoreHelper */,
-				68F773B5267A442700C3C670 /* Support */,
+				68D7F2062770DE85008EBC09 /* Styles */,
+				6841611F27971DAC0000188D /* Util */,
 				687273A72683744E00C37D94 /* ViewModels */,
 				68F773B6267A444000C3C670 /* Views */,
 			);
@@ -497,7 +481,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1320;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1320;
 				TargetAttributes = {
 					684160D5279719080000188D = {
 						CreatedOnToolsVersion = 13.2;
@@ -660,7 +644,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Shared/Util/StoreHelper-macOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Support/StoreHelper-macOS.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -675,7 +660,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rarcher.StoreHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -691,7 +676,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Shared/Util/StoreHelper-macOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Support/StoreHelper-macOS.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -706,7 +692,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rarcher.StoreHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";

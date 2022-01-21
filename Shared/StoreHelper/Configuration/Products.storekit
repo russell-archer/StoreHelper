@@ -13,6 +13,11 @@
           "description" : "A cool bunch of mixed flowers",
           "displayName" : "Large Flowers",
           "locale" : "en_US"
+        },
+        {
+          "description" : "Lovely large flowers",
+          "displayName" : "Large Flowers",
+          "locale" : "en_GB"
         }
       ],
       "productID" : "com.rarcher.nonconsumable.flowers-large",
@@ -28,6 +33,11 @@
           "description" : "A cool small bunch of flowers",
           "displayName" : "Small Flowers",
           "locale" : "en_US"
+        },
+        {
+          "description" : "Nice small flowers",
+          "displayName" : "Small Flowers",
+          "locale" : "en_GB"
         }
       ],
       "productID" : "com.rarcher.nonconsumable.flowers-small",

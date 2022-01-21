@@ -134,7 +134,6 @@ public class StoreHelper: ObservableObject {
     
     /// Request localized product info from the App Store for a set of ProductId.
     ///
-    ///
     /// This method runs on the main thread because it may result in updates to the UI.
     /// - Parameter productIds: The product ids that you want localized information for.
     /// - Returns: Returns an array of `Product`, or nil if no product information is returned by the App Store.

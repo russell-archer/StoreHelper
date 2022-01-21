@@ -12,8 +12,6 @@ import SwiftUI
 // Consumables:     [Purchases].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
 // Subscriptions:   [Purchases].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
-import SwiftUI
-
 struct SubscriptionInfoSheet: View {
     @State private var showManageSubscriptionsSheet = false
     @State private var extendedSubscriptionInfo: ExtendedSubscriptionInfo?

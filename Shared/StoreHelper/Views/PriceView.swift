@@ -12,7 +12,7 @@ import StoreKit
 struct PriceView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var canMakePayments: Bool = false
-    @Binding var purchaseState: PurchaseState
+    @Binding var purchaseState: PurchaseState  // Propagates the result of a purchase back from `PriceViewModel`
     
     var productId: ProductId
     var price: String
@@ -29,61 +29,43 @@ struct PriceView: View {
                 withAnimation { purchaseState = .inProgress }
                 Task.init { await priceViewModel.purchase(product: product) }
             }) {
-                if canMakePayments {
-                    Text(price)
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 95, height: 40)
-                        .fixedSize()
-                        .background(Color.blue)
-                        .cornerRadius(25)
-                        .padding(.leading, 10)
-                } else {
-                    Text("Disabled")
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 95, height: 40)
-                        .fixedSize()
-                        .background(Color.blue)
-                        .cornerRadius(25)
-                        .padding(.leading, 10)
-                }
+                PriceButtonText(price: price, disabled: !canMakePayments)
             }
             .disabled(!canMakePayments)
             #elseif os(macOS)
-            HStack {
-                if canMakePayments {
-                    Text(price)
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 100, height: 40)
-                        .fixedSize()
-                        .background(Color.blue)
-                        .cornerRadius(25)
-                        .padding(.leading, 10)
-                } else {
-                    Text("Disabled")
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 100, height: 40)
-                        .fixedSize()
-                        .background(Color.blue)
-                        .cornerRadius(25)
-                        .padding(.leading, 10)
-                }
-            }
+            HStack { PriceButtonText(price: price, disabled: !canMakePayments)}
             .contentShape(Rectangle())
             .onTapGesture {
+                guard canMakePayments else { return }
                 withAnimation { purchaseState = .inProgress }
                 Task.init { await priceViewModel.purchase(product: product) }
             }
             #endif
         }
         .onAppear { canMakePayments = AppStore.canMakePayments }
+    }
+}
+
+struct PriceButtonText: View {
+    var price: String
+    var disabled: Bool
+    
+    #if os(iOS)
+    var frameWidth: CGFloat = 95
+    #elseif os(macOS)
+    var frameWidth: CGFloat = 100
+    #endif
+    
+    var body: some View {
+        Text(disabled ? "Disabled" : price)
+            .font(.body)
+            .foregroundColor(.white)
+            .padding()
+            .frame(width: frameWidth, height: 40)
+            .fixedSize()
+            .background(Color.blue)
+            .cornerRadius(25)
+            .padding(.leading, 10)
     }
 }
 
