@@ -88,7 +88,7 @@ struct PurchaseInfoSheet: View {
                     }) { Label("Request Refund", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)
                     #elseif os(macOS)
                     Button(action: {
-                        NSWorkspace.shared.open(URL(string: StorageKey.requestRefund.value()!)!)
+                        NSWorkspace.shared.open(URL(string: StoreHelperStorageKey.requestRefund.value()!)!)
                     }) { Label("Request Refund", systemImage: "creditcard.circle")}.macOSStyle()
                     #endif
                     

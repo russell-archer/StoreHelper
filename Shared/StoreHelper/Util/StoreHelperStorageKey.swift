@@ -1,13 +1,13 @@
 //
-//  StorageKey.swift
-//  StoreHelper (iOS)
+//  StoreHelperStorageKey.swift
+//  StoreHelper
 //
 //  Created by Russell Archer on 20/12/2021.
 //
 
 import Foundation
 
-public enum StorageKey {
+public enum StoreHelperStorageKey {
     case appGroupBundleId   // Not stored. Constant value. The id for the container shared between the main app and widgets
     case contactUsUrl       // Not stored. Constant value. A URL where the user can contact the app developer.
     case requestRefund      // Not stored. Constant value. A URL which users on macOS can use to request a refund for an IAP.

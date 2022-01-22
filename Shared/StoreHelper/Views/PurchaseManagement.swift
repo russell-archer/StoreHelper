@@ -45,7 +45,7 @@ struct PurchaseManagement: View {
                     .disabled(!storeHelper.hasSubscriptionProducts)
                 
                 Button(action: { restorePurchases()}, label: { Label("Restore Purchases", systemImage: "purchased")})
-                Button(action: { openURL(URL(string: StorageKey.contactUsUrl.value()!)!)}, label: { Label("Contact Us", systemImage: "bubble.right")})
+                Button(action: { openURL(URL(string: StoreHelperStorageKey.contactUsUrl.value()!)!)}, label: { Label("Contact Us", systemImage: "bubble.right")})
 
             } label: { Label("", systemImage: "line.3.horizontal").labelStyle(.iconOnly)}
             .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)

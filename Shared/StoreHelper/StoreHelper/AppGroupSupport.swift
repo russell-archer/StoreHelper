@@ -22,12 +22,12 @@ struct AppGroupSupport {
         // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
         // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
         // StoreKit is concerned.
-        guard let id = StorageKey.appGroupBundleId.value() else { return }
+        guard let id = StoreHelperStorageKey.appGroupBundleId.value() else { return }
         if let defaults = UserDefaults(suiteName: id) { defaults.set(purchased, forKey: productId)}
     }
     
     static func isPurchased(productId: String) -> Bool {
-        guard let id = StorageKey.appGroupBundleId.value() else { return false }
+        guard let id = StoreHelperStorageKey.appGroupBundleId.value() else { return false }
         var purchased = false
         if let defaults = UserDefaults(suiteName: id) { purchased = defaults.bool(forKey: productId)}
         return purchased

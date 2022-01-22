@@ -58,8 +58,8 @@
 		6841612827971DAC0000188D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6841612227971DAC0000188D /* Assets.xcassets */; };
 		6841612927971DAC0000188D /* StoreHelperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612327971DAC0000188D /* StoreHelperApp.swift */; };
 		6841612A27971DAC0000188D /* StoreHelperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612327971DAC0000188D /* StoreHelperApp.swift */; };
-		6841612B27971DAC0000188D /* StorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612427971DAC0000188D /* StorageKey.swift */; };
-		6841612C27971DAC0000188D /* StorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612427971DAC0000188D /* StorageKey.swift */; };
+		6841612B27971DAC0000188D /* StoreHelperStorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612427971DAC0000188D /* StoreHelperStorageKey.swift */; };
+		6841612C27971DAC0000188D /* StoreHelperStorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612427971DAC0000188D /* StoreHelperStorageKey.swift */; };
 		6841612E279735430000188D /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612D279735430000188D /* Button.swift */; };
 		6841612F279735430000188D /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6841612D279735430000188D /* Button.swift */; };
 		6848F1F026AAF6730000F0AC /* ProductListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6848F1EF26AAF6730000F0AC /* ProductListView.swift */; };
@@ -112,7 +112,7 @@
 		6841612127971DAC0000188D /* PropertyFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PropertyFile.swift; sourceTree = "<group>"; };
 		6841612227971DAC0000188D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6841612327971DAC0000188D /* StoreHelperApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreHelperApp.swift; sourceTree = "<group>"; };
-		6841612427971DAC0000188D /* StorageKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageKey.swift; sourceTree = "<group>"; };
+		6841612427971DAC0000188D /* StoreHelperStorageKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreHelperStorageKey.swift; sourceTree = "<group>"; };
 		6841612D279735430000188D /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		6848F1EF26AAF6730000F0AC /* ProductListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListView.swift; sourceTree = "<group>"; };
 		6848F1F526AAF9C70000F0AC /* ProductListViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListViewRow.swift; sourceTree = "<group>"; };
@@ -280,7 +280,7 @@
 			isa = PBXGroup;
 			children = (
 				6841612127971DAC0000188D /* PropertyFile.swift */,
-				6841612427971DAC0000188D /* StorageKey.swift */,
+				6841612427971DAC0000188D /* StoreHelperStorageKey.swift */,
 				68F773CE267A494500C3C670 /* Utils.swift */,
 			);
 			path = Util;
@@ -565,7 +565,7 @@
 				684160FD27971C270000188D /* PurchaseInfoViewModel.swift in Sources */,
 				684160FA27971C210000188D /* Utils.swift in Sources */,
 				684160EE27971C150000188D /* StoreConfiguration.swift in Sources */,
-				6841612C27971DAC0000188D /* StorageKey.swift in Sources */,
+				6841612C27971DAC0000188D /* StoreHelperStorageKey.swift in Sources */,
 				684160F527971C1C0000188D /* StoreNotification.swift in Sources */,
 				684160F427971C1C0000188D /* SubscriptionInfo.swift in Sources */,
 				684160FC27971C270000188D /* SubscriptionInfoViewModel.swift in Sources */,
@@ -614,7 +614,7 @@
 				6824DD2026A5ED5A00E44F35 /* PurchaseInfoView.swift in Sources */,
 				689C72FB2784C38900355CBA /* PurchaseManagement.swift in Sources */,
 				68D7F2172771036D008EBC09 /* AppGroupSupport.swift in Sources */,
-				6841612B27971DAC0000188D /* StorageKey.swift in Sources */,
+				6841612B27971DAC0000188D /* StoreHelperStorageKey.swift in Sources */,
 				68CE0D8726B35F2700CE9CC4 /* PurchaseInfo.swift in Sources */,
 				68F773CF267A494500C3C670 /* Utils.swift in Sources */,
 				68706B892790588400A31888 /* PurchaseInfoSheet.swift in Sources */,
