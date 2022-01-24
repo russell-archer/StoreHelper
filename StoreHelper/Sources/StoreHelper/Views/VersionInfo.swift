@@ -21,22 +21,16 @@ public struct VersionInfo: View {
             
             HStack {
                 #if os(iOS)
-                Image("ios-icon").bodyImage().frame(width: 75)
+                Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)
                 VStack {
-                    Text("Version \(versionInfo)").font(.subheadline).foregroundColor(Color("GroupBoxText")).padding(1)
-                    Text("Build \(buildInfo)").font(.subheadline).foregroundColor(Color("GroupBoxText")).padding(1)
+                    Text("Version \(versionInfo)").font(.subheadline).padding(1)
+                    Text("Build \(buildInfo)").font(.subheadline).padding(1)
                 }
                 #elseif os(macOS)
-                Image("mac-icon").bodyImageConstrainedNoPadding(width: 64, height: 64)
+                Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)
                 VStack {
-                    Text("Version \(versionInfo)")
-                        .font(.subheadline)
-                        .foregroundColor(Color("GroupBoxText"))
-                        .padding(EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1))
-                    Text("Build number \(buildInfo)")
-                        .font(.subheadline)
-                        .foregroundColor(Color("GroupBoxText"))
-                        .padding(EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1))
+                    Text("Version \(versionInfo)").font(.subheadline).padding(EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1))
+                    Text("Build number \(buildInfo)").font(.subheadline).padding(EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1))
                 }
                 #endif
             }
@@ -56,12 +50,3 @@ public struct VersionInfo: View {
     }
 }
 
-struct VersionInfo_Previews: PreviewProvider {
-    static var previews: some View {
-        VersionInfo()
-        
-        VersionInfo()
-            .preferredColorScheme(.dark)
-
-    }
-}

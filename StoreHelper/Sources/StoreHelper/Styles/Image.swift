@@ -8,15 +8,38 @@
 import SwiftUI
 
 public extension Image {
+    
+    // Read images from the Sources/Resources folder
+    init(packageResource name: String, ofType type: String) {
+        #if canImport(UIKit)
+        guard let path = Bundle.module.path(forResource: name, ofType: type),
+              let image = UIImage(contentsOfFile: path) else {
+                  self.init(name)
+                  return
+              }
+        
+        self.init(uiImage: image)
+        #elseif canImport(AppKit)
+        guard let path = Bundle.module.path(forResource: name, ofType: type),
+              let image = NSImage(contentsOfFile: path) else {
+                  self.init(name)
+                  return
+              }
+        self.init(nsImage: image)
+        #else
+        self.init(name)
+        #endif
+    }
+    
     func bodyImage() -> some View {
         self
             .resizable()
             .cornerRadius(15)
             .aspectRatio(contentMode: .fit)
-        #if os(macOS)
+            #if os(macOS)
             .frame(maxWidth: 1200)
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 20, trailing: 10))
-        #endif
+            #endif
     }
     
     func bodyImageNotRounded() -> some View {
