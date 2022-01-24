@@ -1,4 +1,5 @@
 # StoreHelper
+
 Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13 with SwiftUI, Swift 5.5, iOS 15 and macOS 12.
 
 See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the `StoreKit1` in iOS 14 and lower.
@@ -6,6 +7,7 @@ See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-
 ---
 
 # Description
+
 ![](./readme-assets/StoreHelperDemo0.png)
 
 Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13 with SwiftUI, Swift 5.5, iOS 15 and macOS 12.
@@ -17,6 +19,7 @@ Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13 with Swif
 ---
 
 # Recent Changes
+
 - 19 January, 2022
 	- Major updates to documentation
 	- Added Mac target
@@ -43,6 +46,7 @@ Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13 with Swif
 ---
 
 # Source Code
+
 The latest version of `StoreHelper` is always available [on GitHub](https://github.com/russell-archer/StoreHelper). 
 
 > **Disclaimer**. The source code presented here is for educational purposes. 
@@ -51,6 +55,7 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 ---
 
 # Contents
+
 - [Description](#Description)
 - [Recent Changes](#Recent-Changes)
 - [Source Code](#Source-Code)
@@ -89,6 +94,7 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 ---
 
 # References
+
 - https://developer.apple.com/in-app-purchase/
 - https://developer.apple.com/documentation/storekit/in-app_purchase
 - https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase
@@ -101,6 +107,7 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 ---
 
 # Overview
+
 ![](./readme-assets/StoreHelperDemo2.png)
 
 This **SwiftUI**-based app will demonstrate how to use Apple's new `StoreKit2` framework to provide in-app purchases to your users. 
