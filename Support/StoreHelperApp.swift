@@ -1,11 +1,12 @@
 //
 //  StoreHelperApp.swift
-//  Shared
+//  StoreHelperDemo
 //
 //  Created by Russell Archer on 16/06/2021.
 //
 
 import SwiftUI
+import StoreHelper
 
 @main
 struct StoreHelperApp: App {
