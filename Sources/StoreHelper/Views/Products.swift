@@ -66,7 +66,7 @@ public struct Products: View {
             }
         }
         #if os(iOS)
-        .navigationBarTitle("Products", displayMode: .large)
+        .navigationBarTitle("Available Products", displayMode: .inline)
         .toolbar { PurchaseManagement() }
         .refundRequestSheet(for: refundRequestTransactionId, isPresented: $showRefundSheet) { refundRequestStatus in
             switch(refundRequestStatus) {
