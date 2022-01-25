@@ -1,0 +1,188 @@
+{
+  "identifier" : "2B418075",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "48594F7A",
+      "localizations" : [
+        {
+          "description" : "A cool bunch of mixed flowers",
+          "displayName" : "Large Flowers",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Lovely large flowers",
+          "displayName" : "Large Flowers",
+          "locale" : "en_GB"
+        }
+      ],
+      "productID" : "com.rarcher.nonconsumable.flowers-large",
+      "referenceName" : "flowers-large",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "FB9E68BF",
+      "localizations" : [
+        {
+          "description" : "A cool small bunch of flowers",
+          "displayName" : "Small Flowers",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Nice small flowers",
+          "displayName" : "Small Flowers",
+          "locale" : "en_GB"
+        }
+      ],
+      "productID" : "com.rarcher.nonconsumable.flowers-small",
+      "referenceName" : "flowers-small",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "D0A0F198",
+      "localizations" : [
+        {
+          "description" : "A large bunch of red roses",
+          "displayName" : "Large Roses",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.rarcher.nonconsumable.roses-large",
+      "referenceName" : "roses-large",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "3.99",
+      "familyShareable" : true,
+      "internalID" : "6AE20A0C",
+      "localizations" : [
+        {
+          "description" : "A small box of chocolates",
+          "displayName" : "Small Chocolates",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.rarcher.nonconsumable.chocolates-small",
+      "referenceName" : "chocolates-small",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "29",
+      "familyShareable" : false,
+      "internalID" : "37B33974",
+      "localizations" : [
+        {
+          "description" : "VIP plant installation service",
+          "displayName" : "Plant Installation",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.rarcher.consumable.plant-installation",
+      "referenceName" : "plant-installation",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitError" : 0,
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "8126C4BB",
+      "localizations" : [
+
+      ],
+      "name" : "VIP",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "AF41C8C8",
+          "introductoryOffer" : {
+            "displayPrice" : "9.99",
+            "internalID" : "D9531218",
+            "paymentMode" : "payUpFront",
+            "subscriptionPeriod" : "P2M"
+          },
+          "localizations" : [
+            {
+              "description" : "Weekly home visits by an expert",
+              "displayName" : "Gold",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.subscription.vip.gold",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Gold",
+          "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "11.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "B8897679",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Visits twice a month by an expert",
+              "displayName" : "Silver",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.subscription.vip.silver",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Silver",
+          "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "59041E8B",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Monthly home visits by an expert",
+              "displayName" : "Bronze",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.subscription.vip.bronze",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Bronze",
+          "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 1,
+    "minor" : 1
+  }
+}
