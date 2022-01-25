@@ -1,18 +1,18 @@
 //
-//  Purchases.swift
+//  Products.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 10/09/2021.
 //
 // View hierachy:
-// Non-Consumables: [Purchases].[ProductListView].[ProductListViewRow]......[ProductView]......[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
-// Consumables:     [Purchases].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
-// Subscriptions:   [Purchases].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
+// Non-Consumables: [Products].[ProductListView].[ProductListViewRow]......[ProductView]......[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Consumables:     [Products].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
+// Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
 import StoreKit
 
-public struct Purchases: View {
+public struct Products: View {
     @State private var showManageSubscriptions = false
     @State private var showRefundSheet = false
     @State private var refundRequestTransactionId: UInt64 = UInt64.min
