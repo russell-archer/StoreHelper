@@ -2,7 +2,9 @@
 
 Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13 with SwiftUI, Swift 5.5, iOS 15 and macOS 12.
 
-See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the `StoreKit1` in iOS 14 and lower.
+- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using `StoreHelper` with Xcode 13.
+
+- See also [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with the `StoreKit1` in iOS 14 and lower.
 
 ---
 
