@@ -6,13 +6,11 @@ import PackageDescription
 let package = Package(
     name: "StoreHelper",
     platforms: [
-        .macOS(.v12), .iOS(.v15)
+        .iOS(.v15), .macOS(.v12)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
-        .library(
-            name: "StoreHelper",
-            targets: ["StoreHelper"]),
+        .library(name: "StoreHelper", targets: ["StoreHelper"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.

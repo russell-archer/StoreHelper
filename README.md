@@ -1,9 +1,8 @@
 # StoreHelper
 
-- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
-- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13**, **iOS 15** and **macOS 12**
-- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
-- See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
+- [Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) - a tutorial on using `StoreHelper`
+- [Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - in-depth discussion on `StoreHelper` and `StoreKit2`
+- [Demo](https://github.com/russell-archer/StoreHelperDemo) - an example SwiftUI project using `StoreHelper` with **Xcode 13** and **iOS 15**
 
 # Overview of StoreHelper
 
@@ -11,19 +10,16 @@
 
 Specifically, `StoreHelper` provides the following features:
 
-- Multi-platform (iOS and macOS) SwiftUI support that allows users to purchase **Consumables**, **Non-consumables** and **Subscriptions**
-- Supports **transaction validation**
-- Handles **pending ("ask to buy") transactions** where parental permission must be obtained before a purchase is completed
-- Handles **cancelled** and **failed transactions**
-- Supports customer **refunds**
-- Handles management of **subscriptions**
+- Multi-platform (iOS and macOS) SwiftUI support enables users to purchase **Consumable**, **Non-consumable** and **Subscription** products
+- Supports **transaction validation**, **pending ("ask to buy") transactions**, **cancelled** and **failed transactions**
+- Supports customer **refunds** and management of **subscriptions**
 - Provides detailed **transaction information and history** for non-consumables and subscriptions
 - Support for direct App Store purchases of **promoted in-app purchases**
-- Used by apps [live on the App Store](https://apps.apple.com/app/writerly/id1143101981)
 
 # License
 
-MIT License. Copyright (c) 2022 Russell Archer. See [License](https://github.com/russell-archer/StoreHelper/blob/main/LICENSE.md).
+MIT license, copyright (c) 2022, Russell Archer. This software is provided "as-is" without warranty and may be freely used, copied, modified and redistributed, including as part of commercial software. 
+See [License](https://github.com/russell-archer/StoreHelper/blob/main/LICENSE.md) for details.
 
 # Requirements
 
