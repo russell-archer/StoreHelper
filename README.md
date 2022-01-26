@@ -1,24 +1,23 @@
 # StoreHelper
 
-Implementing and testing In-App Purchases with `StoreKit2` in Xcode 13 with SwiftUI, Swift 5.5, iOS 15 and macOS 12.
-
-Created: 16-06-2021 11:50
+Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 13** with **SwiftUI**, **Swift 5.5**, **iOS 15** and **macOS 12**.
 
 ---
 
 # Description
-![[StoreHelper Demo 0b.png | 125]]
+![](./readme-assets/StoreHelperDemo0c.png)
 
 This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13**, **iOS 15** and **macOS 12**.
 
-### See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
-### See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
-### See [[#Quick Start]] below for a package usage
+- ### See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
+- ### See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
+- ### Jump to [[#Quick Start]] below for a package usage
+- ### Jump to [[#Overview]] below for in-depth discussion of StoreKit2
 
 ---
 
 # Recent Changes
-- 24 January, 2002
+- 25 January, 2002
 	- Refactored `StoreHelper` as a SPM Package
 	- Moved example app to separate repo ([StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo))
 	- Updated documentation re change to SPM package
@@ -48,7 +47,6 @@ This document describes how to implement and test in-app purchases with **SwiftU
 ---
 
 # Source Code
-
 The latest version of `StoreHelper` is always available [on GitHub](https://github.com/russell-archer/StoreHelper). 
 
 > **Disclaimer**. The source code presented here is for educational purposes. 
@@ -67,6 +65,15 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 	- [Use StoreHelper to support in-app purchases](#Use-StoreHelper-to-support-in-app-purchases)
 	- [What you'll need](#What-you'll-need)
 	- [Steps](#Steps)
+		- [Getting the StoreHelper Package](#Getting-the-StoreHelper-Package)
+		- [Create the App struct](#Create-the-App-struct)
+		- [Create MainView](#Create-MainView)
+		- [Create ProductView](#Create-ProductView)
+		- [Modify ContentView](#Modify-ContentView)
+		- [Create the ProductInfo View](#Create-the-ProductInfo-View)
+		- [Add Product Images](#Add-Product-Images)
+		- [Add Product Configuration Files](#Add-Product-Configuration-Files)
+		- [Run the App](#Run-the-App)
 - [Overview](#Overview)
 - [What's changed from the original StoreKit?](#What's-changed-from-the-original-StoreKit)
 	- [Receipt validation](#Receipt-validation)
@@ -112,8 +119,7 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 ---
 
 # Quick Start
-## Use StoreHelper to support in-app purchases
-The following steps show to use `StoreHelper` to create bare-bones demo app that supports in-app purchases on **iOS 15** and **macOS 12**.
+The following steps show to use `StoreHelper` to create a bare-bones SwiftUI demo app that supports in-app purchases on **iOS 15** and **macOS 12**.
 
 See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using `StoreHelper` with Xcode 13.
 
@@ -123,14 +129,18 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 - About 15-minutes!
 
 # Steps
-- Open Xcode and create a new project. Use either the iOS app, macOS app or multi-platform app template (these steps use the multi-platform template to create an app named "StoreHelperExample")
+## Getting the StoreHelper Package
+- Open Xcode and create a new project. Use either the **iOS app**, **macOS app** or **multi-platform app** template. These steps use the multi-platform template to create an app named **"StoreHelperDemo"**
 - Select **File > Add Packages...**
-- Paste the URL of the `StoreHelper` package into the search box: https://github.com/russell-archer/StoreHelper
+- Paste the URL of the `StoreHelper` package into the search box: 
+
+    - https://github.com/russell-archer/StoreHelper
+
 - Click **Add Package**:
 
 ![](./readme-assets/StoreHelperDemo101.png)
 
-- Xcode will fetch the package and then display a confirmation. Click **Add Package**:
+- Xcode will fetch the package from GitHub and then display a confirmation. Click **Add Package**:
 
 ![](./readme-assets/StoreHelperDemo102.png)
 
@@ -138,7 +148,7 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 
 ![](./readme-assets/StoreHelperDemo103.png)
 
-- Notice that `StoreHelper` and the `swift-collections` package (which is a dependency for `StoreHelper`) have been added to the project
+- Notice that the `StoreHelper` and `swift-collections` packages have been added to the project. `swift-collections` is a package dependency for `StoreHelper`
 - If you expand the `StoreHelper` package you'll be able to see the source:
 
 ![](./readme-assets/StoreHelperDemo104.png)
@@ -152,7 +162,13 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 
 ![](./readme-assets/StoreHelperDemo106.png)
 
+## Create the App struct
 - Open `StoreHelperExampleApp.swift` and replace the existing code with the following:
+
+> Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
+> - Copy all files in **StoreHelper > Samples > Code** into your project's **Shared** folder
+> - Copy all files in **StoreHelper > Samples > Configuration** into your project's **Shared** folder
+> - Add all the images in **StoreHelper > Samples > Images** to your project's **Asset Catalog** folder
 
 ```swift
 import SwiftUI
@@ -180,6 +196,8 @@ struct StoreHelperDemoApp: App {
 ```
 
 - Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class and add it to the SwiftUI view hierarchy using the `.environment()` modifier 
+
+## Create MainView
 - Create a new SwiftUI `View` in the **Shared** folder named `MainView` and replace the existing code with the following:
 
 ```swift
@@ -204,7 +222,10 @@ struct MainView: View {
 }
 ```
 
-- `MainView` provides simple navigation to the product list view, and a new `ProductView` which will allow the user access to a particular product if they've purchased it. Notice how we pass the `ProductId` for either the Large Flowers or Small Flowers product to `ProductView`
+- `MainView` provides simple navigation to `ContentView`, which shows a list of available products, and `ProductView` which gives the user access to a particular product if they've purchased it
+- Notice how we pass the `ProductId` for either the "Large Flowers" or "Small Flowers" product to `ProductView`
+
+## Create ProductView
 - Create a new SwiftUI `View` named `ProductView` and save it to the **Shared** folder. Replace the existing code with the following:
 
 ```swift
@@ -238,6 +259,8 @@ struct ProductView: View {
 ```
 
 - Notice that when the `VStack` appears we asynchronously call `StoreHelper.isPurchased(productId:)` to see if the user has purchased the product 
+
+## Modify ContentView
 - Open `ContentView.swift` and replace the existing code with the following:
 
 ```swift
@@ -268,9 +291,11 @@ struct ContentView: View {
 }
 ```
 
-- The above creates the `StoreHelper Products` view. This view will display a list of your configured products (we haven't configured them yet) and allow the user to purchase them and see detailed information about purchases
-- If the user taps on a product's **More Info** button, the `Purchases` view provides the unique `ProductId` of that product to our app via a closure. We can then display a view or (as in this example) sheet showing details of the product, and why the user might want to purchase it
+- The above creates the `StoreHelper Products` view. This view displays a list of your configured products (we haven't configured them yet), allow the user to purchase products and see detailed information about purchases
+- If the user taps on a product's **More Info** button, the `Products` view provides the unique `ProductId` of that product to our app via a closure. We can then display a view or (as in this example) sheet showing details of the product, and why the user might want to purchase it
 - We hand-off the presentation of our product information details to the (as yet undefined) `ProductInfo` view
+
+## Create the ProductInfo View
 - Create a new SwiftUI view in the **Shared** folder named `ProductInfo.swift`. Replace the existing code with the following:
 
 ```swift
@@ -336,38 +361,40 @@ struct ProductInfoDefault: View {
 ```
 
 - `ProductInfo` uses `StoreHelper.product(from:)` to retrieve a `StoreKit2 Product` struct, which gives localized information about the product
-- From the **StoreHelper > Samples > Images** folder, drag all the images into the project's **Asset Catalog**. These images have filenames that are the same as the product ids which they represent
+
+## Add Product Images
+- From the **StoreHelper > Samples > Images** folder, drag all the images into the project's **Asset Catalog**. These images have filenames that are the same as the product ids for the products which they represent
+
+## Add Product Configuration Files
 - From the **StoreHelper > Samples > Configuration** folder, drag the `Products.storekit` and `Products.plist` files into the **Shared** project folder. These are example product configuration files
 - Select the **iOS target** and select **Product > Scheme> Edit Scheme**. Select the `Products.storekit` file in the **StoreKit Configuration** field:
 
 ![](./readme-assets/StoreHelperDemo107.png)
 
 - Repeat the previous step for the **macOS target**
+
+## Run the App
 - Select the **iOS target** and run it in the simulator:
-	- The **Product List** will display a list of products, along with images and descriptions
-	- Try purchasing the Large Flowers product
-	- Your demo app supports a complete range of in-app purchase-related features. See the documentation for `StoreHelper` for a full list of features
-	- Try selecting "Large Flowers" from the main view. If you've purchased it you should see that you have access, otherwise you'll see a "no access" error 
+    - The MainView provides navigation to the **Products List** and product access views
+    - The **Products List** view displays a list of products, along with images and descriptions
+    - Try purchasing the **Large Flowers** product
+    - Your demo app supports a complete range of in-app purchase-related features. See the documentation for `StoreHelper` for a full list of features
+    - Try selecting "Large Flowers" from the main view. If you've purchased it you should see that you have access, otherwise you'll see a "no access" error 
 
 ![](./readme-assets/StoreHelperDemo108.png)
 
 ---
 # Overview
-![](./readme-assets/StoreHelperDemo2.png)
-
-This **SwiftUI**-based app will demonstrate how to use Apple's new `StoreKit2` framework to provide in-app purchases to your users. 
-
-The basic premise for the demo is that we're creating an app for an on-line florist that sells a range of flowers, chocolates and other related services like home visits to water and care for house plants.
+This document discusses how to use Apple's `StoreKit2` framework to provide in-app purchases in your **iOS** or **macOS** **SwiftUI**-based apps. 
 
 Specifically, we'll cover:
 
-- How to use `StoreHelper` to create a multi-platform (iOS and macOS) SwiftUI app that allows users to purchase a range of products, including:
-
+- How to use the `StoreHelper` SPM package to create a multi-platform (iOS and macOS) SwiftUI app that allows users to purchase a range of products, including:
 	- **Consumables** (VIP plant installation service: lasts for one day)
 	- **Non-consumables** (cut flowers, potted plants, chocolates, etc.)
 	- **Subscriptions** (VIP plant home care: scheduled home visits to water and care for house plants)
-
 - An in-depth review of how to use `StoreHelper`, a Swift package that encapsulates `StoreKit2` in-app purchase functionality and makes it easy to work with the App Store
+- Developing a demo app (**StoreHelperFlorist**) for an on-line florist that sells a range of flowers, chocolates and other related services like home visits to water and care for house plants
 - Requesting localized **product information** from the App Store
 - How to **purchase** a product and **validate the transaction**
 - Handling **pending ("ask to buy") transactions** where parental permission must be obtained before a purchase is completed
@@ -415,28 +442,14 @@ The good news is that although there are two versions of the StoreKit, both fram
 - Both versions of StoreKit provide the exact same UI experience for users
 - Transactions made with one version of StoreKit are immediately available in the other version
 
-# StoreHelper Demo App
+# StoreHelperDemo App
+![](./readme-assets/StoreHelperDemo2.png)
+
 The best way to get familiar with `StoreKit2` is to create a simple, but full-featured (from an in-app purchase perspective) demo app. You may be surprised how little "app code" is required to implement in-app purchases: `StoreHelper` and `StoreKit2` handle all the heavy-lifting!
 
 # Get Started
-To get started, here's the structure of the Xcode project:
-
-![](./readme-assets/StoreHelperDemo1.png)
-
-The **Project Root > Views** directory holds a couple of views that, along with **Project Root > Support > StoreHelperApp**, constitute the "app" part of the project. 
-The **Project Root > Shared** directory contains the reusable **StoreHelper** code, as well as a few shared support files such as styles, etc. It's structured as follows:
-
-![](./readme-assets/StoreHelperDemo1b.png)
-
-Notice that that the **iOS** target supports **iOS 15** and higher:
-
-![](./readme-assets/StoreHelperDemo3.png)
-
-The **macOS** target supports **macOS 12** and higher:
-
-![](./readme-assets/StoreHelperDemo3b.png)
-
-Both targets support the **In-App Purchase** capability. Adding this capability also adds the `StoreKit2` framework to your project:
+To get started, create a new multi-platform Xcode project and add the `StoreHelper` package. See [[#Getting the StoreHelper Package]] above for details.
+Make sure that both the iOS and macOS targets include the `StoreHelper` library, and that both targets support the **In-App Purchase** capability. Adding this capability also adds the `StoreKit2` framework to your project:
 
 ![](./readme-assets/StoreHelperDemo5.png)
 
@@ -454,14 +467,14 @@ Before we do anything else we need to define the products we'll be selling. Ulti
 
 Fortunately, there's now a much better way.
 
-Introduced in Xcode 12 a new **local** StoreKit test environment allows you to do early testing of IAPs in the simulator without having to set anything up in App Store Connect. You define your products locally in a **StoreKit Configuration** file. Furthermore, you can view and delete transactions, issue refunds, and a whole lot more. There’s also a new `StoreKitTest` framework that enables you to do automated testing of IAPs. We'll use this approach to test IAPs in our app.
+Introduced in Xcode 12, a new **local** StoreKit test environment allows you to do early testing of IAPs in the simulator without having to set anything up in App Store Connect. You define your products locally in a **StoreKit Configuration** file. Furthermore, you can view and delete transactions, issue refunds, and a whole lot more. There’s also a new `StoreKitTest` framework that enables you to do automated testing of IAPs. We'll use this approach to test IAPs in our app.
 
 # The StoreKit configuration file
 You create a **StoreKit Configuration File** by selecting **File > New > File** and choosing the **StoreKit Configuration File** template:
 
 ![](./readme-assets/StoreHelperDemo6.png)
 
-StoreHelper has a `Products.storekit` file in the `Shared/StoreHelper/Configuration` folder:
+`StoreHelper` includes a sample `Products.storekit` file in the `StoreHelper/Samples/Configuration` folder which you should copy to the `Shared/Configuration` folder of your project:
 
 ![](./readme-assets/StoreHelperDemo6b.png)
 
@@ -521,7 +534,7 @@ using the local StoreKit test environment and the live App Store environment. Th
 We've defined our products in the StoreKit configuration file, so it seems obvious that we should use that as the repository for our IAP data. Retrieving config data at runtime isn't difficult 
 (it's `JSON`). However, the StoreKit configuration file is intended for use *when testing* and it's not a good idea to use it for production too. It would be all too easy to allow "test products" to make it into the release build!
 
-`StoreHelper` defines a list of product identifiers in a property list named `Products.plist`. It's saved in the `Shared/StoreHelper/Configuration` folder:
+Your project should include a list of product identifiers in a property list named `Products.plist`. Save it in the `Shared/Configuration` folder and make sure to include it in the **Target Membership** for both targets:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -543,7 +556,7 @@ We've defined our products in the StoreKit configuration file, so it seems obvio
 </plist>
 ```
 
-To help it read the property list `StoreHelper` includes a `PropertyFile` struct with a single `static read(filename:)` method. See `PropertyFile.swift`  in the `Shared/StoreHelper/Util` folder:
+To help it read the property list `StoreHelper` includes a `PropertyFile` struct with a single `static read(filename:)` method. See `PropertyFile.swift`  in the `Sources/StoreHelper/Util` folder:
 
 ```swift
 struct PropertyFile {
@@ -575,7 +588,7 @@ The first thing our app needs to do is get a list of our products that our app h
 
 This procedure is the same whether you're using a local StoreKit test environment, sandbox testing or the live App Store:
 
-- Get a `Set` of `ProductId` (e.g. hardcode the list, or read it from a property file as `StoreHelper` does)
+- Get a `Set` of `ProductId` (e.g. hardcode the list, or read it from a property file as `StoreHelper` is setup to do)
 - Asynchronously call the `StoreKit2` `Product.products(for:)` method, passing it the set of `ProductId`
 - The App Store returns a collection of `Product`, each element of which contains localized product information
 - Display product information, along with a purchase button, to the user
@@ -590,11 +603,11 @@ These are the steps required to request localized product information from the A
 public class StoreHelper: ObservableObject { ... }
 ```
 
-- An instance of `StoreHelper` is stored in a `@StateObject` property in the app object `StoreHelperApp`, and added to the SwiftUI view environment :
+- An instance of `StoreHelper` is stored in a `@StateObject` property in your demo project's app object `StoreHelperDemoApp`, and added to the SwiftUI view environment :
 
 ```swift
 @main
-struct StoreHelperApp: App {
+struct StoreHelperDemoApp: App {
     
     // Create the StoreHelper object that will be shared throughout the View hierarchy
     @StateObject var storeHelper = StoreHelper()
@@ -646,7 +659,7 @@ The following diagram shows the flow for requesting localized product informatio
 ![](./readme-assets/StoreHelperDemo12.png)
 
 # Displaying Products
-The demo app includes an asset catalog with some images for our products. They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files:
+The `StoreHelper` package includes some images for example products (see `Samples/Images`). They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files. See [[#Add Product Images]] above for details. Add these sample images to your demo app's **Asset Catalog**:
 
 ![](./readme-assets/StoreHelperDemo10.png)
 
@@ -935,8 +948,10 @@ To enable ask-to-buy support in `StoreKit` select the `.storekit` configuration 
 
 ![](./readme-assets/StoreHelperDemo17.png)
 
-Now run the app and attempt to make a purchase. You'll find that the purchase proceeds as normal. 
-However, instead of receiving a purchase confirmation you'll see an **Ask Permission** alert. 
+Now run the demo app and attempt to make a purchase. You'll find that the purchase proceeds as normal. 
+However, instead of receiving a purchase confirmation you'll see an **Ask Permission** alert:
+
+![](./readme-assets/StoreHelperDemo17b.png)
 
 Tap **Ask** and you'll see that the purchase enters a `.pending` state, as denoted by the orange hourglass next to the product purchase button:
 
@@ -946,17 +961,17 @@ With the app still running, click the **Manage StoreKit Transaction** button on 
 
 ![](./readme-assets/StoreHelperDemo19.png)
 
-You'll now be able to see the transaction that is "Pending Approval":
-
-![](./readme-assets/StoreHelperDemo21.png)
-
-Right-click the transaction that is pending approval and select **Approve Transaction**:
+You'll now be able to see the transaction that is "Pending Approval". Right-click the transaction that is pending approval and select **Approve Transaction**:
 
 ![](./readme-assets/StoreHelperDemo23.png)
 
 You should see the purchase confirmed as `StoreHelper` processes the transaction:
 
-![](./readme-assets/StoreHelperDemo22.gif)
+![](./readme-assets/StoreHelperDemo23b.png)
+
+The console shows how `StoreHelper` handled the process:
+
+![](./readme-assets/StoreHelperDemo23c.png)
 
 # What Products has the user purchased?
 What happens if we quit and restart the demo app? How do we know what purchases the user has previously made?
@@ -1380,7 +1395,7 @@ struct SubscriptionInfoSheet: View {
 }
 ```
 
-Apple's documentation says it doesn't (yet) work with StoreKit testing in Xcode, and that you have to test subscription management in the sandbox environment. However, using Xcode 13.2 and iOS15.2 it **does** seem to work in the simulator.
+Apple's documentation says it doesn't (yet) work with StoreKit testing in Xcode, and that you have to test subscription management in the sandbox environment. However, using Xcode 13.2 and iOS15.2 it **does** *seem* to work in the simulator.
 
 Tapping **Manage Subscription** displays the following sheet:
 
@@ -1408,7 +1423,7 @@ Tapping **Request Refund** shows:
 The following shows how to display the refund request sheet:
 
 ```swift
-struct Purchases: View {
+struct Products: View {
     @State private var showRefundSheet = false
     
     @ViewBuilder var body: some View {
