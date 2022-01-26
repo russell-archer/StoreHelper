@@ -11,8 +11,8 @@ This document describes how to implement and test in-app purchases with **SwiftU
 
 - ### See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
 - ### See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
-- ### Jump to [[#Quick Start]] below for a package usage
-- ### Jump to [[#Overview]] below for in-depth discussion of StoreKit2
+- ### Jump to [Quick Start](##Quick-Start) below for a package usage
+- ### Jump to [Overview](#Overview) below for in-depth discussion of StoreKit2
 
 ---
 
@@ -448,7 +448,7 @@ The good news is that although there are two versions of the StoreKit, both fram
 The best way to get familiar with `StoreKit2` is to create a simple, but full-featured (from an in-app purchase perspective) demo app. You may be surprised how little "app code" is required to implement in-app purchases: `StoreHelper` and `StoreKit2` handle all the heavy-lifting!
 
 # Get Started
-To get started, create a new multi-platform Xcode project and add the `StoreHelper` package. See [[#Getting the StoreHelper Package]] above for details.
+To get started, create a new multi-platform Xcode project and add the `StoreHelper` package. See [Getting the StoreHelper Package](#Getting-the-StoreHelper-Package) above for details.
 Make sure that both the iOS and macOS targets include the `StoreHelper` library, and that both targets support the **In-App Purchase** capability. Adding this capability also adds the `StoreKit2` framework to your project:
 
 ![](./readme-assets/StoreHelperDemo5.png)
@@ -659,7 +659,7 @@ The following diagram shows the flow for requesting localized product informatio
 ![](./readme-assets/StoreHelperDemo12.png)
 
 # Displaying Products
-The `StoreHelper` package includes some images for example products (see `Samples/Images`). They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files. See [[#Add Product Images]] above for details. Add these sample images to your demo app's **Asset Catalog**:
+The `StoreHelper` package includes some images for example products (see `Samples/Images`). They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files. See [Add Product Images](#Add-Product-Images) above for details. Add these sample images to your demo app's **Asset Catalog**:
 
 ![](./readme-assets/StoreHelperDemo10.png)
 
@@ -668,11 +668,13 @@ The hierarchy of views used to display products is broken into a number of small
 ![](./readme-assets/StoreHelperDemo15.png)
 
 Running the app's iOS target produces:
+
 ![](./readme-assets/StoreHelperDemo11.png)
 
 Note that prices are in US dollars. This is because, by default in test environment, the App Store `Storefront` is **United States (USD)** and the localization is **English (US)**. To support testing other locales you can change this. Make sure the `Products.storekit` file is open, then select **Editor > Default Storefront** and change this to another value. You can also changed the localization from **English (US**) with **Editor > Default Localization**.
 
 Here I selected **United Kingdom (GBP)** as the storefront and **English (UK)** as the localization. I also created some UK-specific descriptions of the products. Notice how prices are now in UK Pounds:
+
 ![](./readme-assets/StoreHelperDemo13.png)
 
 # The Product type
@@ -1282,7 +1284,7 @@ struct PurchaseInfoView: View {
 }
 ```
 
-Tapping the `PurchaseInfoView` button displays a sheet with more detailed purchase information, along with a refund request button (see [[#Refunds]] below):
+Tapping the `PurchaseInfoView` button displays a sheet with more detailed purchase information, along with a refund request button (see [Refunds](#Refunds) below):
 
 ![](./readme-assets/StoreHelperDemo46c.png)
 
