@@ -9,7 +9,7 @@ Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in 
 
 This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13**, **iOS 15** and **macOS 12**.
 
-- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
+- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
 
@@ -167,7 +167,7 @@ The good news is that although there are two versions of the StoreKit, both fram
 The best way to get familiar with `StoreKit2` is to create a simple, but full-featured (from an in-app purchase perspective) demo app. You may be surprised how little "app code" is required to implement in-app purchases: `StoreHelper` and `StoreKit2` handle all the heavy-lifting!
 
 # Get Started
-To get started, create a new multi-platform Xcode project and add the `StoreHelper` package. See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/Documentation/quickstart.md) for details.
+To get started, create a new multi-platform Xcode project and add the `StoreHelper` package. See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for details.
 Make sure that both the iOS and macOS targets include the `StoreHelper` library, and that both targets support the **In-App Purchase** capability. Adding this capability also adds the `StoreKit2` framework to your project:
 
 ![](./assets/StoreHelperDemo5.png)
@@ -378,7 +378,7 @@ The following diagram shows the flow for requesting localized product informatio
 ![](./assets/StoreHelperDemo12.png)
 
 # Displaying Products
-The `StoreHelper` package includes some images for example products (see `Samples/Images`). They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files. See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/Documentation/quickstart.md) for details. Add these sample images to your demo app's **Asset Catalog**:
+The `StoreHelper` package includes some images for example products (see `Samples/Images`). They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files. See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for details. Add these sample images to your demo app's **Asset Catalog**:
 
 ![](./assets/StoreHelperDemo10.png)
 

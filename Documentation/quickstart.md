@@ -4,7 +4,7 @@
 ![](./assets/StoreHelperDemo0c.png)
 
 - See [StoreHelper](https://github.com/russell-archer/StoreHelper) for an overview of the `StoreHelper` package
-- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13**, **iOS 15** and **macOS 12**
+- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13**, **iOS 15** and **macOS 12**
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
 
 # Contents

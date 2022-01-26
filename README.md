@@ -1,7 +1,7 @@
 # StoreHelper
 
-- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
-- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13**, **iOS 15** and **macOS 12**
+- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
+- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13**, **iOS 15** and **macOS 12**
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
 
