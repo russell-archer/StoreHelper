@@ -4,7 +4,7 @@
 - [Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - `StoreHelper` and `StoreKit2` in-depth
 - [Demo](https://github.com/russell-archer/StoreHelperDemo) - Example **Xcode 13** `StoreHelper` project
 
-# Overview of StoreHelper
+## Overview of StoreHelper
 
 `StoreHelper` is a Swift Package Manager (SPM) package that enables developers to 
 easily add in-app purchase support to **iOS 15/macOS 12 SwiftUI** apps.
@@ -17,7 +17,7 @@ Specifically, `StoreHelper` provides the following features:
 - Provides detailed **transaction information and history** for non-consumables and subscriptions
 - Support for direct App Store purchases of **promoted in-app purchases**
 
-# License
+## License
 
 MIT license, copyright (c) 2022, Russell Archer. This software is provided "as-is" 
 without warranty and may be freely used, copied, modified and redistributed, including 
@@ -25,11 +25,11 @@ as part of commercial software.
 
 See [License](https://github.com/russell-archer/StoreHelper/blob/main/LICENSE.md) for details.
 
-# Requirements
+## Requirements
 
 `StoreHelper` uses Apple's `StoreKit2`, which requires **iOS 15**, **macOS 12** and **Xcode 13** or higher.
 
-# Adding the Package to your Project
+## Adding the Package to your Project
 
 - Open your project in Xcode
 - Select **File > Add Packages...**
