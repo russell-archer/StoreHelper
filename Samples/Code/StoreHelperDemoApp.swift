@@ -12,17 +12,12 @@ import StoreHelper
 struct StoreHelperDemoApp: App {
     @StateObject var storeHelper = StoreHelper()
     
-    #if os(macOS)
-    let minScreenSize = CGSize(width: 600, height: 600)
-    let defaultScreenSize = CGSize(width: 700, height: 700)
-    #endif
-    
     var body: some Scene {
         WindowGroup {
             MainView().environmentObject(storeHelper)
                 #if os(macOS)
-                .frame(minWidth: minScreenSize.width, idealWidth: defaultScreenSize.width, minHeight: minScreenSize.height, idealHeight: defaultScreenSize.height)
-                .font(.title2)  // Default font
+                .frame(minWidth: 700, idealWidth: 700, minHeight: 700, idealHeight: 700)
+                .font(.title2)
                 #endif
         }
     }

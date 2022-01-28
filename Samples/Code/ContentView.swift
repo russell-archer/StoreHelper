@@ -21,13 +21,12 @@ struct ContentView: View {
             .sheet(isPresented: $showProductInfoSheet) {
                 VStack {
                     // Pull in text and images that explain the particular product identified by `productId`
-                    ProductInfo(productInfoProductId: $productId)
+                    ProductInfo(productInfoProductId: $productId, showProductInfoSheet: $showProductInfoSheet)
                 }
                 #if os(macOS)
-                .frame(minWidth: 700, idealWidth: 700, maxWidth: 700, minHeight: 700, idealHeight: 800, maxHeight: 900)
+                .frame(minWidth: 500, idealWidth: 500, maxWidth: 500, minHeight: 500, idealHeight: 500, maxHeight: 500)
                 #endif
             }
         }
     }
 }
-

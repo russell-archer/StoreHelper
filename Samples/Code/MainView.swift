@@ -13,14 +13,15 @@ struct MainView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                NavigationLink(destination: ContentView()) { Text("Product List").font(.title) }.padding()
-                NavigationLink(destination: ProductView(productId: largeFlowersId)) { Text("Large Flowers").font(.title) }.padding()
-                NavigationLink(destination: ProductView(productId: smallFlowersId)) { Text("Small Flowers").font(.title) }.padding()
-                Spacer()
+            List {
+                NavigationLink(destination: ContentView()) { Text("Product List").font(.largeTitle).padding()}
+                NavigationLink(destination: ProductView(productId: largeFlowersId)) { Text("Large Flowers").font(.largeTitle).padding()}
+                NavigationLink(destination: ProductView(productId: smallFlowersId)) { Text("Small Flowers").font(.largeTitle).padding()}
             }
         }
+        #if os(iOS)
         .navigationViewStyle(.stack)
         .navigationBarTitle(Text("StoreHelperDemo"), displayMode: .large)
+        #endif
     }
 }
