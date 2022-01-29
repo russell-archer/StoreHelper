@@ -23,6 +23,8 @@ public struct Products: View {
     @State private var productInfoProductId: ProductId = ""
     
     private var productInfoCompletion: ((ProductId) -> Void)
+    // TODO: Pass this down the view hirearchy so ProductInfoView can trigger things directly
+    // rather than having to trigger through a change to productInfoProductId
     
     #if os(macOS)
     @State private var showManagePurchases = false
@@ -35,7 +37,7 @@ public struct Products: View {
     @ViewBuilder public var body: some View {
         VStack {
             #if os(iOS)
-            ProductListView(productInfoProductId: $productInfoProductId, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId)
+            ProductListView(productInfoProductId: $productInfoProductId, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productInfoCompletion: productInfoCompletion)
             Button(purchasesRestored ? "Purchases Restored" : "Restore Purchases") {
                 Task.init {
                     try? await AppStore.sync()
@@ -52,7 +54,7 @@ public struct Products: View {
                 .foregroundColor(.secondary)
             
             #elseif os(macOS)
-            ProductListView(productInfoProductId: $productInfoProductId)
+            ProductListView(productInfoProductId: $productInfoProductId, productInfoCompletion: productInfoCompletion)
             DisclosureGroup(isExpanded: $showManagePurchases, content: { PurchaseManagement()}, label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
                 .onTapGesture { withAnimation { showManagePurchases.toggle()}}
                 .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
@@ -81,10 +83,10 @@ public struct Products: View {
             Button("OK") { showRefundAlert.toggle()}
         }
         .onAppear { canMakePayments = AppStore.canMakePayments }
-        .onChange(of: productInfoProductId) { _ in
-            guard productInfoProductId.count > 0 else { return }
-            productInfoCompletion(productInfoProductId)
-        }
+//        .onChange(of: productInfoProductId) { _ in
+//            guard productInfoProductId.count > 0 else { return }
+//            productInfoCompletion(productInfoProductId)
+//        }
         
         VersionInfo()
     }

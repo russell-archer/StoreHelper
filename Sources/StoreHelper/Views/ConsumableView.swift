@@ -25,6 +25,7 @@ public struct ConsumableView: View {
     var displayName: String
     var description: String
     var price: String
+    var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         VStack {
@@ -78,7 +79,7 @@ public struct ConsumableView: View {
                 #endif
             }
             else {
-                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName)
+                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
             Divider()
@@ -111,7 +112,7 @@ struct ConsumableView_Previews: PreviewProvider {
                               productId: "com.rarcher.consumable.plant-installation",
                               displayName: "Plant Installation",
                               description: "Expert plant installation",
-                              price: "£0.99")
+                              price: "£0.99") { pid in }
             .environmentObject(storeHelper)
     }
 }

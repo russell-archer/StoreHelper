@@ -22,10 +22,12 @@ public struct ProductView: View {
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
+    
     var productId: ProductId
     var displayName: String
     var description: String
     var price: String
+    var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         VStack {
@@ -65,7 +67,7 @@ public struct ProductView: View {
                 #endif
             }
             else {
-                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName)
+                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
             Divider()

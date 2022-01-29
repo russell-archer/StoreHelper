@@ -15,12 +15,14 @@ public struct ProductInfoView: View {
     @Binding var productInfoProductId: ProductId
     var productId: ProductId
     var displayName: String
+    var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         #if os(iOS)
         Button(action: {
-            productInfoProductId = ""
             productInfoProductId = productId
+            guard productInfoProductId.count > 0 else { return }
+            productInfoCompletion(productInfoProductId)
         }) {
             HStack {
                 Image(systemName: "info.circle")
@@ -48,8 +50,9 @@ public struct ProductInfoView: View {
         }
         .padding()
         .onTapGesture {
-            productInfoProductId = ""
             productInfoProductId = productId
+            guard productInfoProductId.count > 0 else { return }
+            productInfoCompletion(productInfoProductId)
         }
         #endif
     }

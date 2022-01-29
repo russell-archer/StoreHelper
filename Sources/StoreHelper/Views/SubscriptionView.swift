@@ -21,6 +21,7 @@ public struct SubscriptionView: View {
     var description: String
     var price: String
     var subscriptionInfo: SubscriptionInfo?  // If non-nil then the product is the highest service level product the user is subscribed to in the subscription group
+    var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         VStack {
@@ -56,7 +57,7 @@ public struct SubscriptionView: View {
             if purchaseState == .purchased, subscriptionInfo != nil {
                 SubscriptionInfoView(subscriptionInfo: subscriptionInfo!)
             } else {
-                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName)
+                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
             Divider()

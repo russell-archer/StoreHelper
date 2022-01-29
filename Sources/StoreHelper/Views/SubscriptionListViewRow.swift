@@ -18,8 +18,10 @@ public struct SubscriptionListViewRow: View {
     @State private var subscriptionGroups: OrderedSet<String>?
     @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
     @Binding var productInfoProductId: ProductId
+    
     var products: [Product]
     var headerText: String
+    var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         Section(header: Text(headerText)) {
@@ -31,7 +33,8 @@ public struct SubscriptionListViewRow: View {
                                  displayName: product.displayName,
                                  description: product.description,
                                  price: product.displayPrice,
-                                 subscriptionInfo: storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionInfo))
+                                 subscriptionInfo: storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionInfo),
+                                 productInfoCompletion: productInfoCompletion)
                     .contentShape(Rectangle())
                     .onTapGesture { productInfoProductId = product.id }
             }

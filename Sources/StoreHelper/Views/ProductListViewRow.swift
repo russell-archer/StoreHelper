@@ -22,6 +22,7 @@ public struct ProductListViewRow: View {
 
     var products: [Product]
     var headerText: String
+    var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         Section(header: Text(headerText)) {
@@ -32,7 +33,8 @@ public struct ProductListViewRow: View {
                                        productId: product.id,
                                        displayName: product.displayName,
                                        description: product.description,
-                                       price: product.displayPrice)
+                                       price: product.displayPrice,
+                                       productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
                             .onTapGesture { productInfoProductId = product.id }
                     }
@@ -45,7 +47,8 @@ public struct ProductListViewRow: View {
                                     productId: product.id,
                                     displayName: product.displayName,
                                     description: product.description,
-                                    price: product.displayPrice)
+                                    price: product.displayPrice,
+                                    productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
                             .onTapGesture { productInfoProductId = product.id }
                         #elseif os(macOS)
@@ -53,7 +56,8 @@ public struct ProductListViewRow: View {
                                     productId: product.id,
                                     displayName: product.displayName,
                                     description: product.description,
-                                    price: product.displayPrice)
+                                    price: product.displayPrice,
+                                    productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
                             .onTapGesture { productInfoProductId = product.id }
                         #endif
