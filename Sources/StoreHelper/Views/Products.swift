@@ -83,6 +83,7 @@ public struct Products: View {
         .onAppear { canMakePayments = AppStore.canMakePayments }
         .onChange(of: productInfoProductId) { _ in
             productInfoCompletion(productInfoProductId)
+            productInfoProductId = ""
         }
         
         VersionInfo()
