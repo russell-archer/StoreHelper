@@ -82,6 +82,7 @@ public struct Products: View {
         }
         .onAppear { canMakePayments = AppStore.canMakePayments }
         .onChange(of: productInfoProductId) { _ in
+            guard productInfoProductId.count > 0 else { return }
             productInfoCompletion(productInfoProductId)
         }
         

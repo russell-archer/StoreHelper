@@ -19,6 +19,7 @@ public struct ProductInfoView: View {
     public var body: some View {
         #if os(iOS)
         Button(action: {
+            productInfoProductId = ""
             productInfoProductId = productId
         }) {
             HStack {
@@ -46,7 +47,10 @@ public struct ProductInfoView: View {
                 .lineLimit(nil)
         }
         .padding()
-        .onTapGesture { productInfoProductId = productId }
+        .onTapGesture {
+            productInfoProductId = ""
+            productInfoProductId = productId
+        }
         #endif
     }
 }
