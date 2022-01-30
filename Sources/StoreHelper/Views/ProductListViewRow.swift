@@ -14,7 +14,6 @@ import StoreKit
 
 public struct ProductListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @Binding var productInfoProductId: ProductId
     #if os(iOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
@@ -29,20 +28,18 @@ public struct ProductListViewRow: View {
             if let p = products.first {
                 if p.type == .consumable {
                     ForEach(products, id: \.id) { product in
-                        ConsumableView(productInfoProductId: $productInfoProductId,
-                                       productId: product.id,
+                        ConsumableView(productId: product.id,
                                        displayName: product.displayName,
                                        description: product.description,
                                        price: product.displayPrice,
                                        productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
-                            .onTapGesture { productInfoProductId = product.id }
+                            .onTapGesture { productInfoCompletion(product.id)}
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
                         #if os(iOS)
-                        ProductView(productInfoProductId: $productInfoProductId,
-                                    showRefundSheet: $showRefundSheet,
+                        ProductView(showRefundSheet: $showRefundSheet,
                                     refundRequestTransactionId: $refundRequestTransactionId,
                                     productId: product.id,
                                     displayName: product.displayName,
@@ -50,16 +47,15 @@ public struct ProductListViewRow: View {
                                     price: product.displayPrice,
                                     productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
-                            .onTapGesture { productInfoProductId = product.id }
+                            .onTapGesture { productInfoCompletion(product.id) }
                         #elseif os(macOS)
-                        ProductView(productInfoProductId: $productInfoProductId,
-                                    productId: product.id,
+                        ProductView(productId: product.id,
                                     displayName: product.displayName,
                                     description: product.description,
                                     price: product.displayPrice,
                                     productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
-                            .onTapGesture { productInfoProductId = product.id }
+                            .onTapGesture { productInfoCompletion(product.id) }
                         #endif
                     }
                 }

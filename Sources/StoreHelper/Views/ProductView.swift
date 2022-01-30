@@ -17,7 +17,6 @@ import WidgetKit
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    @Binding var productInfoProductId: ProductId
     #if os(iOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
@@ -40,7 +39,7 @@ public struct ProductView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoProductId = productId }
+                .onTapGesture { productInfoCompletion(productId) }
             
             HStack {
                 Image(productId)
@@ -49,7 +48,7 @@ public struct ProductView: View {
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
-                    .onTapGesture { productInfoProductId = productId }
+                    .onTapGesture { productInfoCompletion(productId) }
                 
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
@@ -67,7 +66,7 @@ public struct ProductView: View {
                 #endif
             }
             else {
-                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
+                ProductInfoView(productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
             Divider()

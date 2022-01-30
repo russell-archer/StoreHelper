@@ -17,7 +17,6 @@ public struct SubscriptionListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
     @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
-    @Binding var productInfoProductId: ProductId
     
     var products: [Product]
     var headerText: String
@@ -28,15 +27,14 @@ public struct SubscriptionListViewRow: View {
             // For each product in the group, display as a row using SubscriptionView().
             // If a product is the highest subscription level then pass its SubscriptionInfo to SubscriptionView().
             ForEach(products, id: \.id) { product in
-                SubscriptionView(productInfoProductId: $productInfoProductId,
-                                 productId: product.id,
+                SubscriptionView(productId: product.id,
                                  displayName: product.displayName,
                                  description: product.description,
                                  price: product.displayPrice,
                                  subscriptionInfo: storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionInfo),
                                  productInfoCompletion: productInfoCompletion)
                     .contentShape(Rectangle())
-                    .onTapGesture { productInfoProductId = product.id }
+                    .onTapGesture { productInfoCompletion(product.id) }
             }
         }
         .onAppear {

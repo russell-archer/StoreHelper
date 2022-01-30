@@ -12,10 +12,8 @@
 import SwiftUI
 
 public struct SubscriptionView: View {
-    
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    @Binding var productInfoProductId: ProductId
     var productId: ProductId
     var displayName: String
     var description: String
@@ -35,7 +33,7 @@ public struct SubscriptionView: View {
                 .foregroundColor(.secondary)
                 .lineLimit(2)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoProductId = productId }
+                .onTapGesture { productInfoCompletion(productId) }
 
             HStack {
                 Image(productId)
@@ -44,7 +42,7 @@ public struct SubscriptionView: View {
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
-                    .onTapGesture { productInfoProductId = productId }
+                    .onTapGesture { productInfoCompletion(productId) }
                 
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
@@ -57,7 +55,7 @@ public struct SubscriptionView: View {
             if purchaseState == .purchased, subscriptionInfo != nil {
                 SubscriptionInfoView(subscriptionInfo: subscriptionInfo!)
             } else {
-                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
+                ProductInfoView(productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
             Divider()

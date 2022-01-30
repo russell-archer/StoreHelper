@@ -15,11 +15,9 @@ import WidgetKit
 
 /// Displays a single row of product information for the main content List.
 public struct ConsumableView: View {
-    
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     @State var count: Int = 0
-    @Binding var productInfoProductId: ProductId
     
     var productId: ProductId
     var displayName: String
@@ -38,7 +36,7 @@ public struct ConsumableView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoProductId = productId }
+                .onTapGesture { productInfoCompletion(productId) }
             
             HStack {
                 if count == 0 {
@@ -49,7 +47,7 @@ public struct ConsumableView: View {
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
                         .contentShape(Rectangle())
-                        .onTapGesture { productInfoProductId = productId }
+                        .onTapGesture { productInfoCompletion(productId) }
                     
                 } else {
                     
@@ -60,7 +58,7 @@ public struct ConsumableView: View {
                         .cornerRadius(25)
                         .overlay(ConsumableBadgeView(count: $count))
                         .contentShape(Rectangle())
-                        .onTapGesture { productInfoProductId = productId }
+                        .onTapGesture { productInfoCompletion(productId) }
                 }
                 
                 Spacer()
@@ -79,7 +77,7 @@ public struct ConsumableView: View {
                 #endif
             }
             else {
-                ProductInfoView(productInfoProductId: $productInfoProductId, productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
+                ProductInfoView(productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
             Divider()
@@ -108,8 +106,7 @@ struct ConsumableView_Previews: PreviewProvider {
         
         @StateObject var storeHelper = StoreHelper()
         
-        return ConsumableView(productInfoProductId: .constant("com.rarcher.consumable.plant-installation"),
-                              productId: "com.rarcher.consumable.plant-installation",
+        return ConsumableView(productId: "com.rarcher.consumable.plant-installation",
                               displayName: "Plant Installation",
                               description: "Expert plant installation",
                               price: "£0.99") { pid in }

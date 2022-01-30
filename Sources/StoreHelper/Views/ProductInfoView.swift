@@ -12,18 +12,13 @@
 import SwiftUI
 
 public struct ProductInfoView: View {
-    @Binding var productInfoProductId: ProductId
     var productId: ProductId
     var displayName: String
     var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
         #if os(iOS)
-        Button(action: {
-            productInfoProductId = productId
-            guard productInfoProductId.count > 0 else { return }
-            productInfoCompletion(productInfoProductId)
-        }) {
+        Button(action: { productInfoCompletion(productId)}) {
             HStack {
                 Image(systemName: "info.circle")
                     .resizable()
@@ -49,11 +44,7 @@ public struct ProductInfoView: View {
                 .lineLimit(nil)
         }
         .padding()
-        .onTapGesture {
-            productInfoProductId = productId
-            guard productInfoProductId.count > 0 else { return }
-            productInfoCompletion(productInfoProductId)
-        }
+        .onTapGesture { productInfoCompletion(productId)}
         #endif
     }
 }

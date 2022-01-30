@@ -13,7 +13,6 @@ import SwiftUI
 
 public struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @Binding var productInfoProductId: ProductId
     #if os(iOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
@@ -27,22 +26,22 @@ public struct ProductListView: View {
     
             if storeHelper.hasNonConsumableProducts, let nonConsumables = storeHelper.nonConsumableProducts {
                 #if os(iOS)
-                ProductListViewRow(productInfoProductId: $productInfoProductId, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
+                ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
                 #elseif os(macOS)
-                ProductListViewRow(productInfoProductId: $productInfoProductId, products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
+                ProductListViewRow(products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
                 #endif
             }
             
             if storeHelper.hasConsumableProducts, let consumables = storeHelper.consumableProducts {
                 #if os(iOS)
-                ProductListViewRow(productInfoProductId: $productInfoProductId, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
+                ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
                 #elseif os(macOS)
-                ProductListViewRow(productInfoProductId: $productInfoProductId, products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
+                ProductListViewRow(products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
                 #endif
             }
             
             if storeHelper.hasSubscriptionProducts, let subscriptions = storeHelper.subscriptionProducts {
-                SubscriptionListViewRow(productInfoProductId: $productInfoProductId, products: subscriptions, headerText: "Subscriptions", productInfoCompletion: productInfoCompletion)
+                SubscriptionListViewRow(products: subscriptions, headerText: "Subscriptions", productInfoCompletion: productInfoCompletion)
             }
             
         } else {
