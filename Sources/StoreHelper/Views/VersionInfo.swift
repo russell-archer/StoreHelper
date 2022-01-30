@@ -21,13 +21,15 @@ public struct VersionInfo: View {
             
             HStack {
                 #if os(iOS)
-                Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)
+//                Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)
+                Image("AppStoreIcon").resizable().frame(width: 75, height: 75)
                 VStack {
                     Text("Version \(versionInfo)").font(.subheadline).padding(1)
                     Text("Build \(buildInfo)").font(.subheadline).padding(1)
                 }
                 #elseif os(macOS)
-                Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)
+//                Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)
+                Image("AppStoreIcon").resizable().frame(width: 75, height: 75)
                 VStack {
                     Text("Version \(versionInfo)").font(.subheadline).padding(EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1))
                     Text("Build number \(buildInfo)").font(.subheadline).padding(EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1))
