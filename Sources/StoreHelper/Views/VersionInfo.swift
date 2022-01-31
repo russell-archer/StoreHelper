@@ -8,9 +8,9 @@
 import SwiftUI
 
 public struct VersionInfo: View {
+    @State private var appName = ""
     @State private var versionInfo = ""
     @State private var buildInfo = ""
-    @State private var useAppStoreIcon = true
     
     let insets = EdgeInsets(top: 0, leading: 2, bottom: 1, trailing: 1)
     
@@ -25,23 +25,21 @@ public struct VersionInfo: View {
             #endif
             
             HStack {
+                // StoreHelper will look for an image named "AppStoreIcon" in your asset catalog
                 Image("AppStoreIcon").resizable().frame(width: 75, height: 75)
-//                if useAppStoreIcon { Image("AppStoreIcon").resizable().frame(width: 75, height: 75)}
-//                else { Image(packageResource: "store-helper-icon", ofType: "png").resizable().frame(width: 75, height: 75)}
                 
                 VStack {
-                    Text("Version \(versionInfo)").font(.subheadline).padding(insets)
+                    Text("\(appName) version \(versionInfo)").font(.subheadline).padding(insets)
                     Text("Build number \(buildInfo)").font(.subheadline).padding(insets)
                 }
             }
             .padding()
         }
         .onAppear {
-            // Read the version and release build numbers from Info.plist. Also see if we have access to the host app's app store icon
-            if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") { versionInfo = "\(version as? String ?? "???")" }
-            if let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") { buildInfo = "\(build as? String ?? "???")" }
-            if Bundle.main.url(forResource: "AppStoreIcon", withExtension: "png") == nil { useAppStoreIcon = false }
+            // Read the app name, version and release build number from Info.plist
+            if let name = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") { appName = "\(name as? String ?? "StoreHelper")" }
+            if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") { versionInfo = "\(version as? String ?? "Unknown")" }
+            if let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") { buildInfo = "\(build as? String ?? "Unknown")" }
         }
     }
 }
-
