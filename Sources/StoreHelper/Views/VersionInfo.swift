@@ -30,14 +30,14 @@ public struct VersionInfo: View {
                 
                 VStack {
                     Text("\(appName) version \(versionInfo)").font(.subheadline).padding(insets)
-                    Text("Build number \(buildInfo)").font(.subheadline).padding(insets)
+                    Text("Build \(buildInfo)").font(.subheadline).padding(insets)
                 }
             }
             .padding()
         }
         .onAppear {
             // Read the app name, version and release build number from Info.plist
-            if let name = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") { appName = "\(name as? String ?? "StoreHelper")" }
+            if let name = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") { appName = "\(name as? String ?? "StoreHelper")" }
             if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") { versionInfo = "\(version as? String ?? "Unknown")" }
             if let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") { buildInfo = "\(build as? String ?? "Unknown")" }
         }
