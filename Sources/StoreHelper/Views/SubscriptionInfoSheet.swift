@@ -21,35 +21,18 @@ public struct SubscriptionInfoSheet: View {
     
     public var body: some View {
         VStack {
-            #if os(iOS)
-            HStack {
-                Spacer()
-                Button(action: { withAnimation { showPurchaseInfoSheet = false }}) {
-                    Image(systemName: "xmark.circle")
-                        .foregroundColor(.secondary)
-                }
-                .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
-            }
-            #elseif os(macOS)
-            HStack {
-                Spacer()
-                Image(systemName: "xmark.circle")
-                    .foregroundColor(.secondary)
-                    .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
-            }
-            .onTapGesture { withAnimation { showPurchaseInfoSheet = false }}
-            #endif
-            
-            Label("Subscription Information", systemImage: "creditcard.circle")
-                .font(.largeTitle)
-                .foregroundColor(.blue)
-                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 5))
+            SheetBarView(showSheet: $showPurchaseInfoSheet, title: "Subscription Information", sysImage: "creditcard.circle")
             
             Image(productId)
                 .resizable()
                 .frame(maxWidth: 85, maxHeight: 85)
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
+            
+            Label("Subscription Information", systemImage: "creditcard.circle")
+                .font(.largeTitle)
+                .foregroundColor(.blue)
+                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 5))
             
             ScrollView {
                 if let esi = extendedSubscriptionInfo, esi.isPurchased {
