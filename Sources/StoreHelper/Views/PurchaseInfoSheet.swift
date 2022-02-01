@@ -29,12 +29,7 @@ public struct PurchaseInfoSheet: View {
                 .resizable()
                 .frame(maxWidth: 85, maxHeight: 85)
                 .aspectRatio(contentMode: .fit)
-                .cornerRadius(25)
-            
-            Label("Purchase Information", systemImage: "creditcard.circle")
-                .font(.largeTitle)
-                .foregroundColor(.blue)
-                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 5))            
+                .cornerRadius(25) 
             
             ScrollView {
                 if let epi = extendedPurchaseInfo, epi.isPurchased {

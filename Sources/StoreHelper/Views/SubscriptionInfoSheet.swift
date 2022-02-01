@@ -29,11 +29,6 @@ public struct SubscriptionInfoSheet: View {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
             
-            Label("Subscription Information", systemImage: "creditcard.circle")
-                .font(.largeTitle)
-                .foregroundColor(.blue)
-                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 5))
-            
             ScrollView {
                 if let esi = extendedSubscriptionInfo, esi.isPurchased {
                     
