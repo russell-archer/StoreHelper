@@ -32,7 +32,7 @@ struct SheetBarView: View {
         #if os(iOS)
         HStack {
             ZStack {
-                if let img = sysImg { Label(title ?? "", systemImage: img).padding(insetsTitle).foregroundColor(.blue)}
+                if let img = sysImg { Label(title ?? "", systemImage: img).padding(insetsTitle)}
                 else if let t = title { Text(t).padding(insetsTitle)}
                 
                 HStack {
@@ -49,7 +49,7 @@ struct SheetBarView: View {
         #elseif os(macOS)
         HStack {
             ZStack {
-                if let img = sysImg { Label(title ?? "", systemImage: img).padding(insetsTitle).foregroundColor(.blue)}
+                if let img = sysImg { Label(title ?? "", systemImage: img).padding(insetsTitle)}
                 else if let t = title { Text(t).padding(insetsTitle)}
                 
                 HStack {
