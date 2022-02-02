@@ -216,13 +216,6 @@ struct ProductInfo: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Spacer()
-                Image(systemName: "xmark.circle")
-                    .foregroundColor(.secondary)
-                    .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
-            }
-            .onTapGesture { withAnimation { showProductInfoSheet = false }}
             ScrollView {
                 VStack {
                     if let p = product {
