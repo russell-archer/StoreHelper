@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SheetBarView: View {
+public struct SheetBarView: View {
     @State private var showXmark = false
     @Binding var showSheet: Bool
     
@@ -22,13 +22,13 @@ struct SheetBarView: View {
     private var insetsTitle = EdgeInsets(top: 13, leading: 0, bottom: 5, trailing: 0)
     #endif
     
-    init(showSheet: Binding<Bool>, title: String? = nil, sysImage: String? = nil) {
+    public init(showSheet: Binding<Bool>, title: String? = nil, sysImage: String? = nil) {
         self._showSheet = showSheet
         self.title = title
         self.sysImg = sysImage
     }
     
-    var body: some View {
+    public var body: some View {
         #if os(iOS)
         HStack {
             ZStack {
