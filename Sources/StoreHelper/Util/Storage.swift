@@ -1,5 +1,5 @@
 //
-//  StoreHelperStorageKey.swift
+//  Storage.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 20/12/2021.
