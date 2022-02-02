@@ -17,11 +17,13 @@ struct ProductInfo: View {
     
     var body: some View {
         VStack {
-            SheetBarView(showSheet: $showProductInfoSheet, title: "Product Details")
+            // Provides platform-appropriate sheet close buttons and title
+            SheetBarView(showSheet: $showProductInfoSheet, title: product?.displayName ?? "Product Info")
+            
             ScrollView {
                 VStack {
                     if let p = product {
-                        Text(p.displayName).font(.largeTitle).foregroundColor(.blue)
+                        // Show an image of the product
                         Image(p.id)
                             .resizable()
                             .frame(maxWidth: 200, maxHeight: 200)
