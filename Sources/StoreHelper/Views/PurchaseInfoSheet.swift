@@ -99,7 +99,7 @@ public struct PurchaseInfoSheet: View {
         }
         .onAppear { Task.init { extendedPurchaseInfo = await viewModel.extendedPurchaseInfo(for: productId)}}
         #if os(macOS)
-        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 650, idealHeight: 650, maxHeight: 650)
+        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 700, idealHeight: 700, maxHeight: 700)
         .fixedSize(horizontal: true, vertical: true)
         #endif
     }
