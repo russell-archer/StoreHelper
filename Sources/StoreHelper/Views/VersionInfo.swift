@@ -19,11 +19,6 @@ public struct VersionInfo: View {
     public var body: some View {
         VStack {
             Spacer()
-            
-            #if os(iOS)
-            Divider()
-            #endif
-            
             HStack {
                 // StoreHelper will look for an image named "AppStoreIcon" in your asset catalog
                 Image("AppStoreIcon").resizable().frame(width: 75, height: 75)
