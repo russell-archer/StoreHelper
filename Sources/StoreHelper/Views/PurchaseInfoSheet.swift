@@ -65,7 +65,9 @@ public struct PurchaseInfoSheet: View {
                             refundRequestTransactionId = tid
                             withAnimation { showRefundSheet.toggle()}
                         }
-                    }) { Label("Request Refund", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)
+                    }) { Label("Request Refund", systemImage: "creditcard.circle")}
+                    .buttonStyle(.borderedProminent)
+                    .padding()
                     }, label: { Label("Manage Purchase", systemImage: "creditcard.circle")})
                         .onTapGesture { withAnimation { showManagePurchase.toggle() }}
                         .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
@@ -99,7 +101,7 @@ public struct PurchaseInfoSheet: View {
         }
         .onAppear { Task.init { extendedPurchaseInfo = await viewModel.extendedPurchaseInfo(for: productId)}}
         #if os(macOS)
-        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 700, idealHeight: 700, maxHeight: 700)
+        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 680, idealHeight: 680, maxHeight: 680)
         .fixedSize(horizontal: true, vertical: true)
         #endif
     }
