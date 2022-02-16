@@ -13,6 +13,7 @@ import SwiftUI
 
 public struct PurchaseInfoSheet: View {
     @State private var extendedPurchaseInfo: ExtendedPurchaseInfo?
+    @State private var showManagePurchase = false
     @Binding var showPurchaseInfoSheet: Bool
     #if os(iOS)
     @Binding var showRefundSheet: Bool
@@ -57,6 +58,7 @@ public struct PurchaseInfoSheet: View {
                     Divider().padding(.bottom)
                     
                     #if os(iOS)
+                    DisclosureGroup(isExpanded: $showManagePurchase, content: {
                     Button(action: {
                         if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
                         if let tid = epi.transactionId {
@@ -64,10 +66,20 @@ public struct PurchaseInfoSheet: View {
                             withAnimation { showRefundSheet.toggle()}
                         }
                     }) { Label("Request Refund", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)
+                    }, label: { Label("Manage Purchase", systemImage: "creditcard.circle")})
+                        .onTapGesture { withAnimation { showManagePurchase.toggle() }}
+                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+                    
                     #elseif os(macOS)
-                    Button(action: {
-                        NSWorkspace.shared.open(URL(string: Storage.requestRefund.value()!)!)
-                    }) { Label("Request Refund", systemImage: "creditcard.circle")}.macOSStyle()
+                    DisclosureGroup(isExpanded: $showManagePurchase, content: {
+                        Button(action: {
+                            NSWorkspace.shared.open(URL(string: Storage.requestRefund.value()!)!)
+                        }) { Label("Request Refund", systemImage: "creditcard.circle")}.macOSStyle()
+
+                    }, label: { Label("Manage Purchase", systemImage: "creditcard.circle")})
+                        .onTapGesture { withAnimation { showManagePurchase.toggle()}}
+                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+
                     #endif
                     
                     Text("You may request a refund from the App Store if a purchase does not perform as expected. This requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")
