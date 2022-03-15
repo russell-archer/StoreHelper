@@ -333,7 +333,9 @@ struct StoreHelperDemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(storeHelper)  // Add storeHelper to the environment
+            ContentView()
+            .environmentObject(storeHelper)  // Add storeHelper to the environment
+            .onAppear { storeHelper.start() }  // Call start() to start listening for transactions and get localized product info
         }
     }
 }
@@ -347,7 +349,7 @@ struct StoreHelperDemoApp: App {
 public private(set) var productIds: OrderedSet<ProductId>?
 ```
 
--  `StoreHelper` then requests localized product information from the App Store:
+-  The `start() `method calls `requestProductsFromAppStore(productIds:)` to request localized product information from the App Store:
 
 ```swift
 /// Request localized product info from the App Store for a set of ProductId.

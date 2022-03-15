@@ -89,7 +89,9 @@ struct StoreHelperDemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView().environmentObject(storeHelper)
+            MainView()
+            .environmentObject(storeHelper)
+            .onAppear { storeHelper.start() }  // Start listening for transactions
                 #if os(macOS)
                 .frame(minWidth: 700, idealWidth: 700, minHeight: 700, idealHeight: 700)
                 .font(.title2)
@@ -99,7 +101,7 @@ struct StoreHelperDemoApp: App {
 }
 ```
 
-- Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class and add it to the SwiftUI view hierarchy using the `.environment()` modifier 
+- Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class, add it to the SwiftUI view hierarchy using the `.environment()` modifier, and call StoreHelper.start() in the `onAppear` view modifier
 
 ## Create MainView
 - Create a new SwiftUI `View` in the **Shared** folder named `MainView` and replace the existing code with the following:
