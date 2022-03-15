@@ -101,7 +101,7 @@ struct StoreHelperDemoApp: App {
 }
 ```
 
-- Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class, add it to the SwiftUI view hierarchy using the `.environment()` modifier, and call StoreHelper.start() in the `onAppear` view modifier
+- Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class, add it to the SwiftUI view hierarchy using the `.environment()` modifier, and call `StoreHelper.start()` in the `onAppear()` view modifier
 
 ## Create MainView
 - Create a new SwiftUI `View` in the **Shared** folder named `MainView` and replace the existing code with the following:
