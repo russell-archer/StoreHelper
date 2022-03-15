@@ -342,7 +342,7 @@ struct StoreHelperDemoApp: App {
         WindowGroup {
             ContentView()
             .environmentObject(storeHelper)  // Add storeHelper to the environment
-            .onAppear { storeHelper.start() }  // Call start() to start listening for transactions and get localized product info
+            .onAppear { storeHelper.start() }  // Start listening for transactions, get localized product info
         }
     }
 }
