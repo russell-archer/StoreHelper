@@ -58,6 +58,9 @@ public class StoreHelper: ObservableObject {
     /// Subscription-related helper methods.
     public var subscriptionHelper: SubscriptionHelper!
     
+    /// True if StoreHelper has been initialized correctly by calling start().
+    public var hasStarted: Bool { transactionListener != nil && isAppStoreAvailable }
+    
     // MARK: - Public helper properties
     
     public var consumableProducts:          [Product]?   { products?.filter { $0.type == .consumable }}
@@ -89,12 +92,11 @@ public class StoreHelper: ObservableObject {
     // MARK: - Initialization
     
     /// StoreHelper enables support for working with in-app purchases and StoreKit2 using the async/await pattern.
-    ///
-    /// During initialization StoreHelper will:
-    /// - Read the Products.plist configuration file to get a list of `ProductId` that defines the set of products we'll request from the App Store.
-    /// - Start listening for App Store transactions.
-    /// - Request localized product info from the App Store.
-    @MainActor public init() {
+    /// This initializer will start support for direct purchases from the app store (IAP promotions) and read the
+    /// Products.plist configuration file to get a list of `ProductId` that defines the set of products we'll request
+    /// from the App Store. Your app must call `StoreHelper.start()` as soon as possible after StoreHelper has
+    /// been initialized.
+    public init() {
         
         // Add a helper for StoreKit1-based direct purchases from the app store (IAP promotions)
         appStoreHelper = AppStoreHelper(storeHelper: self)
@@ -102,22 +104,31 @@ public class StoreHelper: ObservableObject {
         // Initialize our subscription helper
         subscriptionHelper = SubscriptionHelper(storeHelper: self)
         
-        // Listen for App Store transactions
-        transactionListener = handleTransactions()
-        
         // Read our list of product ids
         productIds = StoreConfiguration.readConfigFile()
         
         // Get the fallback list of purchased products in case the App Store's not available
         purchasedProductsFallback = readPurchasedProductsFallbackList()
-        
-        // Get localized product info from the App Store
-        refreshProductsFromAppStore()
     }
     
     deinit { transactionListener?.cancel() }
     
     // MARK: - Public methods
+    
+    /// Call this method as soon as possible after your app starts and StoreHelper has been initialized.
+    /// Failure to call` start()` may result in transactions being missed.
+    /// This method starts listening for App Store transactions and requests localized product info from the App Store.
+    @MainActor public func start() {
+        guard !hasStarted else { return }
+        
+        // Listen for App Store transactions
+        transactionListener = handleTransactions()
+        
+        // Get localized product info from the App Store
+        refreshProductsFromAppStore()
+        
+        hasStarted = true
+    }
     
     /// Request refreshed localized product info from the App Store. In general, use this method
     /// in preference to `requestProductsFromAppStore(productIds:)` as you don't need to supply
@@ -157,6 +168,11 @@ public class StoreHelper: ObservableObject {
     @MainActor public func isPurchased(productId: ProductId) async throws -> Bool {
         
         var purchased = false
+        
+        guard hasStarted else {
+            StoreLog.event("Please call StoreHelper.start() before use.")
+            return
+        }
         
         guard isAppStoreAvailable, hasProducts else {
             // The App Store is not available, or it didn't return a list of localized products
@@ -253,6 +269,11 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
     @MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
+        
+        guard hasStarted else {
+            StoreLog.event("Please call StoreHelper.start() before use.")
+            return
+        }
         
         guard AppStore.canMakePayments else {
             StoreLog.event(.purchaseUserCannotMakePayments)
