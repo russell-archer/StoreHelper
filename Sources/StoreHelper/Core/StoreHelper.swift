@@ -126,8 +126,6 @@ public class StoreHelper: ObservableObject {
         
         // Get localized product info from the App Store
         refreshProductsFromAppStore()
-        
-        hasStarted = true
     }
     
     /// Request refreshed localized product info from the App Store. In general, use this method
@@ -171,7 +169,7 @@ public class StoreHelper: ObservableObject {
         
         guard hasStarted else {
             StoreLog.event("Please call StoreHelper.start() before use.")
-            return
+            return false
         }
         
         guard isAppStoreAvailable, hasProducts else {
@@ -272,7 +270,7 @@ public class StoreHelper: ObservableObject {
         
         guard hasStarted else {
             StoreLog.event("Please call StoreHelper.start() before use.")
-            return
+            return (nil, .notStarted)
         }
         
         guard AppStore.canMakePayments else {
