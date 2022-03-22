@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct VersionInfo: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     @State private var appName = ""
     @State private var versionInfo = ""
     @State private var buildInfo = ""
@@ -24,8 +25,8 @@ public struct VersionInfo: View {
                 Image("AppStoreIcon").resizable().frame(width: 75, height: 75)
                 
                 VStack {
-                    Text("\(appName) version \(versionInfo)").font(.subheadline).padding(insets)
-                    Text("Build \(buildInfo)").font(.subheadline).padding(insets)
+                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("\(appName) version \(versionInfo)")}.padding(insets)
+                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Build \(buildInfo)")}.padding(insets)
                 }
             }
             .padding()

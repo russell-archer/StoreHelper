@@ -13,6 +13,7 @@ import SwiftUI
 // Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 public struct SubscriptionInfoSheet: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     @State private var showManageSubscriptionsSheet = false
     @State private var extendedSubscriptionInfo: ExtendedSubscriptionInfo?
     @Binding var showPurchaseInfoSheet: Bool
@@ -71,18 +72,20 @@ public struct SubscriptionInfoSheet: View {
                     Button(action: {
                         if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
                         withAnimation { showManageSubscriptionsSheet.toggle()}
-                    }) { Label("Manage Subscriptions", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)
+                    }) {
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Subscription")}.padding()},
+                              icon:  { Image(systemName: "creditcard.circle")})
+                    }
+                    .buttonStyle(.borderedProminent)
                     #endif
                     
-                    Text("Managing your subscriptions may require you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")
-                        .font(.caption2)
+                    Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Managing your subscriptions may require you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
                         .padding()
                     
                 } else {
-                    Text("No purchase information available")
-                        .font(.title)
+                    TitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text("No purchase information available")}
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                         .padding(EdgeInsets(top: 1, leading: 5, bottom: 0, trailing: 5))

@@ -47,18 +47,15 @@ public struct ProductListView: View {
         } else {
             
             VStack {
-                Text("No products available")
-                    .font(.title)
-                    .foregroundColor(.red)
+                TitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text("No products available")}.foregroundColor(.red)
                 
-                Text("This error indicates that a connection to the App Store is temporarily unavailable. Purchases you have made previously may not be available.\n\nCheck your network connectivity and try again.")
-                    .font(.caption)
+                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("This error indicates that a connection to the App Store is temporarily unavailable. Purchases you have made previously may not be available.\n\nCheck your network connectivity and try again.")}
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding()
                 
-                Button("Retry App Store") {
-                    storeHelper.refreshProductsFromAppStore()
+                Button(action: { storeHelper.refreshProductsFromAppStore()}) {
+                    BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Retry App Store")}
                 }
                 #if os(iOS)
                 .buttonStyle(.borderedProminent).padding()

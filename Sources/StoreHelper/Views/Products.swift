@@ -13,6 +13,7 @@ import SwiftUI
 import StoreKit
 
 public struct Products: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     @State private var showManageSubscriptions = false
     @State private var showRefundSheet = false
     @State private var refundRequestTransactionId: UInt64 = UInt64.min
@@ -35,17 +36,16 @@ public struct Products: View {
         VStack {
             #if os(iOS)
             ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productInfoCompletion: productInfoCompletion)
-            Button(purchasesRestored ? "Purchases Restored" : "Restore Purchases") {
+            Button(action: {
                 Task.init {
                     try? await AppStore.sync()
                     purchasesRestored = true
                 }
-            }
+            }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : "Restore Purchases")}}
             .buttonStyle(.borderedProminent).padding()
             .disabled(purchasesRestored)
             
-            Text("Manually restoring previous purchases is not normally necessary. Tap \"Restore Purchases\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")
-                .font(.caption2)
+            Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Tap \"Restore Purchases\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                 .multilineTextAlignment(.center)
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                 .foregroundColor(.secondary)
@@ -59,9 +59,7 @@ public struct Products: View {
             
             if !canMakePayments {
                 Spacer()
-                Text("Purchases are not permitted on your device.")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
             }
         }
         #if os(iOS)

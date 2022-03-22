@@ -16,8 +16,7 @@ public struct macOSButtonStyle: ButtonStyle {
     var padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
     
     public func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .font(.title2)
+        Title2Font { configuration.label }
             .padding(15)
             .foregroundColor(foregroundColor)
             .background(configuration.isPressed ? pressedColor : backgroundColor).opacity(opacity)

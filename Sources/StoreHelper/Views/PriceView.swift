@@ -47,6 +47,7 @@ public struct PriceView: View {
 }
 
 public struct PriceButtonText: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     var price: String
     var disabled: Bool
     
@@ -57,8 +58,7 @@ public struct PriceButtonText: View {
     #endif
     
     public var body: some View {
-        Text(disabled ? "Disabled" : price)
-            .font(.body)
+        BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(disabled ? "Disabled" : price)}
             .foregroundColor(.white)
             .padding()
             .frame(width: frameWidth, height: 40)
@@ -75,7 +75,6 @@ struct PriceView_Previews: PreviewProvider {
         HStack {
             Button(action: {}) {
                 Text("£1.98")
-                    .font(.title2)
                     .foregroundColor(.white)
                     .padding()
                     .frame(height: 40)

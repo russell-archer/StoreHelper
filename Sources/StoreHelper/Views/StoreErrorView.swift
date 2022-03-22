@@ -9,10 +9,10 @@ import SwiftUI
 
 /// Displays an error.
 public struct StoreErrorView: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     
     public var body: some View {
-        Text("Store Error")
-            .font(.title2)
+        Title2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Store Error")}
             .foregroundColor(.white)
             .padding()
             .frame(height: 40)

@@ -24,7 +24,7 @@ public struct ProductListViewRow: View {
     var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
-        Section(header: Text(headerText)) {
+        Section(content: {
             if let p = products.first {
                 if p.type == .consumable {
                     ForEach(products, id: \.id) { product in
@@ -33,8 +33,8 @@ public struct ProductListViewRow: View {
                                        description: product.description,
                                        price: product.displayPrice,
                                        productInfoCompletion: productInfoCompletion)
-                            .contentShape(Rectangle())
-                            .onTapGesture { productInfoCompletion(product.id)}
+                        .contentShape(Rectangle())
+                        .onTapGesture { productInfoCompletion(product.id)}
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
@@ -46,21 +46,21 @@ public struct ProductListViewRow: View {
                                     description: product.description,
                                     price: product.displayPrice,
                                     productInfoCompletion: productInfoCompletion)
-                            .contentShape(Rectangle())
-                            .onTapGesture { productInfoCompletion(product.id) }
+                        .contentShape(Rectangle())
+                        .onTapGesture { productInfoCompletion(product.id) }
                         #elseif os(macOS)
                         ProductView(productId: product.id,
                                     displayName: product.displayName,
                                     description: product.description,
                                     price: product.displayPrice,
                                     productInfoCompletion: productInfoCompletion)
-                            .contentShape(Rectangle())
-                            .onTapGesture { productInfoCompletion(product.id) }
+                        .contentShape(Rectangle())
+                        .onTapGesture { productInfoCompletion(product.id) }
                         #endif
                     }
                 }
             }
-        }
+        }, header: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(headerText)}})
     }
 }
 

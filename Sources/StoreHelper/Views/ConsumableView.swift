@@ -27,16 +27,22 @@ public struct ConsumableView: View {
     
     public var body: some View {
         VStack {
-            Text(displayName).font(.largeTitle).padding(.bottom, 1)
-            Text(description)
-                #if os(iOS)
-                .font(.subheadline)
-                #endif
+            LargeTitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text(displayName)}.padding(.bottom, 1)
+            #if os(iOS)
+            SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(description)}
                 .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
+            #elseif os(macOS)
+            BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(description)}
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .contentShape(Rectangle())
+                .onTapGesture { productInfoCompletion(productId) }
+            #endif
             
             HStack {
                 if count == 0 {

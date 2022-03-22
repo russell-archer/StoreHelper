@@ -61,6 +61,9 @@ public class StoreHelper: ObservableObject {
     /// True if StoreHelper has been initialized correctly by calling start().
     public var hasStarted: Bool { transactionListener != nil && isAppStoreAvailable }
     
+    /// Optional support for overriding dynamic font size
+    public var fontScaleFactor: Double { _fontScaleFactor ?? FontUtil.baseDynamicTypeSize(for: .large)}
+    
     // MARK: - Public helper properties
     
     public var consumableProducts:          [Product]?   { products?.filter { $0.type == .consumable }}
@@ -88,6 +91,9 @@ public class StoreHelper: ObservableObject {
     
     /// Support for App Store IAP promotions and StoreKit1. Only used for purchase of IAPs direct from the App Store.
     private var appStoreHelper: AppStoreHelper?
+    
+    /// Support for overriding dynamic font scale.
+    private var _fontScaleFactor: Double? = nil
     
     // MARK: - Initialization
     

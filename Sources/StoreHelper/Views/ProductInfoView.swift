@@ -12,6 +12,7 @@
 import SwiftUI
 
 public struct ProductInfoView: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     var productId: ProductId
     var displayName: String
     var productInfoCompletion: ((ProductId) -> Void)
@@ -24,8 +25,8 @@ public struct ProductInfoView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(height: 30)
-                Text("Info on \"\(displayName)\"")
-                    .font(.subheadline)
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Info on \"\(displayName)\"")}
+                    .padding()
                     .foregroundColor(.blue)
                     .lineLimit(nil)
             }
@@ -38,8 +39,8 @@ public struct ProductInfoView: View {
                 .aspectRatio(contentMode: .fit)
                 .foregroundColor(.blue)
                 .frame(height: 30)
-            Text("Info on \"\(displayName)\"")
-                .font(.title3)
+            Title3Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Info on \"\(displayName)\"")}
+                .padding()
                 .foregroundColor(.blue)
                 .lineLimit(nil)
         }

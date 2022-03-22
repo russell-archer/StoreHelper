@@ -31,8 +31,7 @@ public struct SubscriptionInfoView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 30)
                     
-                    Text(subscriptionInfoText)
-                        .font(.subheadline)
+                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(subscriptionInfoText)}
                         .foregroundColor(.blue)
                         .lineLimit(nil)
                 }
@@ -55,8 +54,7 @@ public struct SubscriptionInfoView: View {
                 .foregroundColor(.blue)
                 .frame(height: 30)
 
-            Text(subscriptionInfoText)
-                .font(.title3)
+            Title3Font(scaleFactor: storeHelper.fontScaleFactor) { Text(subscriptionInfoText)}
                 .foregroundColor(.blue)
                 .lineLimit(nil)
         }

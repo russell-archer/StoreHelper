@@ -12,6 +12,7 @@
 import SwiftUI
 
 public struct PurchaseInfoSheet: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     @State private var extendedPurchaseInfo: ExtendedPurchaseInfo?
     @State private var showManagePurchase = false
     @Binding var showPurchaseInfoSheet: Bool
@@ -47,8 +48,7 @@ public struct PurchaseInfoSheet: View {
                             PurchaseInfoFieldView(fieldName: "Notes:", fieldValue: "\(epi.revocationDate == nil ? "-" : "Purchased revoked \(epi.revocationDateFormatted ?? "") \(epi.revocationReason == .developerIssue ? "(developer issue)" : "(other issue)")")")
                             
                         } else {
-                            Text("No additional purchase information available")
-                                .font(.caption2)
+                            Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("No additional purchase information available")}
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                                 .padding(EdgeInsets(top: 1, leading: 5, bottom: 0, trailing: 5))
@@ -59,18 +59,25 @@ public struct PurchaseInfoSheet: View {
                     
                     #if os(iOS)
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
-                    Button(action: {
-                        if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
-                        if let tid = epi.transactionId {
-                            refundRequestTransactionId = tid
-                            withAnimation { showRefundSheet.toggle()}
+                        Button(action: {
+                            if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
+                            if let tid = epi.transactionId {
+                                refundRequestTransactionId = tid
+                                withAnimation { showRefundSheet.toggle()}
+                            }
+                        }) {
+                            Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Request Refund")}.padding()},
+                                  icon:  { Image(systemName: "creditcard.circle")})
                         }
-                    }) { Label("Request Refund", systemImage: "creditcard.circle")}
-                    .buttonStyle(.borderedProminent)
-                    .padding()
-                    }, label: { Label("Manage Purchase", systemImage: "creditcard.circle")})
-                        .onTapGesture { withAnimation { showManagePurchase.toggle() }}
-                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+                        .buttonStyle(.borderedProminent)
+                        .padding()
+                        
+                    }) {
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
+                              icon:  { Image(systemName: "creditcard.circle")})
+                    }
+                    .onTapGesture { withAnimation { showManagePurchase.toggle() }}
+                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
                     
                     #elseif os(macOS)
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
@@ -78,21 +85,21 @@ public struct PurchaseInfoSheet: View {
                             NSWorkspace.shared.open(URL(string: Storage.requestRefund.value()!)!)
                         }) { Label("Request Refund", systemImage: "creditcard.circle")}.macOSStyle()
 
-                    }, label: { Label("Manage Purchase", systemImage: "creditcard.circle")})
-                        .onTapGesture { withAnimation { showManagePurchase.toggle()}}
-                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
-
+                    }) {
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
+                              icon:  { Image(systemName: "creditcard.circle")})
+                    }
+                    .onTapGesture { withAnimation { showManagePurchase.toggle()}}
+                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
                     #endif
                     
-                    Text("You may request a refund from the App Store if a purchase does not perform as expected. This requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")
-                        .font(.caption2)
+                    Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("You may request a refund from the App Store if a purchase does not perform as expected. This requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
                         .padding()
                     
                 } else {
-                    Text("No purchase information available")
-                        .font(.title)
+                    TitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text("No purchase information available")}
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                         .padding(EdgeInsets(top: 1, leading: 5, bottom: 0, trailing: 5))
@@ -130,13 +137,14 @@ struct PurchaseInfoFieldView: View {
 }
 
 struct PurchaseInfoFieldText: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     let text: String
     
     var body: some View {
         #if os(iOS)
-        Text(text).font(.footnote)
+        FootnoteFont(scaleFactor: storeHelper.fontScaleFactor) { Text(text)}
         #elseif os(macOS)
-        Text(text).font(.title2)
+        Title2Font(scaleFactor: storeHelper.fontScaleFactor) { Text(text)}
         #endif
     }
 }

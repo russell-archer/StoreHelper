@@ -36,8 +36,7 @@ public struct PurchaseInfoView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 30)
                     
-                    Text(purchaseInfoText)
-                        .font(.subheadline)
+                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText)}
                         .foregroundColor(.blue)
                         .lineLimit(nil)
                 }
@@ -58,8 +57,7 @@ public struct PurchaseInfoView: View {
                 .foregroundColor(.blue)
                 .frame(height: 30)
             
-            Text(purchaseInfoText)
-                .font(.title3)
+            Title3Font(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText)}
                 .foregroundColor(.blue)
                 .lineLimit(nil)
         }
