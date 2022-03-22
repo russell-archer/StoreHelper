@@ -58,7 +58,8 @@ public struct PriceButtonText: View {
     #endif
     
     public var body: some View {
-        BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(disabled ? "Disabled" : price)}
+        Text(disabled ? "Disabled" : price)  // Don't use scaled fonts for the price at it can lead to truncation
+            .font(.body)
             .foregroundColor(.white)
             .padding()
             .frame(width: frameWidth, height: 40)

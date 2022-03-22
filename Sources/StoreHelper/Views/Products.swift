@@ -41,7 +41,7 @@ public struct Products: View {
                     try? await AppStore.sync()
                     purchasesRestored = true
                 }
-            }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : "Restore Purchases")}}
+            }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : "Restore Purchases")}.padding()}
             .buttonStyle(.borderedProminent).padding()
             .disabled(purchasesRestored)
             
