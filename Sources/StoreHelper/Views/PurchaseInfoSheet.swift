@@ -67,14 +67,14 @@ public struct PurchaseInfoSheet: View {
                             }
                         }) {
                             Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Request Refund")}.padding()},
-                                  icon:  { Image(systemName: "creditcard.circle")})
+                                  icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                         }
                         .buttonStyle(.borderedProminent)
                         .padding()
                         
                     }) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
-                              icon:  { Image(systemName: "creditcard.circle")})
+                              icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                     }
                     .onTapGesture { withAnimation { showManagePurchase.toggle() }}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
@@ -87,7 +87,7 @@ public struct PurchaseInfoSheet: View {
 
                     }) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
-                              icon:  { Image(systemName: "creditcard.circle")})
+                              icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                     }
                     .onTapGesture { withAnimation { showManagePurchase.toggle()}}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
@@ -128,11 +128,19 @@ struct PurchaseInfoFieldView: View {
     #endif
     
     var body: some View {
+        #if os(iOS)
+        VStack {
+            PurchaseInfoFieldText(text: fieldName).foregroundColor(.secondary).frame(width: width, alignment: .leading).padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 5))
+            PurchaseInfoFieldText(text:fieldValue).foregroundColor(.blue).padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 5))
+            Spacer()
+        }
+        #elseif os(macOS)
         HStack {
             PurchaseInfoFieldText(text: fieldName).foregroundColor(.secondary).frame(width: width, alignment: .leading).padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 5))
             PurchaseInfoFieldText(text:fieldValue).foregroundColor(.blue).padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 5))
             Spacer()
         }
+        #endif
     }
 }
 

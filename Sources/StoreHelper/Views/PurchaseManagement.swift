@@ -60,14 +60,14 @@ public struct PurchaseManagement: View {
                 HStack {
                     Button(action: { restorePurchases()}) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Restore Purchases")}.padding()},
-                              icon:  { Image(systemName: "purchased")})
+                              icon:  { Image(systemName: "purchased").bodyImageNotRounded().frame(height: 24)})
                     }
                     .macOSStyle(padding: edgeInsets)
                     .disabled(purchasesRestored)
                     
                     Button(action: { openURL(URL(string: Storage.contactUsUrl.value()!)!)}) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Contact Us")}.padding()},
-                              icon:  { Image(systemName: "bubble.right")})
+                              icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
                     }
                     .macOSStyle(padding: edgeInsets)
                 }

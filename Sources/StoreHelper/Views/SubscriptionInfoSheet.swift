@@ -74,7 +74,7 @@ public struct SubscriptionInfoSheet: View {
                         withAnimation { showManageSubscriptionsSheet.toggle()}
                     }) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Subscription")}.padding()},
-                              icon:  { Image(systemName: "creditcard.circle")})
+                              icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                     }
                     .buttonStyle(.borderedProminent)
                     #endif
