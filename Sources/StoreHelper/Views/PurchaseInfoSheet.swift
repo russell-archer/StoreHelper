@@ -128,19 +128,11 @@ struct PurchaseInfoFieldView: View {
     #endif
     
     var body: some View {
-        #if os(iOS)
-        VStack {
-            TextBlockLeft { PurchaseInfoFieldText(text: fieldName)}.foregroundColor(.secondary).padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 5))
-            TextBlockLeft { PurchaseInfoFieldText(text: fieldValue)}.foregroundColor(.blue).padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 5))
-            Spacer()
-        }
-        #elseif os(macOS)
         HStack {
             PurchaseInfoFieldText(text: fieldName).foregroundColor(.secondary).frame(width: width, alignment: .leading).padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 5))
             PurchaseInfoFieldText(text:fieldValue).foregroundColor(.blue).padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 5))
             Spacer()
         }
-        #endif
     }
 }
 
@@ -149,10 +141,11 @@ struct PurchaseInfoFieldText: View {
     let text: String
     
     var body: some View {
+        // Note. We intentionaly don't support scalable fonts here
         #if os(iOS)
-        FootnoteFont(scaleFactor: storeHelper.fontScaleFactor) { Text(text)}
+        Text(text).font(.footnote)
         #elseif os(macOS)
-        Title2Font(scaleFactor: storeHelper.fontScaleFactor) { Text(text)}
+        Text(text).font(.title2)
         #endif
     }
 }
