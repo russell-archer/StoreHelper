@@ -130,8 +130,8 @@ struct PurchaseInfoFieldView: View {
     var body: some View {
         #if os(iOS)
         VStack {
-            PurchaseInfoFieldText(text: fieldName).foregroundColor(.secondary).frame(width: width, alignment: .leading).padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 5))
-            PurchaseInfoFieldText(text:fieldValue).foregroundColor(.blue).padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 5))
+            TextBlockLeft { PurchaseInfoFieldText(text: fieldName)}.foregroundColor(.secondary).padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 5))
+            TextBlockLeft { PurchaseInfoFieldText(text: fieldValue)}.foregroundColor(.blue).padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 5))
             Spacer()
         }
         #elseif os(macOS)
