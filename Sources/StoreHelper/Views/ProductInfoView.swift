@@ -25,6 +25,7 @@ public struct ProductInfoView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(height: 30)
+                
                 SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Info on \"\(displayName)\"")}
                     .padding()
                     .foregroundColor(.blue)
@@ -39,6 +40,7 @@ public struct ProductInfoView: View {
                 .aspectRatio(contentMode: .fit)
                 .foregroundColor(.blue)
                 .frame(height: 30)
+            
             Title3Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Info on \"\(displayName)\"")}
                 .padding()
                 .foregroundColor(.blue)

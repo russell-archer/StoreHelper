@@ -62,7 +62,10 @@ public class StoreHelper: ObservableObject {
     public var hasStarted: Bool { transactionListener != nil && isAppStoreAvailable }
     
     /// Optional support for overriding dynamic font size
-    public var fontScaleFactor: Double { _fontScaleFactor ?? FontUtil.baseDynamicTypeSize(for: .large)}
+    public var fontScaleFactor: Double {
+        get { _fontScaleFactor ?? FontUtil.baseDynamicTypeSize(for: .large)}
+        set { _fontScaleFactor = newValue }
+    }
     
     // MARK: - Public helper properties
     
