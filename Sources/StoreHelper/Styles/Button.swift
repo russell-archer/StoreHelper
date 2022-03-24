@@ -14,9 +14,10 @@ public struct macOSButtonStyle: ButtonStyle {
     var pressedColor: Color = .secondary
     var opacity: Double = 1
     var padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+    var scaleFactor: Double = FontUtil.baseDynamicTypeSize(for: .large)
     
     public func makeBody(configuration: Self.Configuration) -> some View {
-        Title2Font { configuration.label }
+        Title2Font(scaleFactor: self.scaleFactor) { configuration.label }
             .padding(15)
             .foregroundColor(foregroundColor)
             .background(configuration.isPressed ? pressedColor : backgroundColor).opacity(opacity)
