@@ -11,9 +11,9 @@ import StoreKit
 public struct PurchaseInfo {
     
     /// The product.
-    var product: Product
+    public var product: Product
 
     /// The most recent StoreKit-verified transaction for a non-consumable. nil if verification failed.
-    var latestVerifiedTransaction: Transaction?
+    public var latestVerifiedTransaction: Transaction?
 }
 
