@@ -36,6 +36,11 @@ public struct SubscriptionInfoViewModel {
     @ObservedObject public var storeHelper: StoreHelper
     public var subscriptionInfo: SubscriptionInfo
     
+    public init(storeHelper: StoreHelper, subscriptionInfo: SubscriptionInfo) {
+        self.storeHelper = storeHelper
+        self.subscriptionInfo = subscriptionInfo
+    }
+    
     /// Extended information related to a product subscription.
     /// - Returns: Returns extended information related to a product subscription.
     @MainActor public func extendedSubscriptionInfo() async -> ExtendedSubscriptionInfo? {

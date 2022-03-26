@@ -23,17 +23,17 @@ public struct ExtendedPurchaseInfo: Hashable {
     public var ownershipType: StoreKit.Transaction.OwnershipType?        // Either .purchased or .familyShared
 
     public init(productId: ProductId,
-         name: String,
-         isPurchased: Bool,
-         productType: Product.ProductType,
-         transactionId: UInt64?  = nil,
-         purchasePrice: String? = nil,
-         purchaseDate: Date? = nil,
-         purchaseDateFormatted: String? = nil,
-         revocationDate: Date? = nil,
-         revocationDateFormatted: String? = nil,
-         revocationReason: StoreKit.Transaction.RevocationReason? = nil,
-         ownershipType: StoreKit.Transaction.OwnershipType? = nil) {
+                name: String,
+                isPurchased: Bool,
+                productType: Product.ProductType,
+                transactionId: UInt64?  = nil,
+                purchasePrice: String? = nil,
+                purchaseDate: Date? = nil,
+                purchaseDateFormatted: String? = nil,
+                revocationDate: Date? = nil,
+                revocationDateFormatted: String? = nil,
+                revocationReason: StoreKit.Transaction.RevocationReason? = nil,
+                ownershipType: StoreKit.Transaction.OwnershipType? = nil) {
         
         self.productId = productId
         self.name = name

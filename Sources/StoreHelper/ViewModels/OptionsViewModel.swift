@@ -11,6 +11,10 @@ import StoreKit
 public struct OptionsViewModel {
     @ObservedObject public var storeHelper: StoreHelper
     
+    public init(storeHelper: StoreHelper){
+        self.storeHelper = storeHelper
+    }
+    
     #if DEBUG
     /// Resets (deletes) all consumable product purchases from the keychain. Debug-only example.
     public func resetConsumables() {
