@@ -9,18 +9,18 @@ import StoreKit
 import SwiftUI
 
 public struct ExtendedPurchaseInfo: Hashable {
-    var productId: ProductId                                      // The product's unique id
-    var name: String                                              // The product's display name
-    var isPurchased: Bool                                         // true if the product has been purchased
-    var productType: Product.ProductType                          // Consumable, non-consumable, subscription, etc.
-    var transactionId: UInt64?                                    // The transactionid for the purchase. UInt64.min if not purchased
-    var purchasePrice: String?                                    // Localized price paid when purchased
-    var purchaseDate: Date?                                       // Date of purchase
-    var purchaseDateFormatted: String?                            // Date of purchase formatted as "d MMM y" (e.g. "28 Dec 2021")
-    var revocationDate: Date?                                     // Date the app revoked the purchase (e.g. because of a refund, etc.)
-    var revocationDateFormatted: String?                          // Date of revocation formatted as "d MMM y"
-    var revocationReason: StoreKit.Transaction.RevocationReason?  // Why the purchase was revoked (.developerIssue or .other)
-    var ownershipType: StoreKit.Transaction.OwnershipType?        // Either .purchased or .familyShared
+    public var productId: ProductId                                      // The product's unique id
+    public var name: String                                              // The product's display name
+    public var isPurchased: Bool                                         // true if the product has been purchased
+    public var productType: Product.ProductType                          // Consumable, non-consumable, subscription, etc.
+    public var transactionId: UInt64?                                    // The transactionid for the purchase. UInt64.min if not purchased
+    public var purchasePrice: String?                                    // Localized price paid when purchased
+    public var purchaseDate: Date?                                       // Date of purchase
+    public var purchaseDateFormatted: String?                            // Date of purchase formatted as "d MMM y" (e.g. "28 Dec 2021")
+    public var revocationDate: Date?                                     // Date the app revoked the purchase (e.g. because of a refund, etc.)
+    public var revocationDateFormatted: String?                          // Date of revocation formatted as "d MMM y"
+    public var revocationReason: StoreKit.Transaction.RevocationReason?  // Why the purchase was revoked (.developerIssue or .other)
+    public var ownershipType: StoreKit.Transaction.OwnershipType?        // Either .purchased or .familyShared
 
     public init(productId: ProductId,
          name: String,
@@ -53,8 +53,8 @@ public struct ExtendedPurchaseInfo: Hashable {
 /// ViewModel for `PurchaseInfoView`. Enables gathering of purchase or subscription information.
 public struct PurchaseInfoViewModel {
     
-    @ObservedObject var storeHelper: StoreHelper
-    var productId: ProductId
+    @ObservedObject public var storeHelper: StoreHelper
+    public var productId: ProductId
     
     /// Provides text information on the purchase of a non-consumable product or auto-renewing subscription.
     /// - Parameter productId: The `ProductId` of the product or subscription.

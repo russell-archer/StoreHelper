@@ -11,8 +11,8 @@ import SwiftUI
 /// ViewModel for `PriceView`. Enables purchasing.
 public struct PriceViewModel {
     
-    @ObservedObject var storeHelper: StoreHelper
-    @Binding var purchaseState: PurchaseState
+    @ObservedObject public var storeHelper: StoreHelper
+    @Binding public var purchaseState: PurchaseState
     
     /// Purchase a product using StoreHelper and StoreKit2.
     /// - Parameter product: The `Product` to purchase
