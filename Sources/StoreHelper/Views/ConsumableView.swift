@@ -89,8 +89,8 @@ public struct ConsumableView: View {
             Divider()
         }
         .padding()
-        .onAppear {
-            Task.init { await purchaseState(for: productId) }
+        .task {
+            await purchaseState(for: productId)
             count = KeychainHelper.count(for: productId)
         }
         .onChange(of: storeHelper.purchasedProducts) { _ in

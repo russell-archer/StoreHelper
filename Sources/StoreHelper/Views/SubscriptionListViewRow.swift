@@ -37,9 +37,7 @@ public struct SubscriptionListViewRow: View {
                     .onTapGesture { productInfoCompletion(product.id) }
             }
         }
-        .onAppear {
-            Task.init { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
-        }
+        .task { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
         }

@@ -106,7 +106,7 @@ public struct PurchaseInfoSheet: View {
                 }
             }
         }
-        .onAppear { Task.init { extendedPurchaseInfo = await viewModel.extendedPurchaseInfo(for: productId)}}
+        .task { extendedPurchaseInfo = await viewModel.extendedPurchaseInfo(for: productId)}
         #if os(macOS)
         .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 680, idealHeight: 680, maxHeight: 680)
         .fixedSize(horizontal: true, vertical: true)

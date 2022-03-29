@@ -38,9 +38,7 @@ public struct SubscriptionInfoView: View {
                 .padding()
             }
         }
-        .onAppear {
-            Task.init { subscriptionInfoText = await viewModel.shortInfo() }
-        }
+        .task { subscriptionInfoText = await viewModel.shortInfo()}
         .sheet(isPresented: $showSubscriptionInfoSheet) {
             if let pid = subscriptionInfo.product?.id {
                 SubscriptionInfoSheet(showPurchaseInfoSheet: $showSubscriptionInfoSheet, productId: pid, viewModel: viewModel)
@@ -60,9 +58,7 @@ public struct SubscriptionInfoView: View {
         }
         .padding()
         .onTapGesture { withAnimation { showSubscriptionInfoSheet.toggle()}}
-        .onAppear {
-            Task.init { subscriptionInfoText = await viewModel.shortInfo() }
-        }
+        .task { subscriptionInfoText = await viewModel.shortInfo()}
         .sheet(isPresented: $showSubscriptionInfoSheet) {
             if let pid = subscriptionInfo.product?.id {
                 SubscriptionInfoSheet(showPurchaseInfoSheet: $showSubscriptionInfoSheet, productId: pid, viewModel: viewModel)

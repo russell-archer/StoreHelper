@@ -999,8 +999,8 @@ struct PurchaseInfoView: View {
                 .padding()
             }
         }
-        .onAppear {
-            Task.init { purchaseInfoText = await viewModel.info(for: productId) }
+        .task {
+            purchaseInfoText = await viewModel.info(for: productId)
         }
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId, viewModel: viewModel)

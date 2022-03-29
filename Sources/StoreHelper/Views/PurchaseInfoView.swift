@@ -43,9 +43,7 @@ public struct PurchaseInfoView: View {
                 .padding()
             }
         }
-        .onAppear {
-            Task.init { purchaseInfoText = await viewModel.info(for: productId) }
-        }
+        .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId, viewModel: viewModel)
         }
@@ -63,9 +61,7 @@ public struct PurchaseInfoView: View {
         }
         .padding()
         .onTapGesture { withAnimation { showPurchaseInfoSheet.toggle()}}
-        .onAppear {
-            Task.init { purchaseInfoText = await viewModel.info(for: productId) }
-        }
+        .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, productId: productId, viewModel: viewModel)
         }

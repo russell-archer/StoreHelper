@@ -92,7 +92,7 @@ public struct SubscriptionInfoSheet: View {
                 }
             }
         }
-        .onAppear { Task.init { extendedSubscriptionInfo = await viewModel.extendedSubscriptionInfo() }}
+        .task { extendedSubscriptionInfo = await viewModel.extendedSubscriptionInfo()}
         #if os(iOS)
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptionsSheet)  // Not available for macOS
         #elseif os(macOS)

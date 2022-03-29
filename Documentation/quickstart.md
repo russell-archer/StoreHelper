@@ -154,11 +154,9 @@ struct ProductView: View {
             }
         }
         .padding()
-        .onAppear {
-            Task.init {
-                if let purchased = try? await storeHelper.isPurchased(productId: productId) {
-                    isPurchased = purchased
-                }
+        .task {
+            if let purchased = try? await storeHelper.isPurchased(productId: productId) {
+                isPurchased = purchased
             }
         }
     }
