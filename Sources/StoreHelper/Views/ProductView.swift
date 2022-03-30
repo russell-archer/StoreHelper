@@ -15,6 +15,7 @@ import WidgetKit
 
 /// Displays a single row of product information for the main content List.
 public struct ProductView: View {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     #if os(iOS)
@@ -47,6 +48,36 @@ public struct ProductView: View {
                 .onTapGesture { productInfoCompletion(productId) }
             #endif
             
+            #if os(iOS)
+            if horizontalSizeClass == .compact {
+                VStack {
+                    Image(productId)
+                        .resizable()
+                        .frame(maxWidth: 250, maxHeight: 250)
+                        .aspectRatio(contentMode: .fit)
+                        .cornerRadius(25)
+                        .contentShape(Rectangle())
+                        .onTapGesture { productInfoCompletion(productId) }
+                    
+                    PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
+                }
+                .padding()
+            } else {
+                HStack {
+                    Image(productId)
+                        .resizable()
+                        .frame(maxWidth: 250, maxHeight: 250)
+                        .aspectRatio(contentMode: .fit)
+                        .cornerRadius(25)
+                        .contentShape(Rectangle())
+                        .onTapGesture { productInfoCompletion(productId) }
+                    
+                    Spacer()
+                    PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
+                }
+                .padding()
+            }
+            #elseif os(macOS)
             HStack {
                 Image(productId)
                     .resizable()
@@ -59,10 +90,9 @@ public struct ProductView: View {
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
-            #if os(macOS)
             .frame(width: 500)
-            #endif
             .padding()
+            #endif
             
             if purchaseState == .purchased {
                 #if os(iOS)
