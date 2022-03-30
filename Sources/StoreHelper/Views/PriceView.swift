@@ -57,9 +57,9 @@ public struct PriceButtonText: View {
             .foregroundColor(.white)
             .padding()
             #if os(iOS)
-            .frame(width: .infinity, height: 40)
+            .frame(minWidth: 90, idealWidth: .infinity, maxWidth: .infinity, minHeight: 40, idealHeight: 40, maxHeight: 40)
             #elseif os(macOS)
-            .frame(width: 110, height: 40)
+            .frame(minWidth: 110, idealWidth: 110, maxWidth: .infinity, minHeight: 40, idealHeight: 40, maxHeight: 40)
             .padding(.leading, 10)
             #endif
             .fixedSize()
