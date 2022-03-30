@@ -47,17 +47,28 @@ public struct PriceView: View {
 }
 
 public struct PriceButtonText: View {
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    #endif
+    
     @EnvironmentObject var storeHelper: StoreHelper
     var price: String
     var disabled: Bool
     
     public var body: some View {
+        #if os(iOS)
+        let pad: CGFloat = horizontalSizeClass == .compact ? 0 : 10
+        #endif
+        
         Text(disabled ? "Disabled" : price)  // Don't use scaled fonts for the price at it can lead to truncation
             .font(.body)
             .foregroundColor(.white)
             .padding()
-            .frame(width: .infinity, height: 40)
-            #if os(macOS)
+            #if os(iOS)
+            .frame(height: 40)
+            .padding(.leading, pad)
+            #elseif os(macOS)
+            .frame(height: 40)
             .padding(.leading, 10)
             #endif
             .fixedSize()
@@ -71,11 +82,12 @@ struct PriceView_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
             Button(action: {}) {
-                Text("United Sates Dollars $1.98")
+                Text("USD $1.98")
                     .font(.body)
                     .foregroundColor(.white)
                     .padding()
                     .frame(height: 40)
+                    .padding(.leading, 0)
                     .fixedSize()
                     .background(Color.blue)
                     .cornerRadius(25)
