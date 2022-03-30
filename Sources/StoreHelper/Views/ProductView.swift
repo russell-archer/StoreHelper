@@ -15,10 +15,10 @@ import WidgetKit
 
 /// Displays a single row of product information for the main content List.
 public struct ProductView: View {
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     #if os(iOS)
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
