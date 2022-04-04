@@ -56,10 +56,6 @@ public struct PriceButtonText: View {
     var disabled: Bool
     
     public var body: some View {
-        #if os(iOS)
-        let pad: CGFloat = horizontalSizeClass == .compact ? 0 : 10
-        #endif
-        
         Text(disabled ? "Disabled" : price)  // Don't use scaled fonts for the price at it can lead to truncation
             .font(.body)
             .foregroundColor(.white)
