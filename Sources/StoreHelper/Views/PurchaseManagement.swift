@@ -35,7 +35,10 @@ public struct PurchaseManagement: View {
     @State private var showManageSubscriptions = false
     
     public var body: some View {
-        if storeHelper.hasProducts {
+        if  storeHelper.hasProducts,
+            let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
+            let contactUrl = URL(string: sContactUrl) {
+            
             Menu {
                 Button(action: {
                     if Utils.isSimulator() { StoreLog.event("You cannot manage subscriptions from the simulator. You must use the sandbox environment.")}
@@ -45,7 +48,7 @@ public struct PurchaseManagement: View {
                 .disabled(!storeHelper.hasSubscriptionProducts)
                 
                 Button(action: { restorePurchases()}) { Label("Restore Purchases", systemImage: "purchased")}
-                Button(action: { openURL(URL(string: Storage.contactUsUrl.value()!)!)}) { Label("Contact Us", systemImage: "bubble.right")}
+                Button(action: { openURL(contactUrl)}) { Label("Contact Us", systemImage: "bubble.right")}
 
             } label: { Label("", systemImage: "line.3.horizontal").labelStyle(.iconOnly)}
             .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
@@ -54,7 +57,10 @@ public struct PurchaseManagement: View {
     
     #elseif os(macOS)
     public var body: some View {
-        if storeHelper.hasProducts {
+        if  storeHelper.hasProducts,
+            let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
+            let contactUrl = URL(string: sContactUrl) {
+            
             let edgeInsets = EdgeInsets(top: 10, leading: 3, bottom: 10, trailing: 3)
             VStack {
                 HStack {
@@ -65,7 +71,7 @@ public struct PurchaseManagement: View {
                     .macOSStyle(padding: edgeInsets)
                     .disabled(purchasesRestored)
                     
-                    Button(action: { openURL(URL(string: Storage.contactUsUrl.value()!)!)}) {
+                    Button(action: { openURL(contactUrl)}) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Contact Us")}.padding()},
                               icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
                     }

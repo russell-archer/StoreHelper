@@ -82,7 +82,10 @@ public struct PurchaseInfoSheet: View {
                     #elseif os(macOS)
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
                         Button(action: {
-                            NSWorkspace.shared.open(URL(string: Storage.requestRefund.value()!)!)
+                            if  let sRefundUrl = storeHelper.configurationProvider?.value(configuration: .requestRefund) ?? Configuration.requestRefund.value(),
+                                let refundUrl = URL(string: sRefundUrl) {
+                                NSWorkspace.shared.open(refundUrl)
+                            }
                         }) { Label("Request Refund", systemImage: "creditcard.circle")}.macOSStyle()
 
                     }) {

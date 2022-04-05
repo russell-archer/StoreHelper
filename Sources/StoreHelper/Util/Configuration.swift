@@ -1,5 +1,5 @@
 //
-//  Storage.swift
+//  Configuration.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 20/12/2021.
@@ -7,18 +7,17 @@
 
 import Foundation
 
-public enum Storage {
+/// Allows the client using StoreHelper to plugin a configuration for static values required by StoreHelper.
+/// Set `StoreHelper.configurationProvider` to override the default values provided by `Configuration`.
+public protocol ConfigurationProvider {
+    func value(configuration: Configuration) -> String?
+}
+
+/// Static config values used by StoreHelper. See `ConfigurationProvider`.
+public enum Configuration {
     case appGroupBundleId   // Not stored. Constant value. The id for the container shared between the main app and widgets
     case contactUsUrl       // Not stored. Constant value. A URL where the user can contact the app developer.
     case requestRefund      // Not stored. Constant value. A URL which users on macOS can use to request a refund for an IAP.
-
-    public func key() -> String {
-        switch self {
-            case .appGroupBundleId: return "appGroupBundleId"
-            case .contactUsUrl:     return "contactUsUrl"
-            case .requestRefund:    return "requestRefund"
-        }
-    }
     
     public func value() -> String? {
         switch self {
@@ -28,10 +27,10 @@ public enum Storage {
             case .appGroupBundleId: return "group.com.rarcher.writerly"
                 
             // A contact URL. Will be used in the purchase management view
-            case .contactUsUrl: return "https://russell-archer.github.io/Writerly/support/"
+            case .contactUsUrl:     return "https://russell-archer.github.io/Writerly/support/"
                 
             // A URL which users on macOS can use to request a refund for an IAP
-            case .requestRefund: return "https://reportaproblem.apple.com/"
+            case .requestRefund:    return "https://reportaproblem.apple.com/"
         }
     }
 }
