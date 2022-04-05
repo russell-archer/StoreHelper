@@ -22,15 +22,10 @@ public enum Configuration {
     public func value() -> String? {
         switch self {
             // If your app supports widgets (e.g. an App Group) that use IAP-based functionality, return the group id that allows
-            // the main app and widgets to share data. For example "group.com.{developer}.{appname}". Returning nil means there's
-            // no shared data
-            case .appGroupBundleId: return "group.com.rarcher.writerly"
-                
-            // A contact URL. Will be used in the purchase management view
-            case .contactUsUrl:     return "https://russell-archer.github.io/Writerly/support/"
-                
-            // A URL which users on macOS can use to request a refund for an IAP
-            case .requestRefund:    return "https://reportaproblem.apple.com/"
+            // the main app and widgets to share data. For example "group.com.{developer}.{appname}"
+            case .appGroupBundleId: return nil  // Returning nil means there's no shared data
+            case .contactUsUrl:     return nil  // A contact URL. Used in the purchase management view
+            case .requestRefund:    return "https://reportaproblem.apple.com/"  // A URL which users on macOS can use to request a refund for an IAP
         }
     }
 }
