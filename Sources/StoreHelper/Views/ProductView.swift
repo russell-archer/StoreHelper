@@ -50,6 +50,12 @@ public struct ProductView: View {
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
+            #elseif os(tvOS)
+            Text(description)
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .contentShape(Rectangle())
             #endif
             
             #if os(iOS)
@@ -81,7 +87,7 @@ public struct ProductView: View {
                 }
                 .padding()
             }
-            #elseif os(macOS)
+            #else
             HStack {
                 Image(productId)
                     .resizable()
@@ -89,7 +95,9 @@ public struct ProductView: View {
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
+                    #if !os(tvOS)
                     .onTapGesture { productInfoCompletion(productId) }
+                    #endif
                 
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
@@ -101,7 +109,7 @@ public struct ProductView: View {
             if purchaseState == .purchased {
                 #if os(iOS)
                 PurchaseInfoView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId)
-                #elseif os(macOS)
+                #else
                 PurchaseInfoView(productId: productId)
                 #endif
             }

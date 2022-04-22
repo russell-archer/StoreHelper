@@ -28,7 +28,7 @@ public struct ProductListView: View {
             if storeHelper.hasNonConsumableProducts, let nonConsumables = storeHelper.nonConsumableProducts {
                 #if os(iOS)
                 ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
-                #elseif os(macOS)
+                #else
                 ProductListViewRow(products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
                 #endif
             }
@@ -36,7 +36,7 @@ public struct ProductListView: View {
             if storeHelper.hasConsumableProducts, let consumables = storeHelper.consumableProducts {
                 #if os(iOS)
                 ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
-                #elseif os(macOS)
+                #else
                 ProductListViewRow(products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
                 #endif
             }

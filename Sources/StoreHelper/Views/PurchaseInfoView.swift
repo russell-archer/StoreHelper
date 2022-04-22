@@ -48,7 +48,7 @@ public struct PurchaseInfoView: View {
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId, viewModel: viewModel)
         }
-        #elseif os(macOS)
+        #else
         HStack(alignment: .center) {
             Image(systemName: "creditcard.circle")
                 .resizable()
@@ -61,7 +61,9 @@ public struct PurchaseInfoView: View {
                 .lineLimit(nil)
         }
         .padding()
+        #if !os(tvOS)
         .onTapGesture { withAnimation { showPurchaseInfoSheet.toggle()}}
+        #endif
         .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, productId: productId, viewModel: viewModel)

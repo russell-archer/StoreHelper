@@ -59,6 +59,13 @@ public struct ProductListViewRow: View {
                                     productInfoCompletion: productInfoCompletion)
                         .contentShape(Rectangle())
                         .onTapGesture { productInfoCompletion(product.id) }
+                        #elseif os(tvOS)
+                        ProductView(productId: product.id,
+                                    displayName: product.displayName,
+                                    description: product.description,
+                                    price: product.displayPrice,
+                                    productInfoCompletion: productInfoCompletion)
+                        .contentShape(Rectangle())
                         #endif
                     }
                 }
