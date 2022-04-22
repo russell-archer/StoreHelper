@@ -11,7 +11,10 @@
 
 import SwiftUI
 import StoreKit
+
+#if !os(tvOS)
 import WidgetKit
+#endif
 
 /// Displays a single row of product information for the main content List.
 public struct ProductView: View {
