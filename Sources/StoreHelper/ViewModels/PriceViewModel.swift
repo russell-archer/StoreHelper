@@ -9,6 +9,7 @@ import StoreKit
 import SwiftUI
 
 /// ViewModel for `PriceView`. Enables purchasing.
+@available(tvOS 15.0, *)
 public struct PriceViewModel {
     @ObservedObject public var storeHelper: StoreHelper
     @Binding public var purchaseState: PurchaseState

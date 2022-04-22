@@ -9,6 +9,7 @@ import Foundation
 import OrderedCollections
 
 /// Provides static methods for reading plist configuration files.
+@available(tvOS 15.0, *)
 public struct StoreConfiguration {
     
     private init() {}

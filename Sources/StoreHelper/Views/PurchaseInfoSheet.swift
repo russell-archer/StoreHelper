@@ -11,6 +11,7 @@
 
 import SwiftUI
 
+@available(tvOS 15.0, *)
 public struct PurchaseInfoSheet: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var extendedPurchaseInfo: ExtendedPurchaseInfo?
@@ -117,6 +118,7 @@ public struct PurchaseInfoSheet: View {
     }
 }
 
+@available(tvOS 15.0, *)
 struct PurchaseInfoFieldView: View {
     let fieldName: String
     let fieldValue: String
@@ -126,6 +128,9 @@ struct PurchaseInfoFieldView: View {
     let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 10, bottom: 0, trailing: 5)
     let width: CGFloat = 95
     #elseif os(macOS)
+    let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 25, bottom: 0, trailing: 5)
+    let width: CGFloat = 140
+    #elseif os(tvOS)
     let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 25, bottom: 0, trailing: 5)
     let width: CGFloat = 140
     #endif
@@ -139,6 +144,7 @@ struct PurchaseInfoFieldView: View {
     }
 }
 
+@available(tvOS 15.0, *)
 struct PurchaseInfoFieldText: View {
     @EnvironmentObject var storeHelper: StoreHelper
     let text: String

@@ -8,6 +8,7 @@
 import SwiftUI
 import StoreKit
 
+@available(tvOS 15.0, *)
 public struct OptionsViewModel {
     @ObservedObject public var storeHelper: StoreHelper
     

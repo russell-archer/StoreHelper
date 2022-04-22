@@ -12,6 +12,7 @@
 import SwiftUI
 import StoreKit
 
+@available(tvOS 15.0, *)
 public struct Products: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var showManageSubscriptions = false

@@ -12,6 +12,7 @@
 import SwiftUI
 import StoreKit
 
+@available(tvOS 15.0, *)
 public struct SubscriptionInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var subscriptionInfoText = ""

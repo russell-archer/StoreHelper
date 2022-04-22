@@ -8,6 +8,7 @@
 import StoreKit
 
 /// Information about the highest service level product in a subscription group a user is subscribed to.
+@available(tvOS 15.0, *)
 public struct SubscriptionInfo: Hashable {
     
     /// The product.

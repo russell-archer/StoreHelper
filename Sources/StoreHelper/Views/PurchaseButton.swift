@@ -10,6 +10,7 @@ import StoreKit
 
 /// Provides a button that enables the user to purchase a product.
 /// The product's price is also displayed in the localized currency.
+@available(tvOS 15.0, *)
 public struct PurchaseButton: View {
     
     @EnvironmentObject var storeHelper: StoreHelper
@@ -44,6 +45,7 @@ public struct PurchaseButton: View {
     }
 }
 
+@available(tvOS 15.0, *)
 struct PurchaseButton_Previews: PreviewProvider {
     static var previews: some View {
 

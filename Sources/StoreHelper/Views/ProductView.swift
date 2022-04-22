@@ -17,6 +17,7 @@ import WidgetKit
 #endif
 
 /// Displays a single row of product information for the main content List.
+@available(tvOS 15.0, *)
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
@@ -115,7 +116,9 @@ public struct ProductView: View {
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init {
                 await purchaseState(for: productId)
+                #if !os(tvOS)
                 WidgetCenter.shared.reloadAllTimelines()
+                #endif
             }
         }
     }

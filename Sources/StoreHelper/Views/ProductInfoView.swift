@@ -11,6 +11,7 @@
 
 import SwiftUI
 
+@available(tvOS 15.0, *)
 public struct ProductInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     var productId: ProductId

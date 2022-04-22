@@ -9,6 +9,7 @@ import StoreKit
 import SwiftUI
 
 /// Extended information about a subscription product. Used for displaying info to the user
+@available(tvOS 15.0, *)
 public struct ExtendedSubscriptionInfo: Hashable {
     public var productId: ProductId                                      // The product's unique id
     public var name: String                                              // The product's display name
@@ -31,6 +32,7 @@ public struct ExtendedSubscriptionInfo: Hashable {
     public var ownershipType: StoreKit.Transaction.OwnershipType?        // Either .purchased or .familyShared
 }
 
+@available(tvOS 15.0, *)
 public struct SubscriptionInfoViewModel {
     
     @ObservedObject public var storeHelper: StoreHelper

@@ -13,6 +13,7 @@ import SwiftUI
 import StoreKit
 
 /// Displays information on a consumable or non-consumable purchase.
+@available(tvOS 15.0, *)
 public struct PurchaseInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchaseInfoText = ""

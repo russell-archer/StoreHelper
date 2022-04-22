@@ -8,10 +8,12 @@
 import SwiftUI
 
 /// Displays a small image that gives a visual clue to the product's purchase state.
+@available(tvOS 15.0, *)
 public struct BadgeView: View {
     
     @Binding var purchaseState: PurchaseState
     
+    @available(tvOS 15.0, *)
     public var body: some View {
         
         if let options = badgeOptions() {
@@ -23,6 +25,7 @@ public struct BadgeView: View {
         }
     }
     
+    @available(tvOS 15.0, *)
     public func badgeOptions() -> (badgeName: String, fgColor: Color)? {
         switch purchaseState {
             case .notStarted:               return nil
@@ -38,7 +41,7 @@ public struct BadgeView: View {
     }
 }
 
-struct PurchasedView_Previews: PreviewProvider {
+@available(tvOS 15.0, *)struct PurchasedView_Previews: PreviewProvider {
     
     static var previews: some View {
         VStack {

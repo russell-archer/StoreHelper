@@ -26,6 +26,7 @@ import StoreKit
  */
 
 /// Allows the user to manage subscriptions, restore purchases, request refunds and contact us.
+@available(tvOS 15.0, *)
 public struct PurchaseManagement: View {
     @Environment(\.openURL) var openURL
     @EnvironmentObject var storeHelper: StoreHelper
@@ -76,6 +77,33 @@ public struct PurchaseManagement: View {
                               icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
                     }
                     .macOSStyle(padding: edgeInsets)
+                }
+                
+                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Click \"Restore Purchases\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
+                    .multilineTextAlignment(.center)
+                    .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    #elseif os(tvOS)
+    public var body: some View {
+        if  storeHelper.hasProducts,
+            let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
+            let contactUrl = URL(string: sContactUrl) {
+            
+            VStack {
+                HStack {
+                    Button(action: { restorePurchases()}) {
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Restore Purchases")}.padding()},
+                              icon:  { Image(systemName: "purchased").bodyImageNotRounded().frame(height: 24)})
+                    }
+                    .disabled(purchasesRestored)
+                    
+                    Button(action: { openURL(contactUrl)}) {
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Contact Us")}.padding()},
+                              icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
+                    }
                 }
                 
                 CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Click \"Restore Purchases\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}

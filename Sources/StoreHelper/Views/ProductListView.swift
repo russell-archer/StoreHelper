@@ -11,6 +11,7 @@
 
 import SwiftUI
 
+@available(tvOS 15.0, *)
 public struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     #if os(iOS)

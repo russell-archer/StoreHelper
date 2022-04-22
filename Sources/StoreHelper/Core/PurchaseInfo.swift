@@ -8,6 +8,7 @@
 import StoreKit
 
 /// Summarized information about a non-consumable purchase.
+@available(tvOS 15.0, *)
 public struct PurchaseInfo {
     
     /// The product.

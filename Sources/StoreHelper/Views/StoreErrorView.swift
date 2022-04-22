@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Displays an error.
+@available(tvOS 15.0, *)
 public struct StoreErrorView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     
@@ -21,6 +22,7 @@ public struct StoreErrorView: View {
     }
 }
 
+@available(tvOS 15.0, *)
 struct StoreErrorView_Previews: PreviewProvider {
     static var previews: some View {
         StoreErrorView()

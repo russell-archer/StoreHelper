@@ -9,6 +9,7 @@ import SwiftUI
 import StoreKit
 
 /// Displays a product price and a button that enables purchasing.
+@available(tvOS 15.0, *)
 public struct PriceView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var canMakePayments: Bool = false
@@ -46,6 +47,7 @@ public struct PriceView: View {
     }
 }
 
+@available(tvOS 15.0, *)
 public struct PriceButtonText: View {
     #if os(iOS)
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
@@ -71,6 +73,7 @@ public struct PriceButtonText: View {
     }
 }
 
+@available(tvOS 15.0, *)
 struct PriceView_Previews: PreviewProvider {
 
     static var previews: some View {

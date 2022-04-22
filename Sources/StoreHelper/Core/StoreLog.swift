@@ -24,6 +24,7 @@ import os.log
 /// unified logging system know it's OK to log these strings through the use of the "%{public}s"
 /// keyword. However, we don't know what the event(message:) function will be used to display,
 /// so its logs will be redacted.
+@available(tvOS 15.0, *)
 public struct StoreLog {
     private static let storeLog = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "STORE")
     

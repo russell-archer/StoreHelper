@@ -17,6 +17,7 @@ import WidgetKit
 #endif
 
 /// Displays a single row of product information for the main content List.
+@available(tvOS 15.0, *)
 public struct ConsumableView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
@@ -56,7 +57,9 @@ public struct ConsumableView: View {
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(25)
                         .contentShape(Rectangle())
+                        #if !os(tvOS)
                         .onTapGesture { productInfoCompletion(productId) }
+                        #endif
                     
                 } else {
                     
@@ -67,7 +70,9 @@ public struct ConsumableView: View {
                         .cornerRadius(25)
                         .overlay(ConsumableBadgeView(count: $count))
                         .contentShape(Rectangle())
+                        #if !os(tvOS)
                         .onTapGesture { productInfoCompletion(productId) }
+                        #endif
                 }
                 
                 Spacer()
@@ -99,7 +104,9 @@ public struct ConsumableView: View {
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init { await purchaseState(for: productId) }
             count = KeychainHelper.count(for: productId)
+            #if !os(tvOS)
             WidgetCenter.shared.reloadAllTimelines()
+            #endif
         }
     }
     
@@ -109,6 +116,7 @@ public struct ConsumableView: View {
     }
 }
 
+@available(tvOS 15.0, *)
 struct ConsumableView_Previews: PreviewProvider {
     
     static var previews: some View {
