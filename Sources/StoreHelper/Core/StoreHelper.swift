@@ -33,7 +33,7 @@ public class StoreHelper: ObservableObject {
     // MARK: - Public properties
     
     /// Array of `Product` retrieved from the App Store and available for purchase.
-    @Published private(set) var products: [Product]?
+    @Published public private(set) var products: [Product]?
     
     /// Array of `ProductId` for products that have been purchased. Each purchased non-consumable product will appear
     /// exactly once. Consumable products can appear more than once.
@@ -43,7 +43,7 @@ public class StoreHelper: ObservableObject {
     ///
     /// - Call `isPurchased(product:)` to see if any type of product has been purchased and validated against the receipt.
     /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
-    @Published private(set) var purchasedProducts = [ProductId]()
+    @Published public private(set) var purchasedProducts = [ProductId]()
     
     /// List of purchased product ids. This list is used as a fallback when the App Store in unavailable.
     /// The public `isPurchased(product:)` method will use this list when `products` is nil and `isAppStoreAvailable` is false.
@@ -74,19 +74,23 @@ public class StoreHelper: ObservableObject {
     
     // MARK: - Public helper properties
     
-    public var consumableProducts:          [Product]?   { products?.filter { $0.type == .consumable }}
-    public var nonConsumableProducts:       [Product]?   { products?.filter { $0.type == .nonConsumable }}
-    public var subscriptionProducts:        [Product]?   { products?.filter { $0.type == .autoRenewable }}
-    public var consumableProductIds:        [ProductId]? { products?.filter { $0.type == .consumable }.map { $0.id }}
-    public var nonConsumableProductIds:     [ProductId]? { products?.filter { $0.type == .nonConsumable }.map { $0.id }}
-    public var subscriptionProductIds:      [ProductId]? { products?.filter { $0.type == .autoRenewable }.map { $0.id }}
-    public var hasProducts:                 Bool         { products?.count ?? 0 > 0 ? true : false }
-    public var hasConsumableProducts:       Bool         { consumableProducts?.count ?? 0 > 0 ? true : false }
-    public var hasNonConsumableProducts:    Bool         { nonConsumableProducts?.count ?? 0 > 0 ? true : false }
-    public var hasSubscriptionProducts:     Bool         { subscriptionProducts?.count ?? 0 > 0 ? true : false }
-    public var hasConsumableProductIds:     Bool         { consumableProductIds?.count ?? 0 > 0 ? true : false }
-    public var hasNonConsumableProductIds:  Bool         { nonConsumableProductIds?.count ?? 0 > 0 ? true : false }
-    public var hasSubscriptionProductIds:   Bool         { subscriptionProductIds?.count ?? 0 > 0 ? true : false }
+    public var consumableProducts:            [Product]?   { products?.filter { $0.type == .consumable }}
+    public var nonConsumableProducts:         [Product]?   { products?.filter { $0.type == .nonConsumable }}
+    public var subscriptionProducts:          [Product]?   { products?.filter { $0.type == .autoRenewable }}
+    public var nonSubscriptionProducts:       [Product]?   { products?.filter { $0.type == .nonRenewable }}
+    public var consumableProductIds:          [ProductId]? { products?.filter { $0.type == .consumable }.map { $0.id }}
+    public var nonConsumableProductIds:       [ProductId]? { products?.filter { $0.type == .nonConsumable }.map { $0.id }}
+    public var subscriptionProductIds:        [ProductId]? { products?.filter { $0.type == .autoRenewable }.map { $0.id }}
+    public var nonSubscriptionProductIds:     [ProductId]? { products?.filter { $0.type == .nonRenewable }.map { $0.id }}
+    public var hasProducts:                   Bool         { products?.count ?? 0 > 0 ? true : false }
+    public var hasConsumableProducts:         Bool         { consumableProducts?.count ?? 0 > 0 ? true : false }
+    public var hasNonConsumableProducts:      Bool         { nonConsumableProducts?.count ?? 0 > 0 ? true : false }
+    public var hasSubscriptionProducts:       Bool         { subscriptionProducts?.count ?? 0 > 0 ? true : false }
+    public var hasNonSubscriptionProducts:    Bool         { nonSubscriptionProducts?.count ?? 0 > 0 ? true : false }
+    public var hasConsumableProductIds:       Bool         { consumableProductIds?.count ?? 0 > 0 ? true : false }
+    public var hasNonConsumableProductIds:    Bool         { nonConsumableProductIds?.count ?? 0 > 0 ? true : false }
+    public var hasSubscriptionProductIds:     Bool         { subscriptionProductIds?.count ?? 0 > 0 ? true : false }
+    public var hasNonSubscriptionProductIds:  Bool         { nonSubscriptionProducts?.count ?? 0 > 0 ? true : false }
 
     // MARK: - Private properties
     
