@@ -33,7 +33,7 @@ public class StoreHelper: ObservableObject {
     // MARK: - Public properties
     
     /// Array of `Product` retrieved from the App Store and available for purchase.
-    @Published private(set) var products: [Product]?
+    @Published public private(set) var products: [Product]?
     
     /// Array of `ProductId` for products that have been purchased. Each purchased non-consumable product will appear
     /// exactly once. Consumable products can appear more than once.
@@ -43,7 +43,7 @@ public class StoreHelper: ObservableObject {
     ///
     /// - Call `isPurchased(product:)` to see if any type of product has been purchased and validated against the receipt.
     /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
-    @Published private(set) var purchasedProducts = [ProductId]()
+    @Published public private(set) var purchasedProducts = [ProductId]()
     
     /// List of purchased product ids. This list is used as a fallback when the App Store in unavailable.
     /// The public `isPurchased(product:)` method will use this list when `products` is nil and `isAppStoreAvailable` is false.
