@@ -284,7 +284,7 @@ public class StoreHelper: ObservableObject {
     /// - Parameter product: The `Product` to purchase.
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
-    @MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
+    @MainActor public func purchase(_ product: Product, options: Set<Product.PurchaseOption> = []) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
         
         guard hasStarted else {
             StoreLog.event("Please call StoreHelper.start() before use.")
@@ -305,7 +305,7 @@ public class StoreHelper: ObservableObject {
         purchaseState = .inProgress
         StoreLog.event(.purchaseInProgress, productId: product.id)
         
-        guard let result = try? await product.purchase() else {
+        guard let result = try? await product.purchase(options: options) else {
             purchaseState = .failed
             StoreLog.event(.purchaseFailure, productId: product.id)
             throw StoreException.purchaseException
