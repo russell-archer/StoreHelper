@@ -282,6 +282,7 @@ public class StoreHelper: ObservableObject {
     /// - `StoreException.transactionVerificationFailed` if the purchase transaction failed verification
     ///
     /// - Parameter product: The `Product` to purchase.
+    /// - Parameter options: Purchase options. See Product.PurchaseOption.
     /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
     /// describing the state of the purchase.
     @MainActor public func purchase(_ product: Product, options: Set<Product.PurchaseOption> = []) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {
