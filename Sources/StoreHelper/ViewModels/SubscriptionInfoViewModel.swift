@@ -98,7 +98,7 @@ public struct SubscriptionInfoViewModel {
                 if let daysLeft = diffComponents.day {
                     if daysLeft > 1 { esi.renewsIn = "\(daysLeft) days" }
                     else if daysLeft == 1 { esi.renewsIn! += "\(daysLeft) day" }
-                    else { esi.renewsIn = "today" }
+                    else { esi.renewsIn = "Today" }
                 }
             }
         }
@@ -117,12 +117,19 @@ public struct SubscriptionInfoViewModel {
     }
     
     /// Text related to a product subscription in the form "Subscribed.", "Subscribed. Renews in x days.", etc.
-    /// - Returns: Returns text related to a product subscription in the form "Subscribed.", "Subscribed. Renews in x days.", etc.
+    /// - Returns: Returns text related to a product subscription in the form "Subscribed.", "Subscribed. Renews in x days.", "Subscription cancelled. Expires date". etc.
     @MainActor public func shortInfo() async -> String {
         
         var text = ""
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM y"
+        
+        // Is the subscription cancelled, but still valid until the expirary date?
+        if let esi = await extendedSubscriptionInfo(), let autoRenewOn = esi.autoRenewOn {
+            if !autoRenewOn, esi.isPurchased {
+                return "Subscription cancelled. Expires \(esi.renewalDate ?? "unknown")"
+            }
+        } else { return "No subscription info available" }
         
         if let state = subscriptionInfo.subscriptionStatus?.state {
             switch state {
@@ -143,9 +150,8 @@ public struct SubscriptionInfoViewModel {
                 
                 let diffComponents = Calendar.current.dateComponents([.day], from: Date(), to: renewalDate)
                 if let daysLeft = diffComponents.day {
-                    text += " Renews in \(daysLeft)"
-                    if daysLeft > 1 { text += " days." }
-                    else if daysLeft == 1 { text += " day." }
+                    if daysLeft > 1 { text += " Renews in \(daysLeft) days." }
+                    else if daysLeft == 1 { text += " Renews in 1 day." }
                     else { text += " Renews today." }
                 }
             }
