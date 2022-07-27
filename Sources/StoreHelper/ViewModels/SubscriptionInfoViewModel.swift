@@ -124,7 +124,7 @@ public struct SubscriptionInfoViewModel {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM y"
         
-        // Is the subscription cancelled (autoRenewOn == false), but still valid (isPurchased == true) until the expirary date?
+        // Is the subscription cancelled, but still valid until the expirary date?
         if let esi = await extendedSubscriptionInfo(), let autoRenewOn = esi.autoRenewOn {
             if !autoRenewOn, esi.isPurchased {
                 return "Subscription cancelled. Expires \(esi.renewalDate ?? "unknown")"
