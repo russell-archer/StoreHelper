@@ -4,8 +4,11 @@
 - [Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - `StoreHelper` and `StoreKit2` in-depth
 - [Demo](https://github.com/russell-archer/StoreHelperDemo) - Example **Xcode 13** `StoreHelper` project
 
-> [!note]
-> StoreHelper has been tested on Xcode 14 Beta 2 with iOS 16 and seems to work as expected.
+{% note %}
+
+StoreHelper has been tested on Xcode 14 Beta 2 with iOS 16 and seems to work as expected.
+
+{% endnote %}
 
 ## Overview of StoreHelper
 
