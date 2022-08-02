@@ -6,7 +6,7 @@
 
 {% note %}
 
-StoreHelper has been tested on Xcode 14 Beta 2 with iOS 16 and seems to work as expected.
+**Note:** StoreHelper has been tested on Xcode 14 Beta 2 with iOS 16 and seems to work as expected.
 
 {% endnote %}
 
