@@ -87,6 +87,7 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 - [Making a Purchase and Validating the Transaction](#Making-a-Purchase-and-Validating-the-Transaction)
 - [Ask-to-buy support](#Ask-to-buy-support)
 - [What Products has the user purchased](#What-Products-has-the-user-purchased)
+- [Restoring Previous Purchases](#Restoring-Previous-Purchases)
 - [Network connectivity issues](#etwork-connectivity-issues)- [Consumables](#Consumables)
 - [The Receipt](#The-Receipt)
 - [Consumables](#Consumables)
@@ -712,7 +713,18 @@ But there is a potential (and non-obvious) problem here. `StoreKit2` has to chec
 
 In my testing of production apps that use `StoreHelper` I found that under certain circumstances (see below), if there's no network connection `StoreKit2` will fail to recognize previously purchased products. I was puzzled by this, because there should always be a **receipt** issued by the App Store, stored *on the device* in the app's **main bundle**. The receipt contains a complete record of a user's in-app purchase history for that app.  
 
-When an app is installed (or re-installed) the App Store issues a receipt at the same time which *includes any previous transactions*. That is, purchases made by the user previously on the same device, or purchases made on another device belonging to the same user (i.e. using the same Apple ID). This is a change from how things worked previously with `StoreKit1` where, in order to sync with the App Store and receive an up-to-date receipt, the user would have to "restore" previous purchases. With `StoreKit2`, users don't need to restore previous transactions when your app is installed/reinstalled. 
+When an app is installed (or re-installed) the App Store issues a receipt at the same time which *includes any previous transactions*. That is, purchases made by the user previously on the same device, or purchases made on another device belonging to the same user (i.e. using the same Apple ID). This is a change from how things worked previously with `StoreKit1` where, in order to sync with the App Store and receive an up-to-date receipt, the user would have to "restore" (see **Restoring Previous Purchases** below) previous purchases. With `StoreKit2`, users don't need to restore previous transactions when your app is installed/reinstalled. 
+
+# Restoring Previous Purchases
+Apples's documentation states that apps **must** provide a mechanism to allow users to manually restore previous in-app purchases. 
+
+> **Important**
+> Failure to provide a "Restore" button will result in apps being rejected during the App Store review process. 
+> By default, StoreHelper provides the required Restore button on the `Products` view. 
+
+With Xcode 14 and iOS16/macOS13 Apple states that manually (and programmatically) restoring previous purchases should no longer normally be necessary. However, you MUST still provide a manual restore feature or your app will be rejected during the review process.
+
+Programmatically restoring purchases simply requires an `async` call to `AppStore.sync()`. However, it's not a good idea to initiate a restore unless the user *specifically* requests it. This is because the user will immediately be prompted to authenticate with the App Store. This behaviour can be very disconcerting for the user, as it may not be obvious *why* they're being asked for their credentials.
 
 # Network connectivity issues
 I have found that if you have:
