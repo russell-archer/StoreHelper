@@ -16,13 +16,14 @@ This document describes how to implement and test in-app purchases with **SwiftU
 ---
 
 # Recent Changes
+- 19 October, 2022
+    - Add new section to the Guide on "Restoring Previous Purchases"
 - 15 March, 2022
     - Changed the initialization flow because of a new warning in Xcode 13.3 related to having `@MainActor init()`
     - Removed the need for StoreHelper's init method to run on the main thread by moving some initialization code to a new `start()` method
     - You should now call `StoreHelper.start()` as soon as possible after initializing `StoreHelper`
     - The `start()` method starts listening for transactions and get localized product info from the App Store
     - Updated all documetation because of this change
-    
 - 25 January, 2022
 	- Refactored `StoreHelper` as a SPM Package
 	- Moved example app to separate repo ([StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo))
