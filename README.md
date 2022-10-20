@@ -4,18 +4,16 @@
 - [Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - `StoreHelper` and `StoreKit2` in-depth
 - [Demo](https://github.com/russell-archer/StoreHelperDemo) - Example **Xcode 13** `StoreHelper` project
 
-> **Note: StoreHelper has been tested on Xcode 14 Beta 2 with iOS 16 and seems to work as expected.**
-
 ## Overview of StoreHelper
 
-`StoreHelper` is a Swift Package Manager (SPM) package that enables developers to 
-easily add in-app purchase support to **iOS 15/macOS 12 SwiftUI** apps.
+`StoreHelper` is a Swift Package Manager (SPM) package that enables developers using Xcode 14 to 
+easily add in-app purchase support to **iOS 16/macOS 13 SwiftUI** apps. Xcode 13 with iOS 15/macOS 12 are also supported.
 
 `StoreHelper` is used to provide in-app purchase support in **Writerly** (iOS/macOS), which is available on the [App Store](https://apps.apple.com/app/writerly/id1143101981?ls=1).
 
 `StoreHelper` provides the following features:
 
-- Multi-platform SwiftUI support for purchasing **Consumable**, **Non-consumable** and **Subscription** products
+- Multi-platform (iOS/macOS, tvOS coming soon) SwiftUI support for purchasing **Consumable**, **Non-consumable** and **Subscription** products
 - Supports **transaction validation**, **pending ("ask to buy") transactions**, **cancelled** and **failed** transactions
 - Supports customer **refunds** and management of **subscriptions**
 - Provides detailed **transaction information and history** for non-consumables and subscriptions
