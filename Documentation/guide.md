@@ -7,7 +7,7 @@ Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in 
 # Description
 ![](./assets/StoreHelperDemo0c.png)
 
-This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13**, **iOS 15** and **macOS 12**.
+This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 14**, **iOS 16** and **macOS 13**.
 
 - See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
@@ -17,13 +17,13 @@ This document describes how to implement and test in-app purchases with **SwiftU
 
 # Recent Changes
 - 19 October, 2022
-    - Add new section to the Guide on "Restoring Previous Purchases"
+	- Added new section to the Guide on "Restoring Previous Purchases"
 - 15 March, 2022
-    - Changed the initialization flow because of a new warning in Xcode 13.3 related to having `@MainActor init()`
-    - Removed the need for StoreHelper's init method to run on the main thread by moving some initialization code to a new `start()` method
-    - You should now call `StoreHelper.start()` as soon as possible after initializing `StoreHelper`
-    - The `start()` method starts listening for transactions and get localized product info from the App Store
-    - Updated all documetation because of this change
+	- Changed the initialization flow because of a new warning in Xcode 13.3 related to having `@MainActor init()`
+	- Removed the need for StoreHelper's init method to run on the main thread by moving some initialization code to a new `start()` method
+	- You should now call `StoreHelper.start()` as soon as possible after initializing `StoreHelper`
+	- The `start()` method starts listening for transactions and get localized product info from the App Store
+	- Updated all documetation because of this change
 - 25 January, 2022
 	- Refactored `StoreHelper` as a SPM Package
 	- Moved example app to separate repo ([StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo))
@@ -358,7 +358,7 @@ struct StoreHelperDemoApp: App {
 public private(set) var productIds: OrderedSet<ProductId>?
 ```
 
--  The `start() `method calls `requestProductsFromAppStore(productIds:)` to request localized product information from the App Store:
+-  `StoreHelper` then requests localized product information from the App Store:
 
 ```swift
 /// Request localized product info from the App Store for a set of ProductId.
