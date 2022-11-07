@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(iOS 15.0, macOS 12.0, *)
 public struct PropertyFile {
     
     /// Read a plist property file and return a dictionary of values

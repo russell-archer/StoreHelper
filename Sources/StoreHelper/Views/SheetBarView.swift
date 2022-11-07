@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SheetBarView: View {
     @State private var showXmark = false
     @Binding var showSheet: Bool

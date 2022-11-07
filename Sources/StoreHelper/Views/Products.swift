@@ -12,7 +12,7 @@
 import SwiftUI
 import StoreKit
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct Products: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var showManageSubscriptions = false
@@ -56,9 +56,6 @@ public struct Products: View {
             DisclosureGroup(isExpanded: $showManagePurchases, content: { PurchaseManagement()}, label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
                 .onTapGesture { withAnimation { showManagePurchases.toggle()}}
                 .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
-            
-            #elseif os(tvOS)
-            ProductListView(productInfoCompletion: productInfoCompletion)
             #endif
             
             if !canMakePayments {

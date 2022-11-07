@@ -20,7 +20,7 @@ import SwiftUI
 /// service level than one appearing lower down. If a group has three subscription products then the
 /// highest service level product will have a service level of 2, while the third product will have
 /// a service level of 0.
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionHelper {
     
     weak public var storeHelper: StoreHelper?

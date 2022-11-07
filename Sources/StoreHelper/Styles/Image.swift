@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public extension Image {
     
     // Read images from the Sources/Resources folder

@@ -12,7 +12,7 @@ import SwiftUI
 // Consumables:     [Products].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
 // Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionInfoSheet: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var showManageSubscriptionsSheet = false

@@ -15,12 +15,14 @@ import Security
 /// to store consumable product ids in the keychain. Each time the consumable is purchased the
 /// count should incremented. When a purchase is expired the count is decremented. When the count
 /// reaches zero the user no longer has access to the product.
+@available(iOS 15.0, macOS 12.0, *)
 public struct ConsumableProductId: Hashable {
     let productId: ProductId
     let count: Int
 }
 
 /// KeychainHelper provides methods for working with collections of `ConsumableProductId` in the keychain.
+@available(iOS 15.0, macOS 12.0, *)
 public struct KeychainHelper {
     
     /// Add a consumable `ProductId` to the keychain and set its count value to 1.

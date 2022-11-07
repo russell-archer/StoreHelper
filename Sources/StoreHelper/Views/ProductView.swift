@@ -11,13 +11,10 @@
 
 import SwiftUI
 import StoreKit
-
-#if !os(tvOS)
 import WidgetKit
-#endif
 
 /// Displays a single row of product information for the main content List.
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
@@ -50,12 +47,6 @@ public struct ProductView: View {
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
-            #elseif os(tvOS)
-            Text(description)
-                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .contentShape(Rectangle())
             #endif
             
             #if os(iOS)
@@ -95,9 +86,7 @@ public struct ProductView: View {
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
-                    #if !os(tvOS)
                     .onTapGesture { productInfoCompletion(productId) }
-                    #endif
                 
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
@@ -124,9 +113,7 @@ public struct ProductView: View {
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init {
                 await purchaseState(for: productId)
-                #if !os(tvOS)
                 WidgetCenter.shared.reloadAllTimelines()
-                #endif
             }
         }
     }

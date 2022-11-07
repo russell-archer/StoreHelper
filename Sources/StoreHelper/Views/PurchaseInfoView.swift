@@ -13,7 +13,7 @@ import SwiftUI
 import StoreKit
 
 /// Displays information on a consumable or non-consumable purchase.
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct PurchaseInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchaseInfoText = ""
@@ -61,9 +61,7 @@ public struct PurchaseInfoView: View {
                 .lineLimit(nil)
         }
         .padding()
-        #if !os(tvOS)
         .onTapGesture { withAnimation { showPurchaseInfoSheet.toggle()}}
-        #endif
         .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, productId: productId, viewModel: viewModel)

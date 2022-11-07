@@ -14,7 +14,7 @@ public typealias ProductId = String
 public enum PurchaseState { case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
 
 /// Information on the result of unwrapping a transaction `VerificationResult`.
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct UnwrappedVerificationResult<T> {
     /// The verified or unverified transaction.
     let transaction: T
@@ -27,7 +27,7 @@ public struct UnwrappedVerificationResult<T> {
 }
 
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public class StoreHelper: ObservableObject {
     
     // MARK: - Public properties

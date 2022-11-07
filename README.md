@@ -13,7 +13,7 @@ easily add in-app purchase support to **iOS 16/macOS 13 SwiftUI** apps. Xcode 13
 
 `StoreHelper` provides the following features:
 
-- Multi-platform (iOS, iPadOS, macOS, tvOS) SwiftUI support for purchasing **Consumable**, **Non-consumable** and **Subscription** products
+- Multi-platform (iOS, macOS) SwiftUI support for purchasing **Consumable**, **Non-consumable** and **Subscription** products
 - Supports **transaction validation**, **pending ("ask to buy") transactions**, **cancelled** and **failed** transactions
 - Supports customer **refunds** and management of **subscriptions**
 - Provides detailed **transaction information and history** for non-consumables and subscriptions

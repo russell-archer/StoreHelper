@@ -12,7 +12,7 @@
 import SwiftUI
 import StoreKit
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct ProductListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     #if os(iOS)
@@ -35,9 +35,7 @@ public struct ProductListViewRow: View {
                                        price: product.displayPrice,
                                        productInfoCompletion: productInfoCompletion)
                         .contentShape(Rectangle())
-                        #if !os(tvOS)
                         .onTapGesture { productInfoCompletion(product.id)}
-                        #endif
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
@@ -59,13 +57,6 @@ public struct ProductListViewRow: View {
                                     productInfoCompletion: productInfoCompletion)
                         .contentShape(Rectangle())
                         .onTapGesture { productInfoCompletion(product.id) }
-                        #elseif os(tvOS)
-                        ProductView(productId: product.id,
-                                    displayName: product.displayName,
-                                    description: product.description,
-                                    price: product.displayPrice,
-                                    productInfoCompletion: productInfoCompletion)
-                        .contentShape(Rectangle())
                         #endif
                     }
                 }

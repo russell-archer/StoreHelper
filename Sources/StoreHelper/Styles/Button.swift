@@ -8,6 +8,7 @@
 import SwiftUI
 
 #if os(macOS)
+@available(macOS 12.0, *)
 public struct macOSButtonStyle: ButtonStyle {
     var foregroundColor: Color = .white
     var backgroundColor: Color = .blue

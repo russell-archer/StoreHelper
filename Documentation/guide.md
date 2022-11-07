@@ -1,6 +1,6 @@
 # StoreHelper Guide
 
-Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 13** with **SwiftUI**, **Swift 5.5**, **iOS 15** and **macOS 12**.
+Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 14** with **SwiftUI**, **Swift 5.7**, **iOS 16** and **macOS 13**.
 
 ---
 
@@ -8,14 +8,17 @@ Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in 
 ![](./assets/StoreHelperDemo0c.png)
 
 This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 14**, **iOS 16** and **macOS 13**.
+Xcode 13 with iOS 15 and macOS 12 are also supported.
 
-- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 15/macOS 12 SwiftUI** app
-- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 13** and **iOS 15**
+- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 16/macOS 13 SwiftUI** app
+- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 14** and **iOS 16**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with StoreKit1 in **iOS 14**
 
 ---
 
 # Recent Changes
+- 7 Nov, 2022
+    - Minor changes re upgrade to iOS 16 and macOS 13
 - 19 October, 2022
 	- Added new section to the Guide on "Restoring Previous Purchases"
 - 15 March, 2022
@@ -160,7 +163,7 @@ See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-arche
 
 ## Should I use StoreKit1 or StoreKit2?
 Working with in-app purchases using `StoreKit2` is a ***vastly*** superior experience over using `StoreKit1` and you should choose to use it if possible.
-However, `StoreKit2` requires that your app targets **iOS 15/macOS 12**. If you need to support iOS 14 and lower you'll need to continue using `StoreKit1`.
+However, `StoreKit2` requires that your app targets **iOS 15/macOS 12** or higher. If you need to support iOS 14 and lower you'll need to continue using `StoreKit1`.
 
 Apple provides [documentation](https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase) to help you decide which version of StoreKit is right for your app.
 
@@ -1115,7 +1118,7 @@ What's required is some way of managing subscriptions from *within* the app.
 
 ![](./assets/StoreHelperDemo58.png)
 
-With iOS 15 we can now display a sheet to allow to the user to manage a subscription using the `.manageSubscriptionsSheet(isPresented:)` view modifier (this view modifier is not available for macOS or tvOS):
+With iOS 15 or higher we can now display a sheet to allow to the user to manage a subscription using the `.manageSubscriptionsSheet(isPresented:)` view modifier (this view modifier is not available for macOS):
 
 ```swift
 struct SubscriptionInfoSheet: View {
@@ -1138,7 +1141,7 @@ struct SubscriptionInfoSheet: View {
 }
 ```
 
-Apple's documentation says it doesn't (yet) work with StoreKit testing in Xcode, and that you have to test subscription management in the sandbox environment. However, using Xcode 13.2 and iOS15.2 it **does** *seem* to work in the simulator.
+Apple's documentation says it doesn't (yet) work with StoreKit testing in Xcode, and that you have to test subscription management in the sandbox environment. 
 
 Tapping **Manage Subscription** displays the following sheet:
 
@@ -1151,7 +1154,7 @@ If you tap **Cancel Subscription**, `StoreKit2` and `StoreHelper` correctly see 
 # Refunds
 Another issue that has been a source of annoyance for many years is the ability to issue users with a refund. The only resources available for developers are App Store support, via a [support article](https://support.apple.com/en-us/HT204084), or Apple's [dedicated refund website](https://reportaproblem.apple.com/?s=6).
 
-In iOS15 (but not macOS or tvOS) we now have the ability to display a refund request sheet from within our apps. The refund sheet shows the user’s transaction details, along with a list of "why I want a refund" codes for the customer to choose from. 
+In iOS 15 or higher (but not macOS) we now have the ability to display a refund request sheet from within our apps. The refund sheet shows the user’s transaction details, along with a list of "why I want a refund" codes for the customer to choose from. 
 
 > Note that developers don't have the ability to ***grant*** the user a refund, but simply the means to *initiate* the refund request process with Apple on the user's behalf.
 

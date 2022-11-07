@@ -15,7 +15,7 @@ import StoreKit
 /// the app to the App Store and you have IAP promotions.
 ///
 /// Note that any IAPs made from **inside** the app are processed by StoreKit2 and do not involve this helper class.
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
 
     private weak var storeHelper: StoreHelper?

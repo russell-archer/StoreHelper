@@ -11,7 +11,7 @@
 
 import SwiftUI
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
@@ -50,9 +50,7 @@ public struct SubscriptionView: View {
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
-                    #if !os(tvOS)
                     .onTapGesture { productInfoCompletion(productId) }
-                    #endif
                 
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)

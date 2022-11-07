@@ -13,7 +13,7 @@ import SwiftUI
 import StoreKit
 import OrderedCollections
 
-@available(tvOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
@@ -35,9 +35,7 @@ public struct SubscriptionListViewRow: View {
                                  subscriptionInfo: storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionInfo),
                                  productInfoCompletion: productInfoCompletion)
                     .contentShape(Rectangle())
-                    #if !os(tvOS)
                     .onTapGesture { productInfoCompletion(product.id) }
-                    #endif
             }
         }
         .task { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
