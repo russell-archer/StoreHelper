@@ -9,7 +9,8 @@ import SwiftUI
 import StoreKit
 
 /// Displays a product price and a button that enables purchasing.
-@available(iOS 15.0, macOS 12.0, *)
+#if os(macOS)
+@available(macOS 12.0, *)
 public struct PriceView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var canMakePayments: Bool = false
@@ -24,16 +25,6 @@ public struct PriceView: View {
         let priceViewModel = PriceViewModel(storeHelper: storeHelper, purchaseState: $purchaseState)
         
         HStack {
-            
-            #if os(iOS)
-            Button(action: {
-                withAnimation { purchaseState = .inProgress }
-                Task.init { await priceViewModel.purchase(product: product) }
-            }) {
-                PriceButtonText(price: price, disabled: !canMakePayments)
-            }
-            .disabled(!canMakePayments)
-            #elseif os(macOS)
             HStack { PriceButtonText(price: price, disabled: !canMakePayments)}
             .contentShape(Rectangle())
             .onTapGesture {
@@ -41,18 +32,13 @@ public struct PriceView: View {
                 withAnimation { purchaseState = .inProgress }
                 Task.init { await priceViewModel.purchase(product: product) }
             }
-            #endif
         }
         .onAppear { canMakePayments = AppStore.canMakePayments }
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(macOS 12.0, *)
 public struct PriceButtonText: View {
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    #endif
-    
     @EnvironmentObject var storeHelper: StoreHelper
     var price: String
     var disabled: Bool
@@ -62,11 +48,7 @@ public struct PriceButtonText: View {
             .font(.body)
             .foregroundColor(.white)
             .padding()
-            #if os(iOS)
             .frame(height: 40)
-            #elseif os(macOS)
-            .frame(height: 40)
-            #endif
             .fixedSize()
             .background(Color.blue)
             .cornerRadius(25)
@@ -93,4 +75,4 @@ struct PriceView_Previews: PreviewProvider {
         .padding()
     }
 }
-
+#endif

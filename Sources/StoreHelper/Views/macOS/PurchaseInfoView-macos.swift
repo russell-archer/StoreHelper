@@ -13,42 +13,18 @@ import SwiftUI
 import StoreKit
 
 /// Displays information on a consumable or non-consumable purchase.
-@available(iOS 15.0, macOS 12.0, *)
+#if os(macOS)
+@available(macOS 12.0, *)
 public struct PurchaseInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchaseInfoText = ""
     @State private var showPurchaseInfoSheet = false
-    #if os(iOS)
-    @Binding var showRefundSheet: Bool
-    @Binding var refundRequestTransactionId: UInt64
-    #endif
     var productId: ProductId
     
     public var body: some View {
         
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
         
-        #if os(iOS)
-        HStack(alignment: .center) {
-            Button(action: { withAnimation { showPurchaseInfoSheet.toggle()}}) {
-                HStack {
-                    Image(systemName: "creditcard.circle")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 30)
-                    
-                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText)}
-                        .foregroundColor(.blue)
-                        .lineLimit(nil)
-                }
-                .padding()
-            }
-        }
-        .task { purchaseInfoText = await viewModel.info(for: productId)}
-        .sheet(isPresented: $showPurchaseInfoSheet) {
-            PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId, viewModel: viewModel)
-        }
-        #else
         HStack(alignment: .center) {
             Image(systemName: "creditcard.circle")
                 .resizable()
@@ -66,6 +42,6 @@ public struct PurchaseInfoView: View {
         .sheet(isPresented: $showPurchaseInfoSheet) {
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, productId: productId, viewModel: viewModel)
         }
-        #endif
     }
 }
+#endif

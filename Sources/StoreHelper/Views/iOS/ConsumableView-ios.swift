@@ -14,7 +14,8 @@ import StoreKit
 import WidgetKit
 
 /// Displays a single row of product information for the main content List.
-@available(iOS 15.0, macOS 12.0, *)
+#if os(iOS)
+@available(iOS 15.0, *)
 public struct ConsumableView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
@@ -29,21 +30,12 @@ public struct ConsumableView: View {
     public var body: some View {
         VStack {
             LargeTitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text(displayName)}.padding(.bottom, 1)
-            #if os(iOS)
             SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(description)}
                 .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
-            #elseif os(macOS)
-            BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(description)}
-                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
-            #endif
             
             HStack {
                 if count == 0 {
@@ -71,17 +63,10 @@ public struct ConsumableView: View {
                 Spacer()
                 PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             }
-            #if os(macOS)
-            .frame(width: 500)
-            #endif
             .padding()
 
             if purchaseState == .purchased {
-                #if os(iOS)
                 PurchaseInfoView(showRefundSheet: .constant(false), refundRequestTransactionId: .constant(UInt64.min), productId: productId)
-                #elseif os(macOS)
-                PurchaseInfoView(productId: productId)
-                #endif
             }
             else {
                 ProductInfoView(productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
@@ -121,3 +106,4 @@ struct ConsumableView_Previews: PreviewProvider {
             .environmentObject(storeHelper)
     }
 }
+#endif

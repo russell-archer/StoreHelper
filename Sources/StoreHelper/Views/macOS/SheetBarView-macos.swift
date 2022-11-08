@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, *)
+#if os(macOS)
+@available(macOS 12.0, *)
 public struct SheetBarView: View {
     @State private var showXmark = false
     @Binding var showSheet: Bool
@@ -15,13 +16,8 @@ public struct SheetBarView: View {
     var title: String?
     var sysImg: String?
     
-    #if os(iOS)
-    private var insets = EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10)
-    private var insetsTitle = EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
-    #elseif os(macOS)
     private var insets = EdgeInsets(top: 13, leading: 20, bottom: 5, trailing: 0)
     private var insetsTitle = EdgeInsets(top: 13, leading: 0, bottom: 5, trailing: 0)
-    #endif
     
     public init(showSheet: Binding<Bool>, title: String? = nil, sysImage: String? = nil) {
         self._showSheet = showSheet
@@ -30,24 +26,6 @@ public struct SheetBarView: View {
     }
     
     public var body: some View {
-        #if os(iOS)
-        HStack {
-            ZStack {
-                if let img = sysImg { Label(title ?? "", systemImage: img).padding(insetsTitle)}
-                else if let t = title { Text(t).padding(insetsTitle)}
-                
-                HStack {
-                    Spacer()
-                    Image(systemName: "xmark.circle")
-                        .foregroundColor(.secondary)
-                        .padding(insets)
-                        .onTapGesture { withAnimation { showSheet.toggle() }}
-                }
-            }
-        }
-        Divider()
-        Spacer()
-        #elseif os(macOS)
         HStack {
             ZStack {
                 if let img = sysImg { Label(title ?? "", systemImage: img).padding(insetsTitle).font(.title)}
@@ -74,6 +52,6 @@ public struct SheetBarView: View {
             }
         }
         Divider()
-        #endif
     }
 }
+#endif

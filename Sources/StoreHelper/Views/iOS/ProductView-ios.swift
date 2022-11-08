@@ -14,15 +14,14 @@ import StoreKit
 import WidgetKit
 
 /// Displays a single row of product information for the main content List.
-@available(iOS 15.0, macOS 12.0, *)
+#if os(iOS)
+@available(iOS 15.0, *)
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    #if os(iOS)
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    #endif
     
     var productId: ProductId
     var displayName: String
@@ -33,23 +32,13 @@ public struct ProductView: View {
     public var body: some View {
         VStack {
             LargeTitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text(displayName)}.padding(.bottom, 1)
-            #if os(iOS)
             SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(description)}
                 .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
-            #elseif os(macOS)
-            Text(description)
-                .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
-            #endif
             
-            #if os(iOS)
             if horizontalSizeClass == .compact {
                 VStack {
                     Image(productId)
@@ -78,29 +67,9 @@ public struct ProductView: View {
                 }
                 .padding()
             }
-            #else
-            HStack {
-                Image(productId)
-                    .resizable()
-                    .frame(maxWidth: 250, maxHeight: 250)
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(25)
-                    .contentShape(Rectangle())
-                    .onTapGesture { productInfoCompletion(productId) }
-                
-                Spacer()
-                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
-            }
-            .frame(width: 500)
-            .padding()
-            #endif
             
             if purchaseState == .purchased {
-                #if os(iOS)
                 PurchaseInfoView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId)
-                #else
-                PurchaseInfoView(productId: productId)
-                #endif
             }
             else {
                 ProductInfoView(productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
@@ -123,4 +92,4 @@ public struct ProductView: View {
         purchaseState = purchased ? .purchased : .unknown
     }
 }
-
+#endif

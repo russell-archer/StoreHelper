@@ -12,13 +12,10 @@
 import SwiftUI
 import StoreKit
 
+#if os(macOS)
 @available(iOS 15.0, macOS 12.0, *)
 public struct ProductListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    #if os(iOS)
-    @Binding var showRefundSheet: Bool
-    @Binding var refundRequestTransactionId: UInt64
-    #endif
 
     var products: [Product]
     var headerText: String
@@ -39,17 +36,6 @@ public struct ProductListViewRow: View {
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
-                        #if os(iOS)
-                        ProductView(showRefundSheet: $showRefundSheet,
-                                    refundRequestTransactionId: $refundRequestTransactionId,
-                                    productId: product.id,
-                                    displayName: product.displayName,
-                                    description: product.description,
-                                    price: product.displayPrice,
-                                    productInfoCompletion: productInfoCompletion)
-                        .contentShape(Rectangle())
-                        .onTapGesture { productInfoCompletion(product.id) }
-                        #elseif os(macOS)
                         ProductView(productId: product.id,
                                     displayName: product.displayName,
                                     description: product.description,
@@ -57,11 +43,10 @@ public struct ProductListViewRow: View {
                                     productInfoCompletion: productInfoCompletion)
                         .contentShape(Rectangle())
                         .onTapGesture { productInfoCompletion(product.id) }
-                        #endif
                     }
                 }
             }
         }, header: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(headerText)}})
     }
 }
-
+#endif

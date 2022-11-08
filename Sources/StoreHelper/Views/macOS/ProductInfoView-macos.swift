@@ -11,7 +11,8 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, *)
+#if os(macOS)
+@available(macOS 12.0, *)
 public struct ProductInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     var productId: ProductId
@@ -19,22 +20,6 @@ public struct ProductInfoView: View {
     var productInfoCompletion: ((ProductId) -> Void)
     
     public var body: some View {
-        #if os(iOS)
-        Button(action: { productInfoCompletion(productId)}) {
-            HStack {
-                Image(systemName: "info.circle")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 30)
-                
-                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Info on \"\(displayName)\"")}
-                    .padding()
-                    .foregroundColor(.blue)
-                    .lineLimit(nil)
-            }
-            .padding()
-        }
-        #elseif os(macOS)
         HStack {
             Image(systemName: "info.circle")
                 .resizable()
@@ -49,7 +34,6 @@ public struct ProductInfoView: View {
         }
         .padding()
         .onTapGesture { productInfoCompletion(productId)}
-        #endif
     }
 }
-
+#endif
