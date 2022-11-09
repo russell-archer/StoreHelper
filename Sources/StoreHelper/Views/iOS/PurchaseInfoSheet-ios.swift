@@ -11,16 +11,15 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, *)
+#if os(iOS)
+@available(iOS 15.0, *)
 public struct PurchaseInfoSheet: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var extendedPurchaseInfo: ExtendedPurchaseInfo?
     @State private var showManagePurchase = false
     @Binding var showPurchaseInfoSheet: Bool
-    #if os(iOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    #endif
     var productId: ProductId
     var viewModel: PurchaseInfoViewModel
     
@@ -58,7 +57,6 @@ public struct PurchaseInfoSheet: View {
                     
                     Divider().padding(.bottom)
                     
-                    #if os(iOS)
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
                         Button(action: {
                             if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
@@ -80,23 +78,6 @@ public struct PurchaseInfoSheet: View {
                     .onTapGesture { withAnimation { showManagePurchase.toggle() }}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
                     
-                    #elseif os(macOS)
-                    DisclosureGroup(isExpanded: $showManagePurchase, content: {
-                        Button(action: {
-                            if  let sRefundUrl = storeHelper.configurationProvider?.value(configuration: .requestRefund) ?? Configuration.requestRefund.value(),
-                                let refundUrl = URL(string: sRefundUrl) {
-                                NSWorkspace.shared.open(refundUrl)
-                            }
-                        }) { Label("Request Refund", systemImage: "creditcard.circle")}.macOSStyle()
-
-                    }) {
-                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
-                              icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
-                    }
-                    .onTapGesture { withAnimation { showManagePurchase.toggle()}}
-                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
-                    #endif
-                    
                     Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("You may request a refund from the App Store if a purchase does not perform as expected. This requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
@@ -111,26 +92,16 @@ public struct PurchaseInfoSheet: View {
             }
         }
         .task { extendedPurchaseInfo = await viewModel.extendedPurchaseInfo(for: productId)}
-        #if os(macOS)
-        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 680, idealHeight: 680, maxHeight: 680)
-        .fixedSize(horizontal: true, vertical: true)
-        #endif
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 15.0, *)
 struct PurchaseInfoFieldView: View {
     let fieldName: String
     let fieldValue: String
     let edgeInsetsFieldValue = EdgeInsets(top: 7, leading: 5, bottom: 0, trailing: 5)
-    
-    #if os(iOS)
     let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 10, bottom: 0, trailing: 5)
     let width: CGFloat = 95
-    #elseif os(macOS)
-    let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 25, bottom: 0, trailing: 5)
-    let width: CGFloat = 140
-    #endif
     
     var body: some View {
         HStack {
@@ -141,17 +112,14 @@ struct PurchaseInfoFieldView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 15.0, *)
 struct PurchaseInfoFieldText: View {
     @EnvironmentObject var storeHelper: StoreHelper
     let text: String
     
     var body: some View {
         // Note. We intentionaly don't support scalable fonts here
-        #if os(iOS)
         Text(text).font(.footnote)
-        #elseif os(macOS)
-        Text(text).font(.title2)
-        #endif
     }
 }
+#endif

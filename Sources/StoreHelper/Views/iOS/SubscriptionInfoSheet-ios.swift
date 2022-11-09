@@ -12,7 +12,8 @@ import SwiftUI
 // Consumables:     [Products].[ProductListView].[ProductListViewRow]......[ConsumableView]...[if purchased].[PurchaseInfoView].....[PurchaseInfoSheet]
 // Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
-@available(iOS 15.0, macOS 12.0, *)
+#if os(iOS)
+@available(iOS 15.0, *)
 public struct SubscriptionInfoSheet: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var showManageSubscriptionsSheet = false
@@ -69,7 +70,6 @@ public struct SubscriptionInfoSheet: View {
                     
                     Divider().padding(.bottom)
                     
-                    #if os(iOS)
                     Button(action: {
                         if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
                         withAnimation { showManageSubscriptionsSheet.toggle()}
@@ -78,7 +78,6 @@ public struct SubscriptionInfoSheet: View {
                               icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                     }
                     .buttonStyle(.borderedProminent)
-                    #endif
                     
                     Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Managing your subscriptions may require you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                         .multilineTextAlignment(.center)
@@ -94,12 +93,7 @@ public struct SubscriptionInfoSheet: View {
             }
         }
         .task { extendedSubscriptionInfo = await viewModel.extendedSubscriptionInfo()}
-        #if os(iOS)
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptionsSheet)  // Not available for macOS
-        #elseif os(macOS)
-        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 650, idealHeight: 650, maxHeight: 650)
-        .fixedSize(horizontal: true, vertical: true)
-        #endif
     }
 }
-
+#endif

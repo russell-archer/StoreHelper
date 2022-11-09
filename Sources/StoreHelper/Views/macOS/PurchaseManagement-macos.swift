@@ -26,37 +26,13 @@ import StoreKit
  */
 
 /// Allows the user to manage subscriptions, restore purchases, request refunds and contact us.
-@available(iOS 15.0, macOS 12.0, *)
+#if os(macOS)
+@available(macOS 12.0, *)
 public struct PurchaseManagement: View {
     @Environment(\.openURL) var openURL
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchasesRestored: Bool = false
     
-    #if os(iOS)
-    @State private var showManageSubscriptions = false
-    
-    public var body: some View {
-        if  storeHelper.hasProducts,
-            let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
-            let contactUrl = URL(string: sContactUrl) {
-            
-            Menu {
-                Button(action: {
-                    if Utils.isSimulator() { StoreLog.event("You cannot manage subscriptions from the simulator. You must use the sandbox environment.")}
-                    showManageSubscriptions.toggle()
-
-                }) { Label("Manage Subscriptions", systemImage: "rectangle.stack.fill.badge.person.crop")}
-                .disabled(!storeHelper.hasSubscriptionProducts)
-                
-                Button(action: { restorePurchases()}) { Label("Restore Purchases", systemImage: "purchased")}
-                Button(action: { openURL(contactUrl)}) { Label("Contact Us", systemImage: "bubble.right")}
-
-            } label: { Label("", systemImage: "line.3.horizontal").labelStyle(.iconOnly)}
-            .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
-        }
-    }
-    
-    #elseif os(macOS)
     public var body: some View {
         if  storeHelper.hasProducts,
             let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
@@ -86,7 +62,6 @@ public struct PurchaseManagement: View {
             }
         }
     }
-    #endif
 
     /// Restores previous user purchases. With StoreKit2 this is normally not necessary and should only be
     /// done in response to explicit user action. Will result in the user having to authenticate with the
@@ -98,5 +73,4 @@ public struct PurchaseManagement: View {
         }
     }
 }
-
-
+#endif

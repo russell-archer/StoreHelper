@@ -69,6 +69,9 @@ public class StoreHelper: ObservableObject {
         set { _fontScaleFactor = newValue }
     }
     
+    /// Set to true if we're currently waiting for a refreshed list of localized products from the App Store.
+    public private(set) var isRefreshingProducts = false
+    
     /// Optional plugin configuration provider to override configuration defaults. See `Configuration` and `ConfigurationProvider`.
     public var configurationProvider: ConfigurationProvider?
     
@@ -152,8 +155,9 @@ public class StoreHelper: ObservableObject {
     /// This method runs on the main thread because it may result in updates to the UI.
     @MainActor public func refreshProductsFromAppStore() {
         Task.init {
-            isAppStoreAvailable = false
             guard let pids = productIds else { return }
+            isAppStoreAvailable = false
+            isRefreshingProducts = true
             products = await requestProductsFromAppStore(productIds: pids)
         }
     }
@@ -164,6 +168,8 @@ public class StoreHelper: ObservableObject {
     /// - Parameter productIds: The product ids that you want localized information for.
     /// - Returns: Returns an array of `Product`, or nil if no product information is returned by the App Store.
     @MainActor public func requestProductsFromAppStore(productIds: OrderedSet<ProductId>) async -> [Product]? {
+        defer { isRefreshingProducts = false }
+        
         StoreLog.event(.requestProductsStarted)
         guard let localizedProducts = try? await Product.products(for: productIds) else {
             isAppStoreAvailable = false
