@@ -38,20 +38,29 @@ public struct ProductListView: View {
             
         } else {
             
-            VStack {
-                TitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text("No products available")}.foregroundColor(.red)
-                
-                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("This error indicates that a connection to the App Store is temporarily unavailable. Purchases you have made previously may not be available.\n\nCheck your network connectivity and try again.")}
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                
-                Button(action: { storeHelper.refreshProductsFromAppStore()}) {
-                    BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Retry App Store")}
+            if storeHelper.isRefreshingProducts {
+                VStack {
+                    Text("Getting products from the App Store...").font(.subheadline)
+                    ProgressView()
                 }
-                .buttonStyle(.borderedProminent).padding()
+                .padding()
                 
-                Divider()
+            } else {
+                VStack {
+                    TitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text("No products available")}.foregroundColor(.red)
+                    
+                    CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("This error indicates that a connection to the App Store is temporarily unavailable. Purchases you have made previously may not be available.\n\nCheck your network connectivity and try again.")}
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    
+                    Button(action: { storeHelper.refreshProductsFromAppStore()}) {
+                        BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Retry App Store")}
+                    }
+                    .buttonStyle(.borderedProminent).padding()
+                    
+                    Divider()
+                }
             }
         }
     }
