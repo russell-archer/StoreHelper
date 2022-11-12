@@ -15,8 +15,11 @@ import SwiftUI
 @available(macOS 12.0, *)
 public struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         

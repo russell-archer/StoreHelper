@@ -19,6 +19,12 @@ public struct ProductInfoView: View {
     var displayName: String
     var productInfoCompletion: ((ProductId) -> Void)
     
+    public init(productId: ProductId, displayName: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        self.productId = productId
+        self.displayName = displayName
+        self.productInfoCompletion = productInfoCompletion
+    }
+    
     public var body: some View {
         Button(action: { productInfoCompletion(productId)}) {
             HStack {

@@ -10,8 +10,11 @@ import SwiftUI
 /// Shows a count badge with the number of times a consumable has been purchased.
 @available(iOS 15.0, macOS 12.0, *)
 public struct ConsumableBadgeView: View {
-    
     @Binding var count : Int
+    
+    public init(count: Binding<Int>) {
+        self._count = count
+    }
     
     public var body: some View {
         

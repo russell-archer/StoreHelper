@@ -12,7 +12,7 @@ import OrderedCollections
 @available(iOS 15.0, macOS 12.0, *)
 public struct StoreConfiguration {
     
-    private init() {}
+    public init() {}
     
     /// Read the contents of the product definition property list.
     /// - Returns: Returns a set of ProductId if the list was read, nil otherwise.

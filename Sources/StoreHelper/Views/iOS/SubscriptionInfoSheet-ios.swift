@@ -22,6 +22,12 @@ public struct SubscriptionInfoSheet: View {
     var productId: ProductId
     var viewModel: SubscriptionInfoViewModel
     
+    public init(showPurchaseInfoSheet: Binding<Bool>, productId: ProductId, viewModel: SubscriptionInfoViewModel) {
+        self._showPurchaseInfoSheet = showPurchaseInfoSheet
+        self.productId = productId
+        self.viewModel = viewModel
+    }
+    
     public var body: some View {
         VStack {
             SheetBarView(showSheet: $showPurchaseInfoSheet, title: "Subscription Information", sysImage: "creditcard.circle")

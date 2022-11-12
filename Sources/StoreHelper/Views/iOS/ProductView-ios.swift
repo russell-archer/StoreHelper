@@ -18,16 +18,32 @@ import WidgetKit
 @available(iOS 15.0, *)
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @State var purchaseState: PurchaseState = .unknown
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @State var purchaseState: PurchaseState = .unknown
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    
     var productId: ProductId
     var displayName: String
     var description: String
     var price: String
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(showRefundSheet: Binding<Bool>,
+                refundRequestTransactionId: Binding<UInt64>,
+                productId: ProductId,
+                displayName: String,
+                description: String,
+                price: String,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
+        self._showRefundSheet = showRefundSheet
+        self._refundRequestTransactionId = refundRequestTransactionId
+        self.productId = productId
+        self.displayName = displayName
+        self.description = description
+        self.price = price
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         VStack {
@@ -87,7 +103,7 @@ public struct ProductView: View {
         }
     }
     
-    func purchaseState(for productId: ProductId) async {
+    public func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
         purchaseState = purchased ? .purchased : .unknown
     }

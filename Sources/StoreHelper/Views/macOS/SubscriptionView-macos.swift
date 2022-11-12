@@ -23,6 +23,21 @@ public struct SubscriptionView: View {
     var subscriptionInfo: SubscriptionInfo?  // If non-nil then the product is the highest service level product the user is subscribed to in the subscription group
     var productInfoCompletion: ((ProductId) -> Void)
     
+    public init(productId: ProductId,
+                displayName: String,
+                description: String,
+                price: String,
+                subscriptionInfo: SubscriptionInfo? = nil,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
+        self.productId = productId
+        self.displayName = displayName
+        self.description = description
+        self.price = price
+        self.subscriptionInfo = subscriptionInfo
+        self.productInfoCompletion = productInfoCompletion
+    }
+    
     public var body: some View {
         VStack {
             LargeTitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text(displayName)}.padding(.bottom, 1)
@@ -64,7 +79,7 @@ public struct SubscriptionView: View {
         }
     }
     
-    func purchaseState(for productId: ProductId) async {
+    public func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
         purchaseState = purchased ? .purchased : .unknown
     }

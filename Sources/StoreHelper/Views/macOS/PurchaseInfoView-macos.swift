@@ -21,8 +21,11 @@ public struct PurchaseInfoView: View {
     @State private var showPurchaseInfoSheet = false
     var productId: ProductId
     
+    public init(productId: ProductId) {
+        self.productId = productId
+    }
+    
     public var body: some View {
-        
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
         
         HStack(alignment: .center) {

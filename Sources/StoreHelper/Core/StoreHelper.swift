@@ -17,13 +17,13 @@ public enum PurchaseState { case notStarted, userCannotMakePayments, inProgress,
 @available(iOS 15.0, macOS 12.0, *)
 public struct UnwrappedVerificationResult<T> {
     /// The verified or unverified transaction.
-    let transaction: T
+    public let transaction: T
     
     /// True if the transaction was successfully verified by StoreKit.
-    let verified: Bool
+    public let verified: Bool
     
     /// If `verified` is false then `verificationError` will hold the verification error, nil otherwise.
-    let verificationError: VerificationResult<T>.VerificationError?
+    public let verificationError: VerificationResult<T>.VerificationError?
 }
 
 /// StoreHelper encapsulates StoreKit2 in-app purchase functionality and makes it easy to work with the App Store.

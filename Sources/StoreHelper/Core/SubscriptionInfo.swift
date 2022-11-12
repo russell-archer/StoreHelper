@@ -10,6 +10,18 @@ import StoreKit
 /// Information about the highest service level product in a subscription group a user is subscribed to.
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionInfo: Hashable {
+    public init(product: Product? = nil,
+                subscriptionGroup: String? = nil,
+                latestVerifiedTransaction: Transaction? = nil,
+                verifiedSubscriptionRenewalInfo: Product.SubscriptionInfo.RenewalInfo? = nil,
+                subscriptionStatus: Product.SubscriptionInfo.Status? = nil) {
+        
+        self.product = product
+        self.subscriptionGroup = subscriptionGroup
+        self.latestVerifiedTransaction = latestVerifiedTransaction
+        self.verifiedSubscriptionRenewalInfo = verifiedSubscriptionRenewalInfo
+        self.subscriptionStatus = subscriptionStatus
+    }
     
     /// The product.
     public var product: Product?

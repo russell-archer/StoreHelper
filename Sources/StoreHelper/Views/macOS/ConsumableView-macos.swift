@@ -20,12 +20,27 @@ public struct ConsumableView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     @State var count: Int = 0
-    
     var productId: ProductId
     var displayName: String
     var description: String
     var price: String
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(purchaseState: PurchaseState = .unknown,
+                count: Int = 0, productId: ProductId,
+                displayName: String,
+                description: String,
+                price: String,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
+        self.purchaseState = purchaseState
+        self.count = count
+        self.productId = productId
+        self.displayName = displayName
+        self.description = description
+        self.price = price
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         VStack {

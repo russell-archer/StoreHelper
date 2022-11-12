@@ -23,8 +23,13 @@ public struct PurchaseInfoView: View {
     @Binding var refundRequestTransactionId: UInt64
     var productId: ProductId
     
+    public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, productId: ProductId) {
+        self._showRefundSheet = showRefundSheet
+        self._refundRequestTransactionId = refundRequestTransactionId
+        self.productId = productId
+    }
+    
     public var body: some View {
-        
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
         
         HStack(alignment: .center) {

@@ -23,6 +23,19 @@ public struct PurchaseInfoSheet: View {
     var productId: ProductId
     var viewModel: PurchaseInfoViewModel
     
+    public init(showPurchaseInfoSheet: Binding<Bool>,
+                showRefundSheet: Binding<Bool>,
+                refundRequestTransactionId: Binding<UInt64>,
+                productId: ProductId,
+                viewModel: PurchaseInfoViewModel) {
+        
+        self._showPurchaseInfoSheet = showPurchaseInfoSheet
+        self._showRefundSheet = showRefundSheet
+        self._refundRequestTransactionId = refundRequestTransactionId
+        self.productId = productId
+        self.viewModel = viewModel
+    }
+    
     public var body: some View {
         VStack {
             SheetBarView(showSheet: $showPurchaseInfoSheet, title: "Purchase Information", sysImage: "creditcard.circle")
