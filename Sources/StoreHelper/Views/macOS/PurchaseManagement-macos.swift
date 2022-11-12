@@ -33,6 +33,8 @@ public struct PurchaseManagement: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchasesRestored: Bool = false
     
+    public init() {}
+    
     public var body: some View {
         if  storeHelper.hasProducts,
             let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),

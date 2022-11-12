@@ -16,10 +16,15 @@ import StoreKit
 @available(iOS 15.0, macOS 12.0, *)
 public struct ProductListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
-
     var products: [Product]
     var headerText: String
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(products: [Product], headerText: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        self.products = products
+        self.headerText = headerText
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         Section(content: {

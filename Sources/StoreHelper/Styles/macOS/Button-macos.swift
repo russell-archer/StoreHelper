@@ -17,6 +17,21 @@ public struct macOSButtonStyle: ButtonStyle {
     var padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
     var scaleFactor: Double = FontUtil.baseDynamicTypeSize(for: .large)
     
+    public init(foregroundColor: Color = .white,
+                backgroundColor: Color = .blue,
+                pressedColor: Color = .secondary,
+                opacity: Double = 1,
+                padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10),
+                scaleFactor: Double = FontUtil.baseDynamicTypeSize(for: .large)) {
+        
+        self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
+        self.pressedColor = pressedColor
+        self.opacity = opacity
+        self.padding = padding
+        self.scaleFactor = scaleFactor
+    }
+    
     public func makeBody(configuration: Self.Configuration) -> some View {
         Title2Font(scaleFactor: self.scaleFactor) { configuration.label }
             .padding(15)

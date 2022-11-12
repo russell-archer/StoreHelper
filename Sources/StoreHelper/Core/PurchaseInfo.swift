@@ -11,6 +11,10 @@ import StoreKit
 @available(iOS 15.0, macOS 12.0, *)
 public struct PurchaseInfo {
     
+    public init(product: Product) {
+        self.product = product
+    }
+    
     /// The product.
     public var product: Product
 

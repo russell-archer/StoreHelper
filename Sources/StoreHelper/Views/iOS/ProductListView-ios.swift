@@ -17,8 +17,13 @@ public struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        self._showRefundSheet = showRefundSheet
+        self._refundRequestTransactionId = refundRequestTransactionId
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         

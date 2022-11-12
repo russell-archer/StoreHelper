@@ -10,10 +10,12 @@ import SwiftUI
 /// Displays a small image that gives a visual clue to the product's purchase state.
 @available(iOS 15.0, macOS 12.0, *)
 public struct BadgeView: View {
-    
     @Binding var purchaseState: PurchaseState
     
-    @available(iOS 15.0, macOS 12.0, *)
+    public init(purchaseState: Binding<PurchaseState>) {
+        self._purchaseState = purchaseState
+    }
+    
     public var body: some View {
         
         if let options = badgeOptions() {
@@ -25,7 +27,6 @@ public struct BadgeView: View {
         }
     }
     
-    @available(iOS 15.0, macOS 12.0, *)
     public func badgeOptions() -> (badgeName: String, fgColor: Color)? {
         switch purchaseState {
             case .notStarted:               return nil

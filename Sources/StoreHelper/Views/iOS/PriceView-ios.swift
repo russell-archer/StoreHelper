@@ -15,10 +15,16 @@ public struct PriceView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var canMakePayments: Bool = false
     @Binding var purchaseState: PurchaseState  // Propagates the result of a purchase back from `PriceViewModel`
-    
     var productId: ProductId
     var price: String
     var product: Product
+    
+    public init(purchaseState: Binding<PurchaseState>, productId: ProductId, price: String, product: Product) {
+        self._purchaseState = purchaseState
+        self.productId = productId
+        self.price = price
+        self.product = product
+    }
     
     public var body: some View {
         

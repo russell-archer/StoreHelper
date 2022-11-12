@@ -12,6 +12,8 @@ import SwiftUI
 public struct StoreErrorView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     
+    public init() {}
+    
     public var body: some View {
         Title2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Store Error")}
             .foregroundColor(.white)

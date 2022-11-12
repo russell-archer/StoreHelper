@@ -19,12 +19,24 @@ import WidgetKit
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    
     var productId: ProductId
     var displayName: String
     var description: String
     var price: String
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(productId: ProductId,
+                displayName: String,
+                description: String,
+                price: String,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
+        self.productId = productId
+        self.displayName = displayName
+        self.description = description
+        self.price = price
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         VStack {
@@ -70,7 +82,7 @@ public struct ProductView: View {
         }
     }
     
-    func purchaseState(for productId: ProductId) async {
+    public func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
         purchaseState = purchased ? .purchased : .unknown
     }

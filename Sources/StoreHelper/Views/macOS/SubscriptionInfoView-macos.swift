@@ -20,8 +20,11 @@ public struct SubscriptionInfoView: View {
     @State private var showSubscriptionInfoSheet = false
     var subscriptionInfo: SubscriptionInfo  // Set by parents
     
+    public init(subscriptionInfo: SubscriptionInfo) {
+        self.subscriptionInfo = subscriptionInfo
+    }
+    
     public var body: some View {
-        
         let viewModel = SubscriptionInfoViewModel(storeHelper: storeHelper, subscriptionInfo: subscriptionInfo)
         
         HStack(alignment: .center) {

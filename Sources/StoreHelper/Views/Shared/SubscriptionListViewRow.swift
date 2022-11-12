@@ -18,10 +18,15 @@ public struct SubscriptionListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
     @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
-    
     var products: [Product]
     var headerText: String
     var productInfoCompletion: ((ProductId) -> Void)
+    
+    public init(products: [Product], headerText: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        self.products = products
+        self.headerText = headerText
+        self.productInfoCompletion = productInfoCompletion
+    }
     
     public var body: some View {
         Section(header: Text(headerText)) {

@@ -28,6 +28,10 @@ public struct SubscriptionHelper {
     private static let productIdSubscriptionName = "subscription"
     private static let productIdSeparator = "."
     
+    public init(storeHelper: StoreHelper) {
+        self.storeHelper = storeHelper
+    }
+    
     /// Determines the group name(s) present in the set of subscription product ids defined in Products.plist.
     /// - Returns: Returns the group name(s) present in the `OrderedSet` of subscription product ids held by `StoreHelper`.
     public func groups() -> OrderedSet<String>? {
