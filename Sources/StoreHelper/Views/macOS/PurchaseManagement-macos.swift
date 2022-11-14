@@ -37,6 +37,7 @@ public struct PurchaseManagement: View {
     
     public var body: some View {
         if  storeHelper.hasProducts,
+            let restorePurchasesTxt = storeHelper.configurationProvider?.value(configuration: .restorePurchasesButton),
             let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
             let contactUrl = URL(string: sContactUrl) {
             
@@ -44,7 +45,7 @@ public struct PurchaseManagement: View {
             VStack {
                 HStack {
                     Button(action: { restorePurchases()}) {
-                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Restore Purchases")}.padding()},
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(restorePurchasesTxt)}.padding()},
                               icon:  { Image(systemName: "purchased").bodyImageNotRounded().frame(height: 24)})
                     }
                     .macOSStyle(padding: edgeInsets)
@@ -57,14 +58,14 @@ public struct PurchaseManagement: View {
                     .macOSStyle(padding: edgeInsets)
                 }
                 
-                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Click \"Restore Purchases\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
+                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Click \"\(restorePurchasesTxt)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                     .foregroundColor(.secondary)
             }
         }
     }
-
+    
     /// Restores previous user purchases. With StoreKit2 this is normally not necessary and should only be
     /// done in response to explicit user action. Will result in the user having to authenticate with the
     /// App Store.

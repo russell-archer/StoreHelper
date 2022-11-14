@@ -34,9 +34,12 @@ public struct Products: View {
     @ViewBuilder public var body: some View {
         VStack {
             ProductListView(productInfoCompletion: productInfoCompletion)
-            DisclosureGroup(isExpanded: $showManagePurchases, content: { PurchaseManagement()}, label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
-                .onTapGesture { withAnimation { showManagePurchases.toggle()}}
-                .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+            
+            if storeHelper.configurationProvider?.value(configuration: .restorePurchasesButton) != nil {
+                DisclosureGroup(isExpanded: $showManagePurchases, content: { PurchaseManagement()}, label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
+                    .onTapGesture { withAnimation { showManagePurchases.toggle()}}
+                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+            }
             
             if !canMakePayments {
                 Spacer()
