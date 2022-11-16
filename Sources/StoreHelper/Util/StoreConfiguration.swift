@@ -18,7 +18,7 @@ public struct StoreConfiguration {
     /// - Returns: Returns a set of ProductId if the list was read, nil otherwise.
     public static func readConfigFile() -> OrderedSet<ProductId>? {
         
-        guard let result = PropertyFile.read(filename: StoreConstants.ConfigFile) else {
+        guard let result = PropertyFile.read(filename: StoreConstants.StoreConfiguration) else {
             StoreLog.event(.configurationNotFound)
             StoreLog.event(.configurationFailure)
             return nil
@@ -30,7 +30,7 @@ public struct StoreConfiguration {
             return nil
         }
         
-        guard let values = result[StoreConstants.ConfigFile] as? [String] else {
+        guard let values = result[StoreConstants.StoreConfiguration] as? [String] else {
             StoreLog.event(.configurationEmpty)
             StoreLog.event(.configurationFailure)
             return nil

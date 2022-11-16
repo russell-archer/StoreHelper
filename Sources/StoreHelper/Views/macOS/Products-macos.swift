@@ -35,7 +35,7 @@ public struct Products: View {
         VStack {
             ProductListView(productInfoCompletion: productInfoCompletion)
             
-            if storeHelper.configurationProvider?.value(configuration: .restorePurchasesButton) != nil {
+            if Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) != nil {
                 DisclosureGroup(isExpanded: $showManagePurchases, content: { PurchaseManagement()}, label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
                     .onTapGesture { withAnimation { showManagePurchases.toggle()}}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))

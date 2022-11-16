@@ -63,7 +63,7 @@ public struct PurchaseInfoSheet: View {
                     
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
                         Button(action: {
-                            if  let sRefundUrl = storeHelper.configurationProvider?.value(configuration: .requestRefund) ?? Configuration.requestRefund.value(),
+                            if  let sRefundUrl = Configuration.requestRefundUrl.value(storeHelper: storeHelper),
                                 let refundUrl = URL(string: sRefundUrl) {
                                 NSWorkspace.shared.open(refundUrl)
                             }

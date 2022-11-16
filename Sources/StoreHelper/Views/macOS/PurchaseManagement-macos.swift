@@ -37,8 +37,8 @@ public struct PurchaseManagement: View {
     
     public var body: some View {
         if  storeHelper.hasProducts,
-            let restorePurchasesTxt = storeHelper.configurationProvider?.value(configuration: .restorePurchasesButton),
-            let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
+            let restorePurchasesTxt = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper),
+            let sContactUrl = Configuration.contactUsUrl.value(storeHelper: storeHelper),
             let contactUrl = URL(string: sContactUrl) {
             
             let edgeInsets = EdgeInsets(top: 10, leading: 3, bottom: 10, trailing: 3)

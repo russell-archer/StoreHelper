@@ -38,7 +38,7 @@ public struct PurchaseManagement: View {
     
     public var body: some View {
         if  storeHelper.hasProducts,
-            let sContactUrl = storeHelper.configurationProvider?.value(configuration: .contactUsUrl) ?? Configuration.contactUsUrl.value(),
+            let sContactUrl = Configuration.contactUsUrl.value(storeHelper: storeHelper),
             let contactUrl = URL(string: sContactUrl) {
             
             Menu {

@@ -23,6 +23,8 @@ public struct Products: View {
     @State private var purchasesRestored: Bool = false
     @State private var showRefundAlert: Bool = false
     @State private var refundAlertText: String = ""
+    @State private var termsOfServiceUrl: String? = nil
+    @State private var privacyPolicyUrl: String? = nil
     
     private var productInfoCompletion: ((ProductId) -> Void)
     
@@ -34,17 +36,19 @@ public struct Products: View {
         VStack {
             ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productInfoCompletion: productInfoCompletion)
             
-            if let restorePurchases = storeHelper.configurationProvider?.value(configuration: .restorePurchasesButton) {
+            TermsOfServiceView()
+
+            if let restorePurchasesButtonText = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) {
                 Button(action: {
                     Task.init {
                         try? await AppStore.sync()
                         purchasesRestored = true
                     }
-                }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : restorePurchases)}.padding()}
+                }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : restorePurchasesButtonText)}.padding()}
                     .buttonStyle(.borderedProminent).padding()
                     .disabled(purchasesRestored)
-                
-                Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Tap \"\(restorePurchases)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
+
+                Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Tap \"\(restorePurchasesButtonText)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                     .foregroundColor(.secondary)
@@ -66,9 +70,14 @@ public struct Products: View {
             showRefundAlert.toggle()
         }
         .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle()}}
-        .onAppear { canMakePayments = AppStore.canMakePayments }
+        .onAppear {
+            canMakePayments = AppStore.canMakePayments
+            termsOfServiceUrl = Configuration.termsOfServiceUrl.value(storeHelper: storeHelper)
+            privacyPolicyUrl = Configuration.privacyPolicyUrl.value(storeHelper: storeHelper)
+        }
         
         VersionInfo()
     }
 }
 #endif
+
