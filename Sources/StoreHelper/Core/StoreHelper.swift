@@ -72,8 +72,10 @@ public class StoreHelper: ObservableObject {
     /// Set to true if we're currently waiting for a refreshed list of localized products from the App Store.
     public private(set) var isRefreshingProducts = false
     
-    /// Optional plugin configuration provider to override configuration defaults. See `Configuration` and `ConfigurationProvider`.
-    public var configurationProvider: ConfigurationProvider?
+    /// Optional dictionary of configuration values that may be used to override StoreHelper defaults.
+    /// Add a property list file to your project to override StoreHelper defaults.
+    /// See `https://github.com/russell-archer/StoreHelperDemo` Configuration.plist for an example.
+    public private(set) var configurationOverride: [String : AnyObject]?
     
     // MARK: - Public helper properties
     
@@ -127,6 +129,9 @@ public class StoreHelper: ObservableObject {
         
         // Read our list of product ids
         productIds = StoreConfiguration.readConfigFile()
+        
+        // Read the hosts Configuration.plist file that overrides our default values
+        configurationOverride = readConfigurationOverride()
         
         // Get the fallback list of purchased products in case the App Store's not available
         purchasedProductsFallback = readPurchasedProductsFallbackList()
@@ -204,7 +209,7 @@ public class StoreHelper: ObservableObject {
         
         guard let product = product(from: productId) else {
             updatePurchasedProductsFallbackList(for: productId, purchased: false)
-            AppGroupSupport.syncPurchase(configProvider: self.configurationProvider, productId: productId, purchased: false)
+            AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: false)
             return false
         }
         
@@ -213,13 +218,13 @@ public class StoreHelper: ObservableObject {
             purchased = KeychainHelper.count(for: productId) > 0
             await updatePurchasedIdentifiers(productId, insert: purchased)
             updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
-            AppGroupSupport.syncPurchase(configProvider: self.configurationProvider, productId: productId, purchased: purchased)
+            AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: purchased)
             return purchased
         }
         
         guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
             // There's no transaction for the product, so it hasn't been purchased
-            AppGroupSupport.syncPurchase(configProvider: self.configurationProvider, productId: productId, purchased: false)
+            AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: false)
             updatePurchasedProductsFallbackList(for: productId, purchased: false)
             return false
         }
@@ -242,7 +247,7 @@ public class StoreHelper: ObservableObject {
         // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
         // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
         // StoreKit is concerned.
-        AppGroupSupport.syncPurchase(configProvider: self.configurationProvider, productId: product.id, purchased: purchased)
+        AppGroupSupport.syncPurchase(storeHelper: self, productId: product.id, purchased: purchased)
         
         // Update and persist our fallback list of purchased products
         updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
@@ -364,7 +369,7 @@ public class StoreHelper: ObservableObject {
                 // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
                 // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
                 // StoreKit is concerned.
-                AppGroupSupport.syncPurchase(configProvider: self.configurationProvider, productId: product.id, purchased: true)
+                AppGroupSupport.syncPurchase(storeHelper: self, productId: product.id, purchased: true)
                 
                 return (transaction: validatedTransaction, purchaseState: .purchased)
                 
@@ -393,7 +398,7 @@ public class StoreHelper: ObservableObject {
         Task.init { await updatePurchasedIdentifiers(productId, insert: true)}
         purchaseState = .purchased
         StoreLog.event(.purchaseSuccess, productId: productId)
-        AppGroupSupport.syncPurchase(configProvider: self.configurationProvider, productId: productId, purchased: true)
+        AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: true)
     }
     
     /// The `Product` associated with a `ProductId`.
@@ -648,6 +653,19 @@ public class StoreHelper: ObservableObject {
                 }
             }
         }
+    }
+    
+    /// Read the property list provided by the host app that overrides StoreHelper default values.
+    /// - Returns: Returns a dictionary of key-value pairs, or nil if the configuration plist file cannot be found.
+    private func readConfigurationOverride() -> [String : AnyObject]? {
+        let configurationOverride = PropertyFile.read(filename: StoreConstants.Configuration)
+        guard configurationOverride != nil else {
+            StoreLog.event(.configurationOverrideNotFound)  // This is not necessarily an error. Overriding our configuration is optional
+            return nil
+        }
+        
+        StoreLog.event(.configurationOverrideSuccess)
+        return configurationOverride
     }
     
     /// Read the list of fallback purchased products from storage.

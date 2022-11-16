@@ -30,6 +30,11 @@ public enum StoreNotification: Error, Equatable {
     case configurationSuccess
     case configurationFailure
     
+    case configurationOverrideNotFound
+    case configurationOverrideEmpty
+    case configurationOverrideSuccess
+    case configurationOverrideFailure
+    
     case requestProductsStarted
     case requestProductsSuccess
     case requestProductsFailure
@@ -63,6 +68,11 @@ public enum StoreNotification: Error, Equatable {
             case .configurationEmpty:              return "Configuration file does not contain any product definitions"
             case .configurationSuccess:            return "Configuration success"
             case .configurationFailure:            return "Configuration failure"
+                
+            case .configurationOverrideNotFound:   return "Configuration override file not found in the main bundle"
+            case .configurationOverrideEmpty:      return "Configuration override file does not contain any key-value pairs"
+            case .configurationOverrideSuccess:    return "Configuration override success"
+            case .configurationOverrideFailure:    return "Configuration override failure"
                 
             case .requestProductsStarted:          return "Request products from the App Store started"
             case .requestProductsSuccess:          return "Request products from the App Store success"

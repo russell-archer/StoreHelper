@@ -11,7 +11,10 @@ import Foundation
 public struct StoreConstants {
     
     /// Returns the name of the .plist configuration file that holds a list of `ProductId`.
-    public static let ConfigFile = "Products"
+    public static let StoreConfiguration = "Products"
+    
+    /// The name of the property list used to override default StoreHelper values
+    public static let Configuration = "Configuration"
     
     /// The UserDefaults key used to store the fallback list of purchased products.
     public static let PurchasedProductsFallbackKey = "PurchasedProductsFallback"
