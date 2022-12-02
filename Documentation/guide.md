@@ -1136,7 +1136,8 @@ For *each subscription product* you may optionally define:
 
 ### Signing Promotional Offers
 
->[!note] Important note on signing promotional subscription offers
+> **Important note on signing promotional subscription offers**
+> 
 > Apple requires that all requests to purchase subscriptions at promotional prices be digitally signed to ensure authenticity. Signing is accomplished using a special in-app purchase key created by the app developer in App Store Connect.
 > 
 > Currently, `StoreHelper` cannot do this **locally** because it has no access to the in-app purchase keys defined by the host app in App Store Connect. Neither `StoreKit1` or `StoreKit2` provide a secure local mechanism for on-device signing of promotional offers. 
