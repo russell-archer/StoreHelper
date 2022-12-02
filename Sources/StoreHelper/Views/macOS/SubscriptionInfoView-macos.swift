@@ -1,5 +1,5 @@
 //
-//  SubscriptionInfoView.swift
+//  SubscriptionInfoView-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 07/08/2021.
@@ -18,7 +18,7 @@ public struct SubscriptionInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var subscriptionInfoText = ""
     @State private var showSubscriptionInfoSheet = false
-    var subscriptionInfo: SubscriptionInfo  // Set by parents
+    private var subscriptionInfo: SubscriptionInfo  // Set by parents
     
     public init(subscriptionInfo: SubscriptionInfo) {
         self.subscriptionInfo = subscriptionInfo

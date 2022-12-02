@@ -1,5 +1,5 @@
 //
-//  PriceView.swift
+//  PriceView-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 21/06/2021.
@@ -8,79 +8,102 @@
 import SwiftUI
 import StoreKit
 
-/// Displays a product price and a button that enables purchasing.
+/// Displays a consumable, non-consumable or subscription product's price, and a button that enables purchasing.
 #if os(iOS)
 @available(iOS 15.0, *)
 public struct PriceView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var canMakePayments: Bool = false
+    @State private var isSubscription = false
+    @State private var isSubscribed = false
+    @State private var prePurchaseSubInfo: PrePurchaseSubscriptionInfo?
+    @State private var signedPromotionalOffer: Product.PurchaseOption?  // The signed promotional offer created by the app on request
+    @State private var showPromoSigningError = false
     @Binding var purchaseState: PurchaseState  // Propagates the result of a purchase back from `PriceViewModel`
-    var productId: ProductId
-    var price: String
-    var product: Product
+    private var productId: ProductId
+    private var price: String
+    private var product: Product
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
     
-    public init(purchaseState: Binding<PurchaseState>, productId: ProductId, price: String, product: Product) {
+    public init(purchaseState: Binding<PurchaseState>,
+                productId: ProductId,
+                price: String,
+                product: Product,
+                signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil) {
+        
         self._purchaseState = purchaseState
         self.productId = productId
         self.price = price
         self.product = product
+        self.signPromotionalOffer = signPromotionalOffer
     }
     
     public var body: some View {
-        
         let priceViewModel = PriceViewModel(storeHelper: storeHelper, purchaseState: $purchaseState)
         
-        HStack {
-            Button(action: {
-                withAnimation { purchaseState = .inProgress }
-                Task.init { await priceViewModel.purchase(product: product) }
-            }) {
-                PriceButtonText(price: price, disabled: !canMakePayments)
-            }
-            .disabled(!canMakePayments)
-        }
-        .onAppear { canMakePayments = AppStore.canMakePayments }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, *)
-public struct PriceButtonText: View {
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
-    @EnvironmentObject var storeHelper: StoreHelper
-    var price: String
-    var disabled: Bool
-    
-    public var body: some View {
-        Text(disabled ? "Disabled" : price)  // Don't use scaled fonts for the price at it can lead to truncation
-            .font(.body)
-            .foregroundColor(.white)
-            .padding()
-            .frame(height: 40)
-            .fixedSize()
-            .background(Color.blue)
-            .cornerRadius(25)
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, *)
-struct PriceView_Previews: PreviewProvider {
-
-    static var previews: some View {
-        HStack {
-            Button(action: {}) {
-                Text("USD $1.98")
-                    .font(.body)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(height: 40)
-                    .padding(.leading, 0)
-                    .fixedSize()
-                    .background(Color.blue)
-                    .cornerRadius(25)
+        VStack {
+            if isSubscription {
+                if let prePurchaseSubInfo, let purchasePriceForDisplay = prePurchaseSubInfo.purchasePriceForDisplay {
+                    
+                    // Display all the promotional, introductory and standard offers (there can be multiple promotional offers)
+                    ForEach(purchasePriceForDisplay) { priceForDisplay in
+                        Button(action: {
+                            withAnimation { purchaseState = .inProgress }
+                            
+                            // Is it a promotional offer (an introductory or standard offer will have a promo id of nil)?
+                            Task.init {
+                                if let promoId = priceForDisplay.id {
+                                    // If the host app has provided a promo signature closure, ask the app to sign the promotional offer
+                                    if let signPromotionalOffer, let signedPromotionalOffer = await signPromotionalOffer(product.id, promoId) {
+                                        // Complete the purchase with the signed promo offer
+                                        await priceViewModel.purchase(product: product, options: [signedPromotionalOffer])
+                                    } else {
+                                        withAnimation { purchaseState = .cancelled }
+                                        showPromoSigningError = true
+                                    }
+                                } else {
+                                    // It's an introductory or standard price. The App Store will automatically apply the eligible introductory offer
+                                    await priceViewModel.purchase(product: product)
+                                }
+                            }
+                            
+                        }) {
+                            PriceButtonTextSubscription(disabled: !canMakePayments, price: priceForDisplay.price)
+                        }
+                        .padding(.top)
+                        .disabled(!canMakePayments)
+                    }
+                }
+                
+            } else {
+                Button(action: {
+                    withAnimation { purchaseState = .inProgress }
+                    Task.init { await priceViewModel.purchase(product: product) }
+                }) {
+                    PriceButtonText(price: price, disabled: !canMakePayments)
+                }
+                .padding(.top)
+                .disabled(!canMakePayments)
             }
         }
-        .padding()
+        .task {
+            canMakePayments = AppStore.canMakePayments
+            
+            // Is the product a subscription? If it is, see if the user is already subscribed. If they're NOT subscribed,
+            // get information on the subscription (including price and renewal period), plus any introductory and
+            // promotional subscriptions offers that are available
+            if product.type == .autoRenewable {
+                isSubscription = true
+                isSubscribed = (try? await storeHelper.isSubscribed(productId: productId)) ?? false
+                
+                if !isSubscribed {
+                    prePurchaseSubInfo = await priceViewModel.getPrePurchaseSubscriptionInfo(productId: productId)
+                }
+            }
+        }
+        .alert("Unable to apply promotional offer pricing.", isPresented: $showPromoSigningError) {
+            Button("OK") { showPromoSigningError.toggle() }
+        }
     }
 }
 #endif

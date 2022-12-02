@@ -1,5 +1,5 @@
 //
-//  ProductInfoView.swift
+//  ProductInfoView-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 06/01/2022.
@@ -15,9 +15,9 @@ import SwiftUI
 @available(macOS 12.0, *)
 public struct ProductInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    var productId: ProductId
-    var displayName: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var productId: ProductId
+    private var displayName: String
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(productId: ProductId, displayName: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
         self.productId = productId

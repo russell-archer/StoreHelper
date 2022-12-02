@@ -1,5 +1,5 @@
 //
-//  PurchaseInfoView.swift
+//  PurchaseInfoView-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 19/07/2021.
@@ -19,7 +19,7 @@ public struct PurchaseInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchaseInfoText = ""
     @State private var showPurchaseInfoSheet = false
-    var productId: ProductId
+    private var productId: ProductId
     
     public init(productId: ProductId) {
         self.productId = productId

@@ -1,5 +1,5 @@
 //
-//  ProductListViewRow.swift
+//  ProductListViewRow-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 23/07/2021.
@@ -13,12 +13,12 @@ import SwiftUI
 import StoreKit
 
 #if os(macOS)
-@available(iOS 15.0, macOS 12.0, *)
+@available(macOS 12.0, *)
 public struct ProductListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    var products: [Product]
-    var headerText: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var products: [Product]
+    private var headerText: String
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(products: [Product], headerText: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
         self.products = products

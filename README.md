@@ -6,8 +6,8 @@
 
 ## Overview of StoreHelper
 
-`StoreHelper` is a Swift Package Manager (SPM) package that enables developers using Xcode 14 to 
-easily add in-app purchase support to **iOS 16/macOS 13 SwiftUI** apps. Xcode 13 with iOS 15/macOS 12 are also supported.
+`StoreHelper` is a Swift Package Manager (SPM) package that enables developers using Xcode 14/13 to easily add in-app purchase 
+support to **iOS 16/15** and **macOS 13/12** SwiftUI apps.
 
 `StoreHelper` is used to provide in-app purchase support in **Writerly** (iOS/macOS), which is available on the [App Store](https://apps.apple.com/app/writerly/id1143101981?ls=1).
 
@@ -29,7 +29,7 @@ See [License](https://github.com/russell-archer/StoreHelper/blob/main/LICENSE.md
 
 ## Requirements
 
-`StoreHelper` uses Apple's `StoreKit2`, which requires **iOS 15**, **macOS 12** and **Xcode 13** or higher.
+`StoreHelper` uses Apple's `StoreKit2`, which requires **iOS 16/15**, **macOS 13/12** and **Xcode 14/13**.
 
 ## Adding the Package to your Project
 

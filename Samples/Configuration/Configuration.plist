@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>appGroupBundleId</key>
+	<string></string>
+	<key>contactUsUrl</key>
+	<string></string>
+	<key>requestRefundUrl</key>
+	<string>https://reportaproblem.apple.com/</string>
+	<key>restorePurchasesButtonText</key>
+	<string>Restore My Purchases</string>
+	<key>termsOfServiceUrl</key>
+	<string>https://www.apple.com/legal/internet-services/itunes/dev/stdeula/</string>
+	<key>privacyPolicyUrl</key>
+	<string>https://russell-archer.github.io/privacy/</string>
+</dict>
+</plist>

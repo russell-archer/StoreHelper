@@ -12,17 +12,21 @@ import StoreKit
 /// The product's price is also displayed in the localized currency.
 @available(iOS 15.0, macOS 12.0, *)
 public struct PurchaseButton: View {
-    
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding var purchaseState: PurchaseState
+    private var productId: ProductId
+    private var price: String
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
     
-    var productId: ProductId
-    var price: String
-    
-    public init(purchaseState: Binding<PurchaseState>, productId: ProductId, price: String) {
+    public init(purchaseState: Binding<PurchaseState>,
+                productId: ProductId,
+                price: String,
+                signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil) {
+        
         self._purchaseState = purchaseState
         self.productId = productId
         self.price = price
+        self.signPromotionalOffer = signPromotionalOffer
     }
     
     public var body: some View {
@@ -34,7 +38,7 @@ public struct PurchaseButton: View {
             
         } else {
             
-            HStack {
+            VStack {
                 
                 if product!.type == .consumable {
                     
@@ -44,7 +48,9 @@ public struct PurchaseButton: View {
                 } else {
                     
                     withAnimation { BadgeView(purchaseState: $purchaseState) }
-                    if purchaseState != .purchased { PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!) }
+                    if purchaseState != .purchased {
+                        PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!, signPromotionalOffer: signPromotionalOffer)
+                    }
                 }
             }
         }

@@ -260,11 +260,52 @@ public class StoreHelper: ObservableObject {
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
-    @MainActor public func isPurchased(product: Product) async throws -> Bool {
-        
-        return try await isPurchased(productId: product.id)
-    }
+    @MainActor public func isPurchased(product: Product) async throws -> Bool { try await isPurchased(productId: product.id) }
     
+    /// Determines if a product is currently subscribed to.
+    ///
+    /// May throw an exception of type `StoreException.transactionVerificationFailed`.
+    /// - Parameter product: The `Product` representing the subscription product.
+    /// - Returns: Returns true if the product is currently subscribed to, false otherwise.
+    @MainActor public func isSubscribed(product: Product) async throws -> Bool { try await isPurchased(productId: product.id) }
+    
+    /// Determines if the product is currently subscribed to.
+    ///
+    /// May throw an exception of type `StoreException.transactionVerificationFailed`.
+    /// - Parameter productId: The `ProductId` of the subscription product.
+    /// - Returns: Returns true if the product is currently subscribed to, false otherwise.
+    @MainActor public func isSubscribed(productId: ProductId) async throws -> Bool { try await isPurchased(productId: productId) }
+    
+    /// Returns true if the product uniquely identified by `productId` is a subscription.
+    /// - Parameter productId: `ProductId` that uniquely identifies a product available in the App Store.
+    /// - Returns: Returns true if the product uniquely identified by `productId` is a subscription, false otherwise.
+    public func isSubscription(productId: ProductId) -> Bool { subscriptionProductIds == nil ? false : subscriptionProductIds!.contains { pid in pid == productId }}
+    
+    /// Returns true if the product is a subscription.
+    /// - Parameter product: `Product` that uniquely identifies a product available in the App Store.
+    /// - Returns: Returns true if the product is a subscription, false otherwise.
+    public func isSubscription(product: Product) -> Bool { return isSubscription(productId: product.id) }
+    
+    /// Returns true if the product uniquely identified by `productId` is a consumable.
+    /// - Parameter productId: `ProductId` that uniquely identifies a product available in the App Store.
+    /// - Returns: Returns true if the product uniquely identified by `productId` is a consumable, false otherwise.
+    public func isConsumable(productId: ProductId) -> Bool { consumableProductIds == nil ? false : consumableProductIds!.contains { pid in pid == productId }}
+    
+    /// Returns true if the product is a consumable.
+    /// - Parameter product: `Product` that uniquely identifies a product available in the App Store.
+    /// - Returns: Returns true if the product is a consumable, false otherwise.
+    public func isConsumable(product: Product) -> Bool { return isConsumable(productId: product.id) }
+    
+    /// Returns true if the product uniquely identified by `productId` is a non-consumable.
+    /// - Parameter productId: `ProductId` that uniquely identifies a product available in the App Store.
+    /// - Returns: Returns true if the product uniquely identified by `productId` is a non-consumable, false otherwise.
+    public func isNonConsumable(productId: ProductId) -> Bool { nonConsumableProductIds == nil ? false : nonConsumableProductIds!.contains { pid in pid == productId }}
+    
+    /// Returns true if the product is a non-consumable.
+    /// - Parameter product: `Product` that uniquely identifies a product available in the App Store.
+    /// - Returns: Returns true if the product is a non-consumable, false otherwise.
+    public func isNonConsumable(product: Product) -> Bool { return isNonConsumable(productId: product.id) }
+
     /// Uses StoreKit's `Transaction.currentEntitlements` property to iterate over the sequence of `VerificationResult<Transaction>`
     /// representing all transactions for products the user is currently entitled to. That is, all currently-subscribed
     /// transactions and all purchased (and not refunded) non-consumables. Note that transactions for consumables are NOT
@@ -442,90 +483,6 @@ public class StoreHelper: ObservableObject {
         
         purchaseInfo.latestVerifiedTransaction = transactionResult.transaction
         return purchaseInfo
-    }
-    
-    /// Information on the highest service level auto-renewing subscription the user is subscribed to
-    /// in the `subscriptionGroup`.
-    /// - Parameter subscriptionGroup: The name of the subscription group
-    /// - Returns: Information on the highest service level auto-renewing subscription the user is
-    /// subscribed to in the `subscriptionGroup`.
-    ///
-    /// When getting information on the highest service level auto-renewing subscription the user is
-    /// subscribed to we enumerate the `Product.subscription.status` array that is a property of each
-    /// `Product` in the group. Each Product in a subscription group provides access to the same
-    /// `Product.SubscriptionInfo.Status` array via its `product.subscription.status` property.
-    ///
-    /// Enumeration of the `SubscriptionInfo.Status` array is necessary because a user may have multiple
-    /// active subscriptions to products in the same subscription group. For example, a user may have
-    /// subscribed themselves to the "Gold" product, as well as receiving an automatic subscription
-    /// to the "Silver" product through family sharing. In this case, we'd need to return information
-    /// on the "Gold" product.
-    ///
-    /// The `Product.subscription.status` is an array of type `[Product.SubscriptionInfo.Status]` that
-    /// contains status information for ALL subscription groups. This demo app only has one subscription
-    /// group, so all products in the `Product.subscription.status` array are part of the same group.
-    /// In an app with two or more subscription groups you need to distinguish between groups by using
-    /// the `product.subscription.subscriptionGroupID` property. Alternatively, use subscriptionHelper.groupName(from:)
-    /// to find the subscription group associated with a product. This will allow you to distinguish
-    /// products by group and subscription service level.
-    @MainActor public func subscriptionInfo(for subscriptionGroup: String) async -> SubscriptionInfo? {
-        
-        // Get the product ids for all the products in the subscription group.
-        // Take the first id and convert it to a Product so we can access the group-common subscription.status array.
-        guard let groupProductIds = subscriptionHelper.subscriptions(in: subscriptionGroup),
-              let groupProductId = groupProductIds.first,
-              let product = product(from: groupProductId),
-              let subscription = product.subscription,
-              let statusCollection = try? await subscription.status else { return nil }
-        
-        var subscriptionInfo = SubscriptionInfo()
-        var highestServiceLevel: Int = -1
-        var highestValueProduct: Product?
-        var highestValueTransaction: Transaction?
-        var highestValueStatus: Product.SubscriptionInfo.Status?
-        var highestRenewalInfo: Product.SubscriptionInfo.RenewalInfo?
-        
-        for status in statusCollection {
-            
-            // If the user's not subscribed to this product then keep looking
-            guard status.state == .subscribed else { continue }
-            
-            // Check the transaction verification
-            let statusTransactionResult = checkVerificationResult(result: status.transaction)
-            guard statusTransactionResult.verified else { continue }
-            
-            // Check the renewal info verification
-            let renewalInfoResult = checkVerificationResult(result: status.renewalInfo)
-            guard renewalInfoResult.verified else { continue }  // Subscription not verified by StoreKit so ignore it
-            
-            // Make sure this product is from the same subscription group as the product we're searching for
-            let currentGroup = subscriptionHelper.groupName(from: renewalInfoResult.transaction.currentProductID)
-            guard currentGroup == subscriptionGroup else { continue }
-            
-            // Get the Product for this subscription
-            guard let candidateSubscription = self.product(from: renewalInfoResult.transaction.currentProductID) else { continue }
-            
-            // We've found a valid transaction for a product in the target subscription group.
-            // Is it's service level the highest we've encountered so far?
-            let currentServiceLevel = subscriptionHelper.subscriptionServiceLevel(in: subscriptionGroup, for: renewalInfoResult.transaction.currentProductID)
-            if currentServiceLevel > highestServiceLevel {
-                highestServiceLevel = currentServiceLevel
-                highestValueProduct = candidateSubscription
-                highestValueTransaction = statusTransactionResult.transaction
-                highestValueStatus = status
-                highestRenewalInfo = renewalInfoResult.transaction
-            }
-        }
-        
-        guard let selectedProduct = highestValueProduct, let selectedStatus = highestValueStatus else { return nil }
-        
-        subscriptionInfo.product = selectedProduct
-        subscriptionInfo.subscriptionGroup = subscriptionGroup
-        subscriptionInfo.latestVerifiedTransaction = highestValueTransaction
-        subscriptionInfo.verifiedSubscriptionRenewalInfo = highestRenewalInfo
-        subscriptionInfo.subscriptionStatus = selectedStatus
-        
-        return subscriptionInfo
     }
     
     /// Check if StoreKit was able to automatically verify a transaction by inspecting the verification result.

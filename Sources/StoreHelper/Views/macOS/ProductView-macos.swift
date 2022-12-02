@@ -1,5 +1,5 @@
 //
-//  ProductView.swift
+//  ProductView-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 21/06/2021.
@@ -19,11 +19,11 @@ import WidgetKit
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    var productId: ProductId
-    var displayName: String
-    var description: String
-    var price: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var productId: ProductId
+    private var displayName: String
+    private var description: String
+    private var price: String
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(productId: ProductId,
                 displayName: String,

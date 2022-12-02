@@ -1,6 +1,6 @@
 //
-//  SheetBarView.swift
-//  
+//  SheetBarView-macos.swift
+//  StoreHelper
 //
 //  Created by Russell Archer on 01/02/2022.
 //

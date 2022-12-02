@@ -1,5 +1,5 @@
 //
-//  SubscriptionView.swift
+//  SubscriptionView-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 07/08/2021.
@@ -10,24 +10,27 @@
 // Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
+import StoreKit
 
 #if os(iOS)
 @available(iOS 15.0, *)
 public struct SubscriptionView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    var productId: ProductId
-    var displayName: String
-    var description: String
-    var price: String
-    var subscriptionInfo: SubscriptionInfo?  // If non-nil then the product is the highest service level product the user is subscribed to in the subscription group
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var productId: ProductId
+    private var displayName: String
+    private var description: String
+    private var price: String
+    private var subscriptionInfo: SubscriptionInfo?  // If non-nil then the product is the highest service level product the user is subscribed to in the subscription group
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(productId: ProductId,
                 displayName: String,
                 description: String,
                 price: String,
                 subscriptionInfo: SubscriptionInfo? = nil,
+                signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil,
                 productInfoCompletion: @escaping ((ProductId) -> Void)) {
         
         self.productId = productId
@@ -35,6 +38,7 @@ public struct SubscriptionView: View {
         self.description = description
         self.price = price
         self.subscriptionInfo = subscriptionInfo
+        self.signPromotionalOffer = signPromotionalOffer
         self.productInfoCompletion = productInfoCompletion
     }
     
@@ -49,7 +53,7 @@ public struct SubscriptionView: View {
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
 
-            HStack {
+            VStack {
                 Image(productId)
                     .resizable()
                     .frame(maxWidth: 250, maxHeight: 250)
@@ -59,7 +63,7 @@ public struct SubscriptionView: View {
                     .onTapGesture { productInfoCompletion(productId) }
                 
                 Spacer()
-                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
+                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price, signPromotionalOffer: signPromotionalOffer)
             }
             .padding()
             

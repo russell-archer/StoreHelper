@@ -1,5 +1,5 @@
 //
-//  ProductListViewRow.swift
+//  ProductListViewRow-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 23/07/2021.
@@ -18,9 +18,9 @@ public struct ProductListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    var products: [Product]
-    var headerText: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var products: [Product]
+    private var headerText: String
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,

@@ -1,5 +1,5 @@
 //
-//  Products.swift
+//  Products-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 10/09/2021.
@@ -13,6 +13,12 @@ import SwiftUI
 import StoreKit
 
 #if os(iOS)
+/// Initializes the `Products` view, which is responsible for displaying a list of available products, along with purchase buttons and a button
+/// to enable users to manually restore previous purchases.
+///
+/// For notes on signing promotional subscription offers see the section on **"Introductory and Promotional Subscription Offers"** in the
+/// [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md).
+///
 @available(iOS 15.0, *)
 public struct Products: View {
     @EnvironmentObject var storeHelper: StoreHelper
@@ -25,34 +31,48 @@ public struct Products: View {
     @State private var refundAlertText: String = ""
     @State private var termsOfServiceUrl: String? = nil
     @State private var privacyPolicyUrl: String? = nil
+    @State private var showRedeemOfferCodeButton = false
+    @State private var showRedeemOfferCodeError = false
     
+    /// An app must sign any request to purchase a subscription using a promotional offer. This is an Apple-mandated requirement.
+    /// StoreHelper can't do this locally because it needs access to IAP keys defined by the host app in App Store Connect.
+    /// Also, neither `StoreKit1` or `StoreKit2` provide a secure local mechanism for signing promotional offers.
+    /// StoreHelper passes-off the signature request to the app using the `signPromotionalOffer` closure. This closure
+    /// is passed down the view hirearch so it can be called just before attempting a purchase with a promotional offer.
+    /// The closure receives a productId and the offerId, returns the signature.
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
+    
+    /// A closure that receives a `ProductId` when the user taps on a product's image or information button for additional information
+    /// about that product. The closure should trigger the presentation of a sheet that shows information to the user on why they
+    /// should purchase the product.
     private var productInfoCompletion: ((ProductId) -> Void)
     
-    public init(productInfoCompletion: @escaping ((ProductId) -> Void)) {
+    /// Initializes the `Products` view, which is responsible for displaying a list of available products, along with purchase buttons and a button
+    /// to enable users to manually restore previous purchases.
+    ///
+    /// For notes on signing promotional subscription offers see the section on **"Introductory and Promotional Subscription Offers"** in the
+    /// [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md).
+    ///
+    /// - Parameters:
+    ///   - signPromotionalOffer: A closure that receives a `ProductId` and promotional offer id, and returns a signed
+    ///   - productInfoCompletion: A closure that receives a `ProductId` when the user taps on a product's image or information button for
+    ///   additional information about that product. The closure should trigger the presentation of a sheet that shows information to the user
+    ///   on why they should purchase the product.
+    public init(signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        self.signPromotionalOffer = signPromotionalOffer
         self.productInfoCompletion = productInfoCompletion
     }
     
     @ViewBuilder public var body: some View {
         VStack {
-            ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productInfoCompletion: productInfoCompletion)
+            ProductListView(showRefundSheet: $showRefundSheet,
+                            refundRequestTransactionId: $refundRequestTransactionId,
+                            signPromotionalOffer: signPromotionalOffer,
+                            productInfoCompletion: productInfoCompletion)
             
             TermsOfServiceView()
-
-            if let restorePurchasesButtonText = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) {
-                Button(action: {
-                    Task.init {
-                        try? await AppStore.sync()
-                        purchasesRestored = true
-                    }
-                }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : restorePurchasesButtonText)}.padding()}
-                    .buttonStyle(.borderedProminent).padding()
-                    .disabled(purchasesRestored)
-
-                Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Tap \"\(restorePurchasesButtonText)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
-                    .multilineTextAlignment(.center)
-                    .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
-                    .foregroundColor(.secondary)
-            }
+            RestorePurchasesView(purchasesRestored: $purchasesRestored)
+            RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
             
             if !canMakePayments {
                 Spacer()
@@ -66,16 +86,17 @@ public struct Products: View {
                 case .failure(_): refundAlertText = "Refund request submission failed"
                 case .success(_): refundAlertText = "Refund request submitted successfully"
             }
-
+            
             showRefundAlert.toggle()
         }
-        .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle()}}
+        .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
+        .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
         .onAppear {
             canMakePayments = AppStore.canMakePayments
             termsOfServiceUrl = Configuration.termsOfServiceUrl.value(storeHelper: storeHelper)
             privacyPolicyUrl = Configuration.privacyPolicyUrl.value(storeHelper: storeHelper)
         }
-        
+            
         VersionInfo()
     }
 }

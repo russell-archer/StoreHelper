@@ -1,5 +1,5 @@
 //
-//  PurchaseInfoView.swift
+//  PurchaseInfoView-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 19/07/2021.
@@ -21,7 +21,7 @@ public struct PurchaseInfoView: View {
     @State private var showPurchaseInfoSheet = false
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    var productId: ProductId
+    private var productId: ProductId
     
     public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, productId: ProductId) {
         self._showRefundSheet = showRefundSheet
@@ -44,7 +44,6 @@ public struct PurchaseInfoView: View {
                         .foregroundColor(.blue)
                         .lineLimit(nil)
                 }
-                .padding()
             }
         }
         .task { purchaseInfoText = await viewModel.info(for: productId)}

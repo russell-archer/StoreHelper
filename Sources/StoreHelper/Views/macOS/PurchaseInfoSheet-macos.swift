@@ -1,5 +1,5 @@
 //
-//  PurchaseInfoSheet.swift
+//  PurchaseInfoSheet-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 05/01/2022.
@@ -18,8 +18,8 @@ public struct PurchaseInfoSheet: View {
     @State private var extendedPurchaseInfo: ExtendedPurchaseInfo?
     @State private var showManagePurchase = false
     @Binding var showPurchaseInfoSheet: Bool
-    var productId: ProductId
-    var viewModel: PurchaseInfoViewModel
+    private var productId: ProductId
+    private var viewModel: PurchaseInfoViewModel
     
     public init(showPurchaseInfoSheet: Binding<Bool>, productId: ProductId, viewModel: PurchaseInfoViewModel) {
         self._showPurchaseInfoSheet = showPurchaseInfoSheet
@@ -73,7 +73,7 @@ public struct PurchaseInfoSheet: View {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
                               icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                     }
-                    .onTapGesture { withAnimation { showManagePurchase.toggle()}}
+                    .onTapGesture { withAnimation { showManagePurchase.toggle() }}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
                     
                     Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("You may request a refund from the App Store if a purchase does not perform as expected. This requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}

@@ -24,6 +24,7 @@ public struct BadgeView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 25, height: 25)
                 .foregroundColor(options.fgColor)
+                .padding(.top)
         }
     }
     

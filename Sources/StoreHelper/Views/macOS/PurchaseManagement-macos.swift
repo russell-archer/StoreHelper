@@ -1,5 +1,5 @@
 //
-//  PurchaseManagement.swift
+//  PurchaseManagement-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 22/07/2021.

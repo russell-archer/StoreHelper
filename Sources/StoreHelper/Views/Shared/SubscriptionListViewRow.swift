@@ -18,13 +18,19 @@ public struct SubscriptionListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
     @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
-    var products: [Product]
-    var headerText: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var products: [Product]
+    private var headerText: String
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
+    private var productInfoCompletion: ((ProductId) -> Void)
     
-    public init(products: [Product], headerText: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+    public init(products: [Product],
+                headerText: String,
+                signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
         self.products = products
         self.headerText = headerText
+        self.signPromotionalOffer = signPromotionalOffer
         self.productInfoCompletion = productInfoCompletion
     }
     
@@ -38,6 +44,7 @@ public struct SubscriptionListViewRow: View {
                                  description: product.description,
                                  price: product.displayPrice,
                                  subscriptionInfo: storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionInfo),
+                                 signPromotionalOffer: signPromotionalOffer,
                                  productInfoCompletion: productInfoCompletion)
                     .contentShape(Rectangle())
                     .onTapGesture { productInfoCompletion(product.id) }
