@@ -343,8 +343,3 @@ struct SimplePurchaseView: View {
 
 ![](./assets/StoreHelperDemo108.png)
 
-- Now select the **macOS target** and run it on your Mac:
-
-![](./assets/StoreHelperDemo108b.png)
-
-![](./assets/StoreHelperDemo108c.png)
