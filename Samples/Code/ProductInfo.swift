@@ -9,6 +9,7 @@ import SwiftUI
 import StoreHelper
 import StoreKit
 
+@available(iOS 15.0, macOS 12.0, *)
 struct ProductInfo: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var product: Product?
@@ -17,13 +18,10 @@ struct ProductInfo: View {
     
     var body: some View {
         VStack {
-            // Provides platform-appropriate sheet close buttons and title
             SheetBarView(showSheet: $showProductInfoSheet, title: product?.displayName ?? "Product Info")
-            
             ScrollView {
                 VStack {
                     if let p = product {
-                        // Show an image of the product
                         Image(p.id)
                             .resizable()
                             .frame(maxWidth: 200, maxHeight: 200)
@@ -33,8 +31,8 @@ struct ProductInfo: View {
                     
                     // Pull in the text appropriate for the product
                     switch productInfoProductId {
-                        case "com.rarcher.nonconsumable.flowers-large": ProductInfoFlowersLarge()
-                        case "com.rarcher.nonconsumable.flowers-small": ProductInfoFlowersSmall()
+                        case "com.rarcher.nonconsumable.flowers.large": ProductInfoFlowersLarge()
+                        case "com.rarcher.nonconsumable.flowers.small": ProductInfoFlowersSmall()
                         default: ProductInfoDefault()
                     }
                 }
@@ -47,6 +45,7 @@ struct ProductInfo: View {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 struct ProductInfoFlowersLarge: View {
     @ViewBuilder var body: some View {
         Text("This is a information about the **Large Flowers** product.").font(.title2).padding().multilineTextAlignment(.center)
@@ -54,6 +53,7 @@ struct ProductInfoFlowersLarge: View {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 struct ProductInfoFlowersSmall: View {
     @ViewBuilder var body: some View {
         Text("This is a information about the **Small Flowers** product.").font(.title2).padding().multilineTextAlignment(.center)
@@ -61,6 +61,7 @@ struct ProductInfoFlowersSmall: View {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 struct ProductInfoDefault: View {
     @ViewBuilder var body: some View {
         Text("This is generic information about a product.").font(.title2).padding().multilineTextAlignment(.center)

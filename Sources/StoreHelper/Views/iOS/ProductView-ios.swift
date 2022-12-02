@@ -1,5 +1,5 @@
 //
-//  ProductView.swift
+//  ProductView-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 21/06/2021.
@@ -22,11 +22,11 @@ public struct ProductView: View {
     @State var purchaseState: PurchaseState = .unknown
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    var productId: ProductId
-    var displayName: String
-    var description: String
-    var price: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var productId: ProductId
+    private var displayName: String
+    private var description: String
+    private var price: String
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
@@ -67,7 +67,6 @@ public struct ProductView: View {
                     
                     PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
                 }
-                .padding()
             } else {
                 HStack {
                     Image(productId)
@@ -81,7 +80,6 @@ public struct ProductView: View {
                     Spacer()
                     PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
                 }
-                .padding()
             }
             
             if purchaseState == .purchased {

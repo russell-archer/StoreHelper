@@ -1,5 +1,5 @@
 //
-//  ProductListView.swift
+//  ProductListView-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 23/07/2021.
@@ -10,14 +10,19 @@
 // Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
+import StoreKit
 
 #if os(macOS)
 @available(macOS 12.0, *)
 public struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
+    private var productInfoCompletion: ((ProductId) -> Void)
     
-    public init(productInfoCompletion: @escaping ((ProductId) -> Void)) {
+    public init(signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
+        self.signPromotionalOffer = signPromotionalOffer
         self.productInfoCompletion = productInfoCompletion
     }
     
@@ -34,7 +39,10 @@ public struct ProductListView: View {
             }
             
             if storeHelper.hasSubscriptionProducts, let subscriptions = storeHelper.subscriptionProducts {
-                SubscriptionListViewRow(products: subscriptions, headerText: "Subscriptions", productInfoCompletion: productInfoCompletion)
+                SubscriptionListViewRow(products: subscriptions,
+                                        headerText: "Subscriptions",
+                                        signPromotionalOffer: signPromotionalOffer,
+                                        productInfoCompletion: productInfoCompletion)
             }
             
         } else {

@@ -1,5 +1,5 @@
 //
-//  ProductListView.swift
+//  ProductListView-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 23/07/2021.
@@ -10,6 +10,7 @@
 // Subscriptions:   [Products].[ProductListView].[SubscriptionListViewRow].[SubscriptionView].[if purchased].[SubscriptionInfoView].[SubscriptionInfoSheet]
 
 import SwiftUI
+import StoreKit
 
 #if os(iOS)
 @available(iOS 15.0, *)
@@ -17,11 +18,17 @@ public struct ProductListView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
+    private var productInfoCompletion: ((ProductId) -> Void)
     
-    public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, productInfoCompletion: @escaping ((ProductId) -> Void)) {
+    public init(showRefundSheet: Binding<Bool>,
+                refundRequestTransactionId: Binding<UInt64>,
+                signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil,
+                productInfoCompletion: @escaping ((ProductId) -> Void)) {
+        
         self._showRefundSheet = showRefundSheet
         self._refundRequestTransactionId = refundRequestTransactionId
+        self.signPromotionalOffer = signPromotionalOffer
         self.productInfoCompletion = productInfoCompletion
     }
     
@@ -30,15 +37,26 @@ public struct ProductListView: View {
         if storeHelper.hasProducts {
     
             if storeHelper.hasNonConsumableProducts, let nonConsumables = storeHelper.nonConsumableProducts {
-                ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
+                ProductListViewRow(showRefundSheet: $showRefundSheet,
+                                   refundRequestTransactionId: $refundRequestTransactionId,
+                                   products: nonConsumables,
+                                   headerText: "Products",
+                                   productInfoCompletion: productInfoCompletion)
             }
             
             if storeHelper.hasConsumableProducts, let consumables = storeHelper.consumableProducts {
-                ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
+                ProductListViewRow(showRefundSheet: $showRefundSheet,
+                                   refundRequestTransactionId: $refundRequestTransactionId,
+                                   products: consumables,
+                                   headerText: "VIP Services",
+                                   productInfoCompletion: productInfoCompletion)
             }
             
             if storeHelper.hasSubscriptionProducts, let subscriptions = storeHelper.subscriptionProducts {
-                SubscriptionListViewRow(products: subscriptions, headerText: "Subscriptions", productInfoCompletion: productInfoCompletion)
+                SubscriptionListViewRow(products: subscriptions,
+                                        headerText: "Subscriptions",
+                                        signPromotionalOffer: signPromotionalOffer,
+                                        productInfoCompletion: productInfoCompletion)
             }
             
         } else {

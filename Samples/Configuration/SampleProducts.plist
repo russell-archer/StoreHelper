@@ -4,11 +4,11 @@
 <dict>
     <key>Products</key>
     <array>
-        <string>com.rarcher.nonconsumable.flowers-large</string>
-        <string>com.rarcher.nonconsumable.flowers-small</string>
-        <string>com.rarcher.nonconsumable.roses-large</string>
-        <string>com.rarcher.nonconsumable.chocolates-small</string>
-        <string>com.rarcher.consumable.plant-installation</string>
+        <string>com.rarcher.nonconsumable.flowers.large</string>
+        <string>com.rarcher.nonconsumable.flowers.small</string>
+        <string>com.rarcher.nonconsumable.roses.large</string>
+        <string>com.rarcher.nonconsumable.chocolates.small</string>
+        <string>com.rarcher.consumable.plant.installation</string>
         <string>com.rarcher.subscription.vip.gold</string>
         <string>com.rarcher.subscription.vip.silver</string>
         <string>com.rarcher.subscription.vip.bronze</string>

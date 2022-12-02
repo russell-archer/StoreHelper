@@ -20,7 +20,7 @@
           "locale" : "en_GB"
         }
       ],
-      "productID" : "com.rarcher.nonconsumable.flowers-large",
+      "productID" : "com.rarcher.nonconsumable.flowers.large",
       "referenceName" : "flowers-large",
       "type" : "NonConsumable"
     },
@@ -40,7 +40,7 @@
           "locale" : "en_GB"
         }
       ],
-      "productID" : "com.rarcher.nonconsumable.flowers-small",
+      "productID" : "com.rarcher.nonconsumable.flowers.small",
       "referenceName" : "flowers-small",
       "type" : "NonConsumable"
     },
@@ -55,7 +55,7 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.rarcher.nonconsumable.roses-large",
+      "productID" : "com.rarcher.nonconsumable.roses.large",
       "referenceName" : "roses-large",
       "type" : "NonConsumable"
     },
@@ -70,7 +70,7 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.rarcher.nonconsumable.chocolates-small",
+      "productID" : "com.rarcher.nonconsumable.chocolates.small",
       "referenceName" : "chocolates-small",
       "type" : "NonConsumable"
     },
@@ -85,7 +85,7 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.rarcher.consumable.plant-installation",
+      "productID" : "com.rarcher.consumable.plant.installation",
       "referenceName" : "plant-installation",
       "type" : "Consumable"
     }
@@ -109,6 +109,16 @@
       "subscriptions" : [
         {
           "adHocOffers" : [
+            {
+              "displayPrice" : "0.99",
+              "internalID" : "F148DF28",
+              "offerID" : "999",
+              "paymentMode" : "payUpFront",
+              "referenceName" : "XmasSale",
+              "subscriptionPeriod" : "P3M"
+            }
+          ],
+          "codeOffers" : [
 
           ],
           "displayPrice" : "19.99",
@@ -116,10 +126,11 @@
           "groupNumber" : 1,
           "internalID" : "AF41C8C8",
           "introductoryOffer" : {
-            "displayPrice" : "9.99",
-            "internalID" : "D9531218",
-            "paymentMode" : "payUpFront",
-            "subscriptionPeriod" : "P2M"
+            "displayPrice" : "1.99",
+            "internalID" : "840B334F",
+            "numberOfPeriods" : 3,
+            "paymentMode" : "payAsYouGo",
+            "subscriptionPeriod" : "P1M"
           },
           "localizations" : [
             {
@@ -136,6 +147,9 @@
         },
         {
           "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
 
           ],
           "displayPrice" : "11.99",
@@ -160,6 +174,9 @@
           "adHocOffers" : [
 
           ],
+          "codeOffers" : [
+
+          ],
           "displayPrice" : "4.99",
           "familyShareable" : false,
           "groupNumber" : 3,
@@ -181,8 +198,12 @@
       ]
     }
   ],
+  "subscriptionOffersKeyPair" : {
+    "id" : "5509FCF1",
+    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmJ/0G8gYMyOHVltbD5jhlxrH4xPOrPwQ7MaxFFRmJ/ygCgYIKoZIzj0DAQehRANCAAR5L/4NGKsB9lNjQrE46EpPiAthZOVjn7uVPvOZnFBBXnGYAnIncBuT6ojTObFPP+n9I5K6O1u5/GZmwJFPTp2x"
+  },
   "version" : {
-    "major" : 1,
-    "minor" : 1
+    "major" : 2,
+    "minor" : 0
   }
 }

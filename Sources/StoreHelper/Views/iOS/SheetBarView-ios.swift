@@ -1,6 +1,6 @@
 //
-//  SheetBarView.swift
-//  
+//  SheetBarView-ios.swift
+//  StoreHelper
 //
 //  Created by Russell Archer on 01/02/2022.
 //
@@ -12,9 +12,8 @@ import SwiftUI
 public struct SheetBarView: View {
     @State private var showXmark = false
     @Binding var showSheet: Bool
-    var title: String?
-    var sysImg: String?
-    
+    private var title: String?
+    private var sysImg: String?
     private var insets = EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10)
     private var insetsTitle = EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
     

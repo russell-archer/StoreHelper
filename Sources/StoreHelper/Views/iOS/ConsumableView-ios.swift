@@ -1,5 +1,5 @@
 //
-//  ConsumableView.swift
+//  ConsumableView-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 21/06/2021.
@@ -20,11 +20,11 @@ public struct ConsumableView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
     @State var count: Int = 0
-    var productId: ProductId
-    var displayName: String
-    var description: String
-    var price: String
-    var productInfoCompletion: ((ProductId) -> Void)
+    private var productId: ProductId
+    private var displayName: String
+    private var description: String
+    private var price: String
+    private var productInfoCompletion: ((ProductId) -> Void)
     
     public init(purchaseState: PurchaseState = .unknown,
                 count: Int = 0, productId: ProductId,
@@ -107,7 +107,7 @@ public struct ConsumableView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 15.0, *)
 struct ConsumableView_Previews: PreviewProvider {
     
     static var previews: some View {

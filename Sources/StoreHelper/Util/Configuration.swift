@@ -15,6 +15,7 @@ public enum Configuration {
     case restorePurchasesButtonText  // The text to display on the restore purchases button. If nil the button is not displayed.
     case termsOfServiceUrl           // A URL that links to your terms of service. Displayed in the list of IAP products. If nil the link is not displayed.
     case privacyPolicyUrl            // A URL that links to your privacy policy. Displayed in the list of IAP products. If nil the link is not displayed.
+    case redeemOfferCodeButtonText   // The text to display on the redeem offer code button. If nil the button is not displayed.
     
     // Default values:
     private static let AppGroupBundleId: String?            = nil
@@ -23,6 +24,7 @@ public enum Configuration {
     private static let RestorePurchasesButtonText: String?  = "Restore Purchases"
     private static let TermsOfServiceUrl: String?           = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
     private static let PrivacyPolicyUrl: String?            = nil
+    private static let RedeemOfferCodeButtonText: String?   = "Redeem an Offer"
     
     /// Gets an overridden configuration value, or if not found, provides a default value.
     /// - Parameter storeHelper: An instance of StoreHelper
@@ -35,6 +37,7 @@ public enum Configuration {
             case .restorePurchasesButtonText:   return resolveOverriddenValue(overrides: storeHelper.configurationOverride)
             case .termsOfServiceUrl:            return resolveOverriddenValue(overrides: storeHelper.configurationOverride)
             case .privacyPolicyUrl:             return resolveOverriddenValue(overrides: storeHelper.configurationOverride)
+            case .redeemOfferCodeButtonText:    return resolveOverriddenValue(overrides: storeHelper.configurationOverride)
         }
     }
     
@@ -46,6 +49,7 @@ public enum Configuration {
             case .restorePurchasesButtonText:   return "restorePurchasesButtonText"
             case .termsOfServiceUrl:            return "termsOfServiceUrl"
             case .privacyPolicyUrl:             return "privacyPolicyUrl"
+            case .redeemOfferCodeButtonText:    return "redeemOfferCodeButtonText"
         }
     }
     
@@ -68,6 +72,7 @@ public enum Configuration {
             case .restorePurchasesButtonText:   return Configuration.RestorePurchasesButtonText
             case .termsOfServiceUrl:            return Configuration.TermsOfServiceUrl
             case .privacyPolicyUrl:             return Configuration.PrivacyPolicyUrl
+            case .redeemOfferCodeButtonText:    return Configuration.RedeemOfferCodeButtonText
         }
     }
 }

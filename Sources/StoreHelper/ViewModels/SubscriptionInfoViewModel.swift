@@ -8,33 +8,69 @@
 import StoreKit
 import SwiftUI
 
-/// Extended information about a subscription product. Used for displaying info to the user
+/// Extended information about a subscription product. Used for displaying info to the user.
 @available(iOS 15.0, macOS 12.0, *)
 public struct ExtendedSubscriptionInfo: Hashable {
-    public var productId: ProductId                                      // The product's unique id
-    public var name: String                                              // The product's display name
-    public var isPurchased: Bool                                         // true if the product has been purchased
-    public var productType: Product.ProductType                          // Consumable, non-consumable, subscription, etc.
-    public var subscribed: Bool?                                         // true if the product is subscribed to
-    public var subscribedtext: String?                                   // Display text for the subscribed state
-    public var upgraded: Bool?                                           // true if the product has been upgraded
-    public var autoRenewOn: Bool?                                        // true if auto-renew is on
-    public var renewalPeriod: String?                                    // Display text for the renewal period (e.g. "Every month")
-    public var renewalDate: String?                                      // Display text for the renewal date
-    public var renewsIn: String?                                         // Display text for when the subscription renews (e.g. "12 days")
-    public var purchasePrice: String?                                    // Localized price paid when purchased
-    public var purchaseDate: Date?                                       // Most recent date of purchase
-    public var purchaseDateFormatted: String?                            // Most recent date of purchase formatted as "d MMM y" (e.g. "28 Dec 2021")
-    public var transactionId: UInt64?                                    // Transactionid for most recent purchase. UInt64.min if not purchased
-    public var revocationDate: Date?                                     // Date the app store revoked the purchase (e.g. because of a refund, etc.)
-    public var revocationDateFormatted: String?                          // Date of revocation formatted as "d MMM y"
-    public var revocationReason: StoreKit.Transaction.RevocationReason?  // Why the purchase was revoked (.developerIssue or .other)
-    public var ownershipType: StoreKit.Transaction.OwnershipType?        // Either .purchased or .familyShared
+    /// The product's unique id.
+    public var productId: ProductId
+    
+    /// The product's display name.
+    public var name: String
+    
+    /// true if the product has been purchased.
+    public var isPurchased: Bool
+    
+    /// Consumable, non-consumable, subscription, etc.
+    public var productType: Product.ProductType
+    
+    /// true if the product is subscribed to.
+    public var subscribed: Bool?
+    
+    /// Display text for the subscribed state.
+    public var subscribedtext: String?
+    
+    /// true if the product has been upgraded.
+    public var upgraded: Bool?
+    
+    /// true if auto-renew is on.
+    public var autoRenewOn: Bool?
+    
+    /// Display text for the renewal period (e.g. "Every month").
+    public var renewalPeriod: String?
+    
+    /// Display text for the renewal date.
+    public var renewalDate: String?
+    
+    /// Display text for when the subscription renews (e.g. "12 days").
+    public var renewsIn: String?
+    
+    /// Localized price paid when purchased.
+    public var purchasePrice: String?
+    
+    /// Most recent date of purchase.
+    public var purchaseDate: Date?
+    
+    /// Most recent date of purchase formatted as "d MMM y" (e.g. "28 Dec 2021").
+    public var purchaseDateFormatted: String?
+    
+    /// Transactionid for most recent purchase. UInt64.min if not purchased.
+    public var transactionId: UInt64?
+    
+    /// Date the app store revoked the purchase (e.g. because of a refund, etc.).
+    public var revocationDate: Date?
+    
+    /// Date of revocation formatted as "d MMM y".
+    public var revocationDateFormatted: String?
+    
+    /// Why the purchase was revoked (.developerIssue or .other).
+    public var revocationReason: StoreKit.Transaction.RevocationReason?
+    
+    /// Either .purchased or .familyShared.
+    public var ownershipType: StoreKit.Transaction.OwnershipType?
 }
 
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionInfoViewModel {
-    
     @ObservedObject public var storeHelper: StoreHelper
     public var subscriptionInfo: SubscriptionInfo
     

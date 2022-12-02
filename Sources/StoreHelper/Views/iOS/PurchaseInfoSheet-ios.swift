@@ -1,5 +1,5 @@
 //
-//  PurchaseInfoSheet.swift
+//  PurchaseInfoSheet-ios.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 05/01/2022.
@@ -20,8 +20,8 @@ public struct PurchaseInfoSheet: View {
     @Binding var showPurchaseInfoSheet: Bool
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
-    var productId: ProductId
-    var viewModel: PurchaseInfoViewModel
+    private var productId: ProductId
+    private var viewModel: PurchaseInfoViewModel
     
     public init(showPurchaseInfoSheet: Binding<Bool>,
                 showRefundSheet: Binding<Bool>,

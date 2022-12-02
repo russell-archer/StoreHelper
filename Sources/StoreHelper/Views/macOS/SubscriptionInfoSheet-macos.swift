@@ -1,5 +1,5 @@
 //
-//  SubscriptionInfoSheet.swift
+//  SubscriptionInfoSheet-macos.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 16/01/2022.
@@ -19,8 +19,8 @@ public struct SubscriptionInfoSheet: View {
     @State private var showManageSubscriptionsSheet = false
     @State private var extendedSubscriptionInfo: ExtendedSubscriptionInfo?
     @Binding var showPurchaseInfoSheet: Bool
-    var productId: ProductId
-    var viewModel: SubscriptionInfoViewModel
+    private var productId: ProductId
+    private var viewModel: SubscriptionInfoViewModel
     
     public init(showPurchaseInfoSheet: Binding<Bool>, productId: ProductId, viewModel: SubscriptionInfoViewModel) {
         self._showPurchaseInfoSheet = showPurchaseInfoSheet
