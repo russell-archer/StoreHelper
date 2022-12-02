@@ -1052,7 +1052,7 @@ Notice that when we purchase the "Gold" subscription we'll be charged a trial ra
 
 > At this point we're simply displaying subscription **prices** (but not renewal dates) in the same way as for consumable and non-consumable products. However, things start to get more complicated if we want to support renewal dates, promotional and introductory offers, upgrades and enticements to lapsed subscribers!
 > 
-> See [[#Introductory and Promotional Subscription Offers]] below for a discussion on how the availability of promotional and introductory offers affects the way we display subscription prices and renewal dates.
+> See **Introductory and Promotional Subscription Offers** below for a discussion on how the availability of promotional and introductory offers affects the way we display subscription prices and renewal dates.
 
 ## Displaying Subscription information
 Displaying information on what product a user is subscribed to, when it renews, how much it costs, and so on is not *quite* as straightforward as it first appears. For example, what happens when a user is subscribed to one level of service and then purchases a higher service level product? The user will expect immediate access to a higher level of service, but how can we tell which subscription is "current"? 
@@ -1152,7 +1152,7 @@ The optional `signPromotionalOffer` closure in your code (see the example code b
 If you intend to define promotional subscription pricing for your app in App Store Connect you'll need to follow these steps:
 
 - In **App Store Connect**, create your subscription group and subscriptions
-- Create promotional offers for your subscriptions (see [[#Defining offers in App Store Connect]]  below)
+- Create promotional offers for your subscriptions (see **Defining offers in App Store Connect**  below)
 - Generate an **In-App Purchase Key** (see Users and Access > Keys on App Store Connect) and download the private key
 - In your app, provide a closure for the optional `signPromotionalOffer` parameter to the `Products` initializer
 - In your `signPromotionalOffer` closure, use `ProductId` and offerId with your in-app purchase key to create a signature on your app server
