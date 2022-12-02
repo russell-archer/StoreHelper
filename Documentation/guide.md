@@ -1443,15 +1443,15 @@ public struct RedeemOfferCodeView: View {
 
 When the user taps of the redeem offer code button the following sheet is presented:
 
-![[StoreHelper Demo 137.png]]
+![](./assets/StoreHelperDemo137.png)
 
 The user can select the offer ("Special Winter Offer") and then tap **Redeem Code**:
 
-![[StoreHelper Demo 138.png]]
+![](./assets/StoreHelperDemo138.png)
 
 Notice how the offer code gives the user a 1 week free trial, then the 3-month introductory offer, followed by the standard monthly subscription price.
 
-![[StoreHelper Demo 139.png]]
+![](./assets/StoreHelperDemo139.png)
 
 # Managing Subscriptions
 If you want to see ALL your Apple subscriptions you can navigate to **Settings > AppleID > Subscriptions**. From here you can view, upgrade, downgrade, or cancel subscriptions.
