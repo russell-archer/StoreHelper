@@ -15,7 +15,8 @@ struct StoreHelperDemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView().environmentObject(storeHelper)
+            MainView()
+                .environmentObject(storeHelper)
                 .task { storeHelper.start() } // Start listening for transactions
                 #if os(macOS)
                 .frame(minWidth: 700, idealWidth: 700, minHeight: 700, idealHeight: 700)

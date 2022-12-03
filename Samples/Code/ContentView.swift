@@ -6,8 +6,15 @@
 //
 
 import SwiftUI
+import StoreKit
 import StoreHelper
 
+/// `ContentView` displays the `Products` view, which is responsible for displaying a list of available products, along with
+/// purchase buttons and a button to enable users to manually restore previous purchases.
+///
+/// For notes on signing promotional subscription offers see the section on **"Introductory and Promotional Subscription Offers"**
+/// in the [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md).
+///
 @available(iOS 15.0, macOS 12.0, *)
 struct ContentView: View {
     @State private var showProductInfoSheet = false
