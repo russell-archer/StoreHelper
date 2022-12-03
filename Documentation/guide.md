@@ -1146,7 +1146,11 @@ For *each subscription product* you may optionally define:
 > 
 > Note that introductory offers do NOT need to be signed. `StoreHelper` will automatically handle the processing of eligible introductory offers.
 
-`StoreHelper` supports **introductory** and **promotional offers** for subscriptions. However, Apple requires that every request to purchase a subscription using a promotional offer must be **digitally signed**. Currently (Xcode 14), the only mechanism to achieve this is a server-based solution as described in  [Generating a Signature for Promotional Offers](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/generating_a_signature_for_promotional_offers). Until `StoreKit2` provides a more convenient solution based on local signing of promotional offers, `StoreHelper` will pass-off the signing request to a `signPromotionalOffer` closure provided by your app. This will happen whenever the user initiates a purchase request for a subscription which has an eligible promotional offer.
+`StoreHelper` supports **introductory** and **promotional offers** for subscriptions:
+
+![](./assets/StoreHelperDemo140.png)
+
+However, Apple requires that every request to purchase a subscription using a promotional offer must be **digitally signed**. Currently (Xcode 14), the only mechanism to achieve this is a server-based solution as described in  [Generating a Signature for Promotional Offers](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/generating_a_signature_for_promotional_offers). Until `StoreKit2` provides a more convenient solution based on local signing of promotional offers, `StoreHelper` will pass-off the signing request to a `signPromotionalOffer` closure provided by your app. This will happen whenever the user initiates a purchase request for a subscription which has an eligible promotional offer.
 
 The optional `signPromotionalOffer` closure in your code (see the example code below) will receive a `ProductId` and the id of the promotional offer. It should return the signed promotional offer, in the form of a `Product.PurchaseOption` object. `StoreHelper` will then pass that object to the `Product.purchase(options:)` method to complete the purchase using promotional pricing.
 
