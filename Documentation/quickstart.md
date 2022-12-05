@@ -80,12 +80,13 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 - Open `StoreHelperExampleApp.swift` and replace the existing code with the following:
 
 > Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
-> - Delete **ContentView.swift** from your project and move it to the trash
-> - Select any file in the **Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
-> - Select all the files in the **Code** directory and drag them into into your project's main folder. Select **Copy items if needed** when prompted
-> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder. Select **Copy items if needed** when prompted
+> - Delete **ContentView.swift** and **Your-Project-NameApp.swift** from your project and move them to the trash
+> - Select any file in the **StoreHelper > Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
+> - In Finder, select all the files in the **Code** directory and drag them into into your project's main folder in Xcode. Select **Copy items if needed** when prompted
+> - Rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StorehelperDemoApp` to `*Your-Project-NameApp`
+> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
 > - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
-> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** folder
+> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
 
 ```swift
 import SwiftUI
@@ -329,11 +330,16 @@ struct SimplePurchaseView: View {
 ```
 
 ## Add Product Images
-- From the **StoreHelper > Samples > Images** folder, drag all the images into the project's **Asset Catalog**. These images have filenames that are the same as the product ids for the products which they represent
+- Select any file in the **StoreHelper > Samples > Images** folder in Xcode, right-click it and select **Show in Finder**
+- In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
+- These images have filenames that are the same as the product ids for the products which they represent
 
 ## Add Product Configuration Files
-- From the **StoreHelper > Samples > Configuration** folder, drag the `Products.storekit` and `Products.plist` files into the **Shared** project folder. These are example product configuration files
-- Select the **target** and then select **Product > Scheme> Edit Scheme**. Select the `Products.storekit` file in the **StoreKit Configuration** field:
+- Select any file in the **StoreHelper > Samples > Configuration** folder in Xcode, right-click it and select **Show in Finder**
+- In Finder, select all files (except readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
+- Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
+- Select your project's **target** and then select **Product > Scheme> Edit Scheme**
+- Select the `Products.storekit` file in the **StoreKit Configuration** field:
 
 ![](./assets/StoreHelperDemo107.png)
 
