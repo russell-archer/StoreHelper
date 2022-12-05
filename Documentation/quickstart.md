@@ -80,9 +80,12 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 - Open `StoreHelperExampleApp.swift` and replace the existing code with the following:
 
 > Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
-> - Copy all files in **StoreHelper > Samples > Code** into your project's **Shared** folder
-> - Copy all files in **StoreHelper > Samples > Configuration** into your project's **Shared** folder
-> - Add all the images in **StoreHelper > Samples > Images** to your project's **Asset Catalog** folder
+> - Delete **ContentView.swift** from your project and move it to the trash
+> - Select any file in the **Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
+> - Select all the files in the **Code** directory and drag them into into your project's main folder. Select **Copy items if needed** when prompted
+> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder. Select **Copy items if needed** when prompted
+> - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
+> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** folder
 
 ```swift
 import SwiftUI
