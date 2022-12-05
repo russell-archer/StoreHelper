@@ -83,7 +83,7 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 > - Delete **ContentView.swift** and **Your-Project-NameApp.swift** from your project and move them to the trash
 > - Select any file in the **StoreHelper > Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
 > - In Finder, select all the files in the **Code** directory and drag them into into your project's main folder in Xcode. Select **Copy items if needed** when prompted
-> - Rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StorehelperDemoApp` to `*Your-Project-NameApp`
+> - Rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StoreHelperDemoApp` to `Your-Project-NameApp`
 > - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
 > - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
 > - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode

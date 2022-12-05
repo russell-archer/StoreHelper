@@ -8,6 +8,8 @@
 import SwiftUI
 import StoreKit
 
+#if os(iOS)
+@available(iOS 15.0, *)
 public struct RedeemOfferCodeView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding var showRedeemOfferCodeButton: Bool
@@ -36,3 +38,5 @@ public struct RedeemOfferCodeView: View {
         }
     }
 }
+#endif
+
