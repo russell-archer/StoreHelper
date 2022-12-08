@@ -8,7 +8,9 @@
 import SwiftUI
 import StoreKit
 
-/// Displays a consumable, non-consumable or subscription product's price, and a button that enables purchasing.
+/// Displays a consumable, non-consumable product's price on a button that enables purchasing. If the product is a subscription,
+/// the price and renewal period is displayed on a button that enables purchasing. If a subscription has one or more eligible offers
+/// then these are displayed in preference to the standard price and renewal period.
 #if os(iOS)
 @available(iOS 15.0, *)
 public struct PriceView: View {
@@ -42,9 +44,9 @@ public struct PriceView: View {
         let priceViewModel = PriceViewModel(storeHelper: storeHelper, purchaseState: $purchaseState)
         
         VStack {
-            if isSubscription {
+            if isSubscription, !isSubscribed {
+                // Show price(s)/renewal period(s) only if we're looking at a subscription and the user's not currently subscribed
                 if let prePurchaseSubInfo, let purchasePriceForDisplay = prePurchaseSubInfo.purchasePriceForDisplay {
-                    
                     // Display all the promotional, introductory and standard offers (there can be multiple promotional offers)
                     ForEach(purchasePriceForDisplay) { priceForDisplay in
                         Button(action: {
@@ -76,6 +78,7 @@ public struct PriceView: View {
                 }
                 
             } else {
+                // Price for non-subscription product
                 Button(action: {
                     withAnimation { purchaseState = .inProgress }
                     Task.init { await priceViewModel.purchase(product: product) }

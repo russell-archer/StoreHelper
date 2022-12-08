@@ -47,10 +47,9 @@ public struct PriceViewModel {
         ppSubInfo.introductoryOffer = processIntroductoryOffer(sub: subscription, for: productId)
         ppSubInfo.promotionalOffers = processPromotionalOffers(sub: subscription, for: productId)
                 
-        // Are there one or more promotional offers, or an introductory offer available?
         ppSubInfo.promotionalOffersEligible = false
         ppSubInfo.introductoryOfferEligible = false
-        
+        // Are there one or more promotional offers, or an introductory offer available?
         if ppSubInfo.promotionalOffers != nil {
             // Promotional offers take precedence over introductory offers. There are promo offers available, but is this user eligible?
             if await storeHelper.subscriptionHelper.isLapsedSubscriber(to: product) {
