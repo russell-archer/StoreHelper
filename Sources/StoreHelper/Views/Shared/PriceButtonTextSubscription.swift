@@ -27,8 +27,6 @@ import StoreKit
 /// each user is only eligible to redeem ONE introductory offer per subscription group.
 /// See https://help.apple.com/app-store-connect/#/deve1d49254f for details.
 ///
-/// As currently implemented, if more than one promotional offer is available, StoreHelper will display the
-/// **first** applicable offer.
 @available(iOS 15.0, macOS 12.0, *)
 public struct PriceButtonTextSubscription: View {
     @EnvironmentObject var storeHelper: StoreHelper

@@ -56,8 +56,7 @@ public struct PrePurchaseSubscriptionInfo: Hashable {
     /// single element with the promo id (which will be nil) and price/period for the offer.
     /// - If there are no offers, the value of this property will be an array with a single element with the standard price/period.
     public var purchasePriceForDisplay: [PurchasePriceForDisplay]? {
-        if promotionalOffersEligible, let promotionalOffers {
-            
+        if promotionalOffersEligible, let promotionalOffers, promotionalOffers.count > 0 {
             var offersDisplay = [PurchasePriceForDisplay]()
             promotionalOffers.forEach { offer in
                 if let offerDisplay = offer.offerDisplay {
