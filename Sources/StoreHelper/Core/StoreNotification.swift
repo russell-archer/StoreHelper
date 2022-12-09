@@ -55,6 +55,8 @@ public enum StoreNotification: Error, Equatable {
     case transactionRevoked
     case transactionRefundRequested
     case transactionRefundFailed
+    case transactionExpired
+    case transactionUpgraded
     
     case consumableSavedInKeychain
     case consumableKeychainError
@@ -94,6 +96,8 @@ public enum StoreNotification: Error, Equatable {
             case .transactionRevoked:              return "Transaction was revoked (refunded) by the App Store"
             case .transactionRefundRequested:      return "Transaction refund successfully requested"
             case .transactionRefundFailed:         return "Transaction refund request failed"
+            case .transactionExpired:              return "Transaction for subscription has expired"
+            case .transactionUpgraded:             return "Transaction superceeded by higher-value subscription"
                 
             case .consumableSavedInKeychain:       return "Consumable purchase successfully saved to the keychain"
             case .consumableKeychainError:         return "Keychain error"

@@ -534,19 +534,19 @@ public class StoreHelper: ObservableObject {
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
     @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
+        var add = true
         
-        if transaction.revocationDate == nil {
-            
-            // The transaction has NOT been revoked by the App Store so this product has been purchase.
-            // Add the ProductId to the list of `purchasedProducts` (it's a Set so it won't add if already there).
-            await updatePurchasedIdentifiers(transaction.productID, insert: true)
-            
-        } else {
-            
-            // The App Store revoked this transaction (e.g. a refund), meaning the user should not have access to it.
-            // Remove the product from the list of `purchasedProducts`.
-            await updatePurchasedIdentifiers(transaction.productID, insert: false)
-        }
+        // Has the user's access to the product has been revoked by the App Store?
+        if transaction.revocationDate == nil { add = false }
+        
+        // Has the user's subscription has expired
+        if let expirationDate = transaction.expirationDate, expirationDate < Date() { add = false }
+        
+        // The transaction has been superceeded by an active, higher-value subscription
+        if transaction.isUpgraded { add = false }
+
+        // Add or remove the ProductId to/from the list of `purchasedProducts`
+        await updatePurchasedIdentifiers(transaction.productID, insert: add)
     }
     
     /// Update our list of purchased product identifiers (see `purchasedProducts`).
@@ -590,24 +590,41 @@ public class StoreHelper: ObservableObject {
         return Task.detached {
             
             for await verificationResult in Transaction.updates {
-                
                 // See if StoreKit validated the transaction
                 let checkResult = await self.checkVerificationResult(result: verificationResult)
-                StoreLog.transaction(.transactionReceived, productId: checkResult.transaction.productID)
-                
-                if checkResult.verified {
-                    
-                    let validatedTransaction = checkResult.transaction
-                    
-                    // The transaction was validated so update the list of products the user has access to
-                    await self.updatePurchasedIdentifiers(validatedTransaction)
-                    await validatedTransaction.finish()
-                    
-                } else {
-                    
-                    // StoreKit's attempts to validate the transaction failed. Don't deliver content to the user.
+                guard checkResult.verified else {
+                    // StoreKit's attempts to validate the transaction failed
                     StoreLog.transaction(.transactionFailure, productId: checkResult.transaction.productID)
+                    return
                 }
+                
+                // The transaction was validated by StoreKit
+                let transaction = checkResult.transaction
+                StoreLog.transaction(.transactionReceived, productId: transaction.productID)
+                    
+                if transaction.revocationDate != nil {
+                    // The user's access to the product has been revoked by the App Store (e.g. a refund, etc.)
+                    // See transaction.revocationReason for more details if required
+                    StoreLog.transaction(.transactionRevoked, productId: transaction.productID)
+                    return
+                }
+                
+                if let expirationDate = transaction.expirationDate, expirationDate < Date() {
+                    // The user's subscription has expired
+                    StoreLog.transaction(.transactionExpired, productId: transaction.productID)
+                    return
+                }
+                
+                if transaction.isUpgraded {
+                    // Transaction superceeded by an active, higher-value subscription
+                    StoreLog.transaction(.transactionUpgraded, productId: transaction.productID)
+                    return
+                }
+                    
+                // Update the list of products the user has access to
+                StoreLog.transaction(.transactionSuccess, productId: transaction.productID)
+                await self.updatePurchasedIdentifiers(transaction)
+                await transaction.finish()
             }
         }
     }
