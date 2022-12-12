@@ -10,12 +10,6 @@ import StoreKit
 
 /*
  
- Menu structure in iOS:
- 
- Manage Subscriptions   􀏺
- Restore Purchases      􀚐
- Contact Us             􀌨
- 
  View in macOS:
  
  [Restore Purchases] [Contact Us]
@@ -32,38 +26,40 @@ public struct PurchaseManagement: View {
     @Environment(\.openURL) var openURL
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchasesRestored: Bool = false
+    @State private var restorePurchasesTxt: String? = ""
     
     public init() {}
     
     public var body: some View {
-        if  storeHelper.hasProducts,
-            let restorePurchasesTxt = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper),
-            let sContactUrl = Configuration.contactUsUrl.value(storeHelper: storeHelper),
-            let contactUrl = URL(string: sContactUrl) {
-            
-            let edgeInsets = EdgeInsets(top: 10, leading: 3, bottom: 10, trailing: 3)
-            VStack {
-                HStack {
+        let edgeInsets = EdgeInsets(top: 10, leading: 3, bottom: 10, trailing: 3)
+        VStack {
+            HStack {
+                if  storeHelper.hasProducts, restorePurchasesTxt != nil {
                     Button(action: { restorePurchases()}) {
-                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(restorePurchasesTxt)}.padding()},
+                        Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(restorePurchasesTxt!)}.padding()},
                               icon:  { Image(systemName: "purchased").bodyImageNotRounded().frame(height: 24)})
                     }
                     .macOSStyle(padding: edgeInsets)
                     .disabled(purchasesRestored)
-                    
+                }
+                
+                if let sContactUrl = Configuration.contactUsUrl.value(storeHelper: storeHelper), let contactUrl = URL(string: sContactUrl) {
                     Button(action: { openURL(contactUrl)}) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Contact Us")}.padding()},
                               icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
                     }
                     .macOSStyle(padding: edgeInsets)
                 }
-                
-                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Click \"\(restorePurchasesTxt)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
+            }
+            
+            if restorePurchasesTxt != nil {
+                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Click \"\(restorePurchasesTxt!)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                     .foregroundColor(.secondary)
             }
         }
+        .task { restorePurchasesTxt = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) }
     }
     
     /// Restores previous user purchases. With StoreKit2 this is normally not necessary and should only be

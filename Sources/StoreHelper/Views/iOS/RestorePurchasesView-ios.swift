@@ -8,6 +8,8 @@
 import SwiftUI
 import StoreKit
 
+#if os(iOS)
+@available(iOS 15.0, *)
 public struct RestorePurchasesView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Binding private var purchasesRestored: Bool
@@ -34,3 +36,5 @@ public struct RestorePurchasesView: View {
         }
     }
 }
+#endif
+

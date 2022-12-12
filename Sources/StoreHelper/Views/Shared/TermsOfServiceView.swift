@@ -9,9 +9,8 @@ import SwiftUI
 
 /// Displays links for terms of service and privacy policy
 @available(iOS 15.0, macOS 12.0, *)
-public struct TermsOfServiceView: View {
-    @State private var termsOfService: String? = nil
-    @State private var privacyPolicy: String? = nil
+public struct TermsOfServiceAndPrivacyPolicyView: View {
+    @EnvironmentObject var storeHelper: StoreHelper
     @State private var termsOfServiceUrl: URL?
     @State private var privacyPolicyUrl: URL?
     
@@ -21,12 +20,12 @@ public struct TermsOfServiceView: View {
             if termsOfServiceUrl != nil, privacyPolicyUrl != nil { Text("and") }
             if let privacyPolicyUrl { Link("Privacy Policy", destination: privacyPolicyUrl) }
         }
-        .onAppear {
-            termsOfService = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
-            privacyPolicy = "https://russell-archer.github.io/privacy/"
+        .task {
+            if  let termsOfService = Configuration.termsOfServiceUrl.value(storeHelper: storeHelper),
+                let tosUrl = URL(string: termsOfService) { termsOfServiceUrl = tosUrl }
             
-            if let termsOfService, let tosUrl = URL(string: termsOfService) { termsOfServiceUrl = tosUrl }
-            if let privacyPolicy, let ppUrl = URL(string: privacyPolicy) { privacyPolicyUrl =  ppUrl }
+            if  let privacyPolicy = Configuration.privacyPolicyUrl.value(storeHelper: storeHelper),
+                let ppUrl = URL(string: privacyPolicy) { privacyPolicyUrl =  ppUrl }
         }
     }
 }
