@@ -29,8 +29,6 @@ public struct Products: View {
     @State private var purchasesRestored: Bool = false
     @State private var showRefundAlert: Bool = false
     @State private var refundAlertText: String = ""
-    @State private var termsOfServiceUrl: String? = nil
-    @State private var privacyPolicyUrl: String? = nil
     @State private var showRedeemOfferCodeButton = false
     @State private var showRedeemOfferCodeError = false
     
@@ -54,7 +52,8 @@ public struct Products: View {
     /// [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md).
     ///
     /// - Parameters:
-    ///   - signPromotionalOffer: A closure that receives a `ProductId` and promotional offer id, and returns a signed
+    ///   - signPromotionalOffer: A closure that receives a `ProductId` and promotional offer id, and returns a signed promotional offer in
+    ///   the form of a `Product.PurchaseOption`.
     ///   - productInfoCompletion: A closure that receives a `ProductId` when the user taps on a product's image or information button for
     ///   additional information about that product. The closure should trigger the presentation of a sheet that shows information to the user
     ///   on why they should purchase the product.
@@ -70,7 +69,7 @@ public struct Products: View {
                             signPromotionalOffer: signPromotionalOffer,
                             productInfoCompletion: productInfoCompletion)
             
-            TermsOfServiceView()
+            TermsOfServiceAndPrivacyPolicyView()
             RestorePurchasesView(purchasesRestored: $purchasesRestored)
             RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
             
@@ -91,11 +90,7 @@ public struct Products: View {
         }
         .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
         .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
-        .onAppear {
-            canMakePayments = AppStore.canMakePayments
-            termsOfServiceUrl = Configuration.termsOfServiceUrl.value(storeHelper: storeHelper)
-            privacyPolicyUrl = Configuration.privacyPolicyUrl.value(storeHelper: storeHelper)
-        }
+        .onAppear { canMakePayments = AppStore.canMakePayments }
             
         VersionInfo()
     }

@@ -16,13 +16,6 @@ import StoreKit
  Restore Purchases      􀚐
  Contact Us             􀌨
  
- View in macOS:
- 
- [Restore Purchases] [Contact Us]
- 
- Note that the APIs to request refunds and manage subscriptions are not currently available for macOS.
- On macOS when the user want to request a refund all we can do is open the Apple "https://reportaproblem.apple.com/" web page.
- 
  */
 
 /// Allows the user to manage subscriptions, restore purchases, request refunds and contact us.
@@ -33,13 +26,12 @@ public struct PurchaseManagement: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchasesRestored: Bool = false
     @State private var showManageSubscriptions = false
+    @State private var contactUrl: URL? = nil
     
     public init() {}
     
     public var body: some View {
-        if  storeHelper.hasProducts,
-            let sContactUrl = Configuration.contactUsUrl.value(storeHelper: storeHelper),
-            let contactUrl = URL(string: sContactUrl) {
+        if  storeHelper.hasProducts {
             
             Menu {
                 Button(action: {
@@ -50,10 +42,16 @@ public struct PurchaseManagement: View {
                 .disabled(!storeHelper.hasSubscriptionProducts)
                 
                 Button(action: { restorePurchases()}) { Label("Restore Purchases", systemImage: "purchased")}
-                Button(action: { openURL(contactUrl)}) { Label("Contact Us", systemImage: "bubble.right")}
+                
+                if let contactUrl {
+                    Button(action: { openURL(contactUrl)}) { Label("Contact Us", systemImage: "bubble.right")}
+                }
 
             } label: { Label("", systemImage: "line.3.horizontal").labelStyle(.iconOnly)}
             .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
+            .task {
+                if let contact = Configuration.contactUsUrl.value(storeHelper: storeHelper) { contactUrl = URL(string: contact)}
+            }
         }
     }
 
