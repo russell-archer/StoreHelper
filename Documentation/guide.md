@@ -13,10 +13,13 @@ This document describes how to implement and test in-app purchases with **SwiftU
 - See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 16/macOS 13 SwiftUI** app
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 14** and **iOS 16**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with `StoreKit1` in **iOS 14**
+- See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
 
 ---
 
-# Recent Changes
+# Recent Major Changes
+- 13 December, 2022
+    - Added proof-of-concept demo showing `StoreHelper` in a UIKit project
 - 27 November, 2022
 	- Major update to the way **subscriptions** are handled
 	- Subscription prices now show **prices and renewal periods**
@@ -1203,14 +1206,12 @@ struct ContentView: View {
     @State private var productId: ProductId = ""
     
     var body: some View {
-        ScrollView {
-            Products() { productId, promoId in
-                // Get the app-server to sign the promotional offer with your App Store Connect key
-                return getSignature(productId: productId, promotionId: promoId)
-                
-            } productInfoCompletion: { id in
-                // User wants more info on a product. Show the info sheet...
-            }
+        Products() { productId, promoId in
+            // Get the app-server to sign the promotional offer with your App Store Connect key
+            return getSignature(productId: productId, promotionId: promoId)
+            
+        } productInfoCompletion: { id in
+            // User wants more info on a product. Show the info sheet...
         }
     }
     

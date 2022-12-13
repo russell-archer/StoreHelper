@@ -7,6 +7,7 @@
 - See [StoreHelper](https://github.com/russell-archer/StoreHelper) for an overview of the `StoreHelper` package
 - See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 14**, **iOS 16** and **macOS 13**
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 14** and **iOS 16**
+- See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
 
 # Contents
 
@@ -193,20 +194,18 @@ struct ContentView: View {
     @State private var productId: ProductId = ""
     
     var body: some View {
-        ScrollView {
-            Products() { id in
-                productId = id
-                showProductInfoSheet = true
+        Products() { id in
+            productId = id
+            showProductInfoSheet = true
+        }
+        .sheet(isPresented: $showProductInfoSheet) {
+            VStack {
+                // Pull in text and images that explain the particular product identified by `productId`
+                ProductInfo(productInfoProductId: $productId, showProductInfoSheet: $showProductInfoSheet)
             }
-            .sheet(isPresented: $showProductInfoSheet) {
-                VStack {
-                    // Pull in text and images that explain the particular product identified by `productId`
-                    ProductInfo(productInfoProductId: $productId, showProductInfoSheet: $showProductInfoSheet)
-                }
-                #if os(macOS)
-                .frame(minWidth: 500, idealWidth: 500, maxWidth: 500, minHeight: 500, idealHeight: 500, maxHeight: 500)
-                #endif
-            }
+            #if os(macOS)
+            .frame(minWidth: 500, idealWidth: 500, maxWidth: 500, minHeight: 500, idealHeight: 500, maxHeight: 500)
+            #endif
         }
     }
 }
