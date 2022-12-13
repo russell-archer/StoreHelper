@@ -62,27 +62,30 @@ public struct Products: View {
     }
     
     @ViewBuilder public var body: some View {
-        VStack {
-            ProductListView(signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
-            
-            TermsOfServiceAndPrivacyPolicyView()
-            if Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) != nil {
-                DisclosureGroup(isExpanded: $showManagePurchases, content: {
-                    PurchaseManagement() },
-                                label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
+        ScrollView {
+            VStack {
+                ProductListView(signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
+                
+                TermsOfServiceAndPrivacyPolicyView()
+                if Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) != nil {
+                    DisclosureGroup(isExpanded: $showManagePurchases, content: {
+                        PurchaseManagement() },
+                                    label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
                     .onTapGesture { withAnimation { showManagePurchases.toggle()}}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
+                }
+                
+                if !canMakePayments {
+                    Spacer()
+                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
+                }
             }
+            .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle()}}
+            .onAppear { canMakePayments = AppStore.canMakePayments }
             
-            if !canMakePayments {
-                Spacer()
-                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
-            }
+            VersionInfo()
         }
-        .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle()}}
-        .onAppear { canMakePayments = AppStore.canMakePayments }
-        
-        VersionInfo()
+        .refreshable { storeHelper.refreshProductsFromAppStore() }
     }
 }
 #endif

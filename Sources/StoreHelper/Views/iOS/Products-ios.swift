@@ -63,36 +63,39 @@ public struct Products: View {
     }
     
     @ViewBuilder public var body: some View {
-        VStack {
-            ProductListView(showRefundSheet: $showRefundSheet,
-                            refundRequestTransactionId: $refundRequestTransactionId,
-                            signPromotionalOffer: signPromotionalOffer,
-                            productInfoCompletion: productInfoCompletion)
-            
-            TermsOfServiceAndPrivacyPolicyView()
-            RestorePurchasesView(purchasesRestored: $purchasesRestored)
-            RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
-            
-            if !canMakePayments {
-                Spacer()
-                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
+        ScrollView {
+            VStack {
+                ProductListView(showRefundSheet: $showRefundSheet,
+                                refundRequestTransactionId: $refundRequestTransactionId,
+                                signPromotionalOffer: signPromotionalOffer,
+                                productInfoCompletion: productInfoCompletion)
+                
+                TermsOfServiceAndPrivacyPolicyView()
+                RestorePurchasesView(purchasesRestored: $purchasesRestored)
+                RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
+                
+                if !canMakePayments {
+                    Spacer()
+                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
+                }
             }
-        }
-        .navigationBarTitle("Available Products", displayMode: .inline)
-        .toolbar { PurchaseManagement() }
-        .refundRequestSheet(for: refundRequestTransactionId, isPresented: $showRefundSheet) { refundRequestStatus in
-            switch(refundRequestStatus) {
-                case .failure(_): refundAlertText = "Refund request submission failed"
-                case .success(_): refundAlertText = "Refund request submitted successfully"
+            .navigationBarTitle("Available Products", displayMode: .inline)
+            .toolbar { PurchaseManagement() }
+            .refundRequestSheet(for: refundRequestTransactionId, isPresented: $showRefundSheet) { refundRequestStatus in
+                switch(refundRequestStatus) {
+                    case .failure(_): refundAlertText = "Refund request submission failed"
+                    case .success(_): refundAlertText = "Refund request submitted successfully"
+                }
+                
+                showRefundAlert.toggle()
             }
+            .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
+            .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
+            .onAppear { canMakePayments = AppStore.canMakePayments }
             
-            showRefundAlert.toggle()
+            VersionInfo()
         }
-        .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
-        .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
-        .onAppear { canMakePayments = AppStore.canMakePayments }
-            
-        VersionInfo()
+        .refreshable { storeHelper.refreshProductsFromAppStore() }
     }
 }
 #endif
