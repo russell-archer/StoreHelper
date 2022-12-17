@@ -536,8 +536,8 @@ public class StoreHelper: ObservableObject {
     @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
         var add = true
         
-        // Has the user's access to the product has been revoked by the App Store?
-        if transaction.revocationDate == nil { add = false }
+        // Has the user's access to the product been revoked by the App Store?
+        if transaction.revocationDate != nil { add = false }
         
         // Has the user's subscription has expired
         if let expirationDate = transaction.expirationDate, expirationDate < Date() { add = false }
