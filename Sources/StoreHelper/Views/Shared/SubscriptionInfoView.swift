@@ -1,5 +1,5 @@
 //
-//  SubscriptionInfoView-ios.swift
+//  SubscriptionInfoView.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 07/08/2021.
@@ -12,8 +12,7 @@
 import SwiftUI
 import StoreKit
 
-#if os(iOS)
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var subscriptionInfoText = ""
@@ -39,8 +38,8 @@ public struct SubscriptionInfoView: View {
                         .foregroundColor(.blue)
                         .lineLimit(nil)
                 }
-                .padding()
             }
+            .xPlatformButtonStyleBorderless()
         }
         .task { subscriptionInfoText = await viewModel.shortInfo()}
         .sheet(isPresented: $showSubscriptionInfoSheet) {
@@ -50,4 +49,4 @@ public struct SubscriptionInfoView: View {
         }
     }
 }
-#endif
+

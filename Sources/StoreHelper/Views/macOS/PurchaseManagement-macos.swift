@@ -31,7 +31,6 @@ public struct PurchaseManagement: View {
     public init() {}
     
     public var body: some View {
-        let edgeInsets = EdgeInsets(top: 10, leading: 3, bottom: 10, trailing: 3)
         VStack {
             HStack {
                 if  storeHelper.hasProducts, restorePurchasesTxt != nil {
@@ -39,7 +38,7 @@ public struct PurchaseManagement: View {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(restorePurchasesTxt!)}.padding()},
                               icon:  { Image(systemName: "purchased").bodyImageNotRounded().frame(height: 24)})
                     }
-                    .macOSStyle(padding: edgeInsets)
+                    .xPlatformButtonStyleBorderedProminent()
                     .disabled(purchasesRestored)
                 }
                 
@@ -48,7 +47,7 @@ public struct PurchaseManagement: View {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Contact Us")}.padding()},
                               icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
                     }
-                    .macOSStyle(padding: edgeInsets)
+                    .xPlatformButtonStyleBorderedProminent()
                 }
             }
             

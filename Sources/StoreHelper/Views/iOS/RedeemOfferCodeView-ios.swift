@@ -25,7 +25,8 @@ public struct RedeemOfferCodeView: View {
                 Button(action: {
                     showRedeemOfferCodeButton = true
                 }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(redeemOfferCodeButtonText)}.padding()}
-                    .buttonStyle(.borderedProminent).padding()
+                    .xPlatformButtonStyleBorderedProminent()
+                    .padding()
                     .offerCodeRedemption(isPresented: $showRedeemOfferCodeButton) { result in
                         switch result {
                             case .failure(_): showRedeemOfferCodeError = true

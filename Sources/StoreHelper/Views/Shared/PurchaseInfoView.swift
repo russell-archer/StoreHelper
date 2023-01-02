@@ -1,5 +1,5 @@
 //
-//  PurchaseInfoView-ios.swift
+//  PurchaseInfoView.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 19/07/2021.
@@ -13,21 +13,29 @@ import SwiftUI
 import StoreKit
 
 /// Displays information on a consumable or non-consumable purchase.
-#if os(iOS)
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct PurchaseInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var purchaseInfoText = ""
     @State private var showPurchaseInfoSheet = false
-    @Binding var showRefundSheet: Bool
-    @Binding var refundRequestTransactionId: UInt64
     private var productId: ProductId
     
+    #if os(iOS)
+    @Binding var showRefundSheet: Bool
+    @Binding var refundRequestTransactionId: UInt64
+    #endif
+    
+    #if os(iOS)
     public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, productId: ProductId) {
         self._showRefundSheet = showRefundSheet
         self._refundRequestTransactionId = refundRequestTransactionId
         self.productId = productId
     }
+    #else
+    public init(productId: ProductId) {
+        self.productId = productId
+    }
+    #endif
     
     public var body: some View {
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
@@ -45,11 +53,16 @@ public struct PurchaseInfoView: View {
                         .lineLimit(nil)
                 }
             }
+            .xPlatformButtonStyleBorderless()
         }
         .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
+            #if os(iOS)
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId, viewModel: viewModel)
+            #else
+            PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, productId: productId, viewModel: viewModel)
+            #endif
         }
     }
 }
-#endif
+

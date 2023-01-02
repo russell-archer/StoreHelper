@@ -18,6 +18,12 @@ public struct PurchaseButton: View {
     private var price: String
     private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
     
+    #if os(iOS)
+    private var padding: CGFloat = 5
+    #else
+    private var padding: CGFloat = 15
+    #endif
+
     public init(purchaseState: Binding<PurchaseState>,
                 productId: ProductId,
                 price: String,
@@ -53,6 +59,7 @@ public struct PurchaseButton: View {
                     }
                 }
             }
+            .padding(padding)
         }
     }
 }

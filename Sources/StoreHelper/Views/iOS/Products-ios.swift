@@ -65,11 +65,7 @@ public struct Products: View {
     @ViewBuilder public var body: some View {
         ScrollView {
             VStack {
-                ProductListView(showRefundSheet: $showRefundSheet,
-                                refundRequestTransactionId: $refundRequestTransactionId,
-                                signPromotionalOffer: signPromotionalOffer,
-                                productInfoCompletion: productInfoCompletion)
-                
+                ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
                 TermsOfServiceAndPrivacyPolicyView()
                 RestorePurchasesView(purchasesRestored: $purchasesRestored)
                 RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)

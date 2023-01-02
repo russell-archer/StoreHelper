@@ -26,7 +26,8 @@ public struct RestorePurchasesView: View {
                     purchasesRestored = true
                 }
             }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchasesRestored ? "Purchases Restored" : restorePurchasesButtonText)}.padding()}
-                .buttonStyle(.borderedProminent).padding()
+                .xPlatformButtonStyleBorderedProminent()
+                .padding()
                 .disabled(purchasesRestored)
             
             Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually restoring previous purchases is not normally necessary. Tap \"\(restorePurchasesButtonText)\" only if this app does not correctly identify your previous purchases. You will be prompted to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}

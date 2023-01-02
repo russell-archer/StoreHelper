@@ -1,5 +1,5 @@
 //
-//  SubscriptionView-ios.swift
+//  SubscriptionView.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 07/08/2021.
@@ -12,8 +12,7 @@
 import SwiftUI
 import StoreKit
 
-#if os(iOS)
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
@@ -44,7 +43,7 @@ public struct SubscriptionView: View {
     
     public var body: some View {
         VStack {
-            LargeTitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text(displayName)}.padding(.bottom, 1)
+            LargeTitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text(displayName)}.padding(5)
             SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(description)}
                 .padding(EdgeInsets(top: 0, leading: 5, bottom: 3, trailing: 5))
                 .multilineTextAlignment(.center)
@@ -53,19 +52,15 @@ public struct SubscriptionView: View {
                 .contentShape(Rectangle())
                 .onTapGesture { productInfoCompletion(productId) }
 
-            VStack {
-                Image(productId)
-                    .resizable()
-                    .frame(maxWidth: 250, maxHeight: 250)
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(25)
-                    .contentShape(Rectangle())
-                    .onTapGesture { productInfoCompletion(productId) }
-                
-                Spacer()
-                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price, signPromotionalOffer: signPromotionalOffer)
-            }
-            .padding()
+            Image(productId)
+                .resizable()
+                .frame(maxWidth: 250, maxHeight: 250)
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(25)
+                .contentShape(Rectangle())
+                .onTapGesture { productInfoCompletion(productId) }
+            
+            PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price, signPromotionalOffer: signPromotionalOffer)
             
             if purchaseState == .purchased, subscriptionInfo != nil {
                 SubscriptionInfoView(subscriptionInfo: subscriptionInfo!)
@@ -75,7 +70,6 @@ public struct SubscriptionView: View {
             
             Divider()
         }
-        .padding()
         .task { await purchaseState(for: productId)}
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init { await purchaseState(for: productId) }
@@ -87,4 +81,4 @@ public struct SubscriptionView: View {
         purchaseState = purchased ? .purchased : .unknown
     }
 }
-#endif
+

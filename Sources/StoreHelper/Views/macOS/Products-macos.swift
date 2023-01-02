@@ -65,8 +65,8 @@ public struct Products: View {
         ScrollView {
             VStack {
                 ProductListView(signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
-                
                 TermsOfServiceAndPrivacyPolicyView()
+                
                 if Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) != nil {
                     DisclosureGroup(isExpanded: $showManagePurchases, content: {
                         PurchaseManagement() },
