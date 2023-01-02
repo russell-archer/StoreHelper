@@ -1,5 +1,5 @@
 //
-//  PriceView-macos.swift
+//  PriceView.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 21/06/2021.
@@ -8,9 +8,10 @@
 import SwiftUI
 import StoreKit
 
-/// Displays a consumable, non-consumable or subscription product's price, and a button that enables purchasing.
-#if os(macOS)
-@available(macOS 12.0, *)
+/// Displays a consumable, non-consumable product's price on a button that enables purchasing. If the product is a subscription,
+/// the price and renewal period is displayed on a button that enables purchasing. If a subscription has one or more eligible offers
+/// then these are displayed in preference to the standard price and renewal period.
+@available(iOS 15.0, macOS 12.0, *)
 public struct PriceView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var canMakePayments: Bool = false
@@ -42,16 +43,12 @@ public struct PriceView: View {
         let priceViewModel = PriceViewModel(storeHelper: storeHelper, purchaseState: $purchaseState)
         
         VStack {
-            if isSubscription {
+            if isSubscription, !isSubscribed {
+                // Show price(s)/renewal period(s) only if we're looking at a subscription and the user's not currently subscribed
                 if let prePurchaseSubInfo, let purchasePriceForDisplay = prePurchaseSubInfo.purchasePriceForDisplay {
-                    
                     // Display all the promotional, introductory and standard offers (there can be multiple promotional offers)
                     ForEach(purchasePriceForDisplay) { priceForDisplay in
-                        VStack {
-                            PriceButtonTextSubscription(disabled: !canMakePayments, price: priceForDisplay.price)
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
+                        Button(action: {
                             guard canMakePayments else { return }
                             withAnimation { purchaseState = .inProgress }
                             
@@ -71,20 +68,24 @@ public struct PriceView: View {
                                     await priceViewModel.purchase(product: product)
                                 }
                             }
+                        }) {
+                            PriceButtonTextSubscription(disabled: !canMakePayments, price: priceForDisplay.price)
                         }
+                        .xPlatformButtonStyleBorderless()
+                        .disabled(!canMakePayments)
                     }
                 }
                 
             } else {
-                VStack {
-                    PriceButtonText(price: price, disabled: !canMakePayments)
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    guard canMakePayments else { return }
+                // Price for non-subscription product
+                Button(action: {
                     withAnimation { purchaseState = .inProgress }
                     Task.init { await priceViewModel.purchase(product: product) }
+                }) {
+                    PriceButtonText(price: price, disabled: !canMakePayments)
                 }
+                .xPlatformButtonStyleBorderless()
+                .disabled(!canMakePayments)
             }
         }
         .task {
@@ -107,4 +108,4 @@ public struct PriceView: View {
         }
     }
 }
-#endif
+

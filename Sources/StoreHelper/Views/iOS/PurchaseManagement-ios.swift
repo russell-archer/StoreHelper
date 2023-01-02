@@ -39,12 +39,15 @@ public struct PurchaseManagement: View {
                     showManageSubscriptions.toggle()
 
                 }) { Label("Manage Subscriptions", systemImage: "rectangle.stack.fill.badge.person.crop")}
-                .disabled(!storeHelper.hasSubscriptionProducts)
+                    .xPlatformButtonStyleBorderedProminent()
+                    .disabled(!storeHelper.hasSubscriptionProducts)
                 
                 Button(action: { restorePurchases()}) { Label("Restore Purchases", systemImage: "purchased")}
+                    .xPlatformButtonStyleBorderedProminent()
                 
                 if let contactUrl {
                     Button(action: { openURL(contactUrl)}) { Label("Contact Us", systemImage: "bubble.right")}
+                        .xPlatformButtonStyleBorderedProminent()
                 }
 
             } label: { Label("", systemImage: "line.3.horizontal").labelStyle(.iconOnly)}

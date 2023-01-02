@@ -1,5 +1,5 @@
 //
-//  PurchaseInfoSheet-ios.swift
+//  PurchaseInfoSheet.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 05/01/2022.
@@ -11,18 +11,21 @@
 
 import SwiftUI
 
-#if os(iOS)
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 public struct PurchaseInfoSheet: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var extendedPurchaseInfo: ExtendedPurchaseInfo?
     @State private var showManagePurchase = false
     @Binding var showPurchaseInfoSheet: Bool
-    @Binding var showRefundSheet: Bool
-    @Binding var refundRequestTransactionId: UInt64
     private var productId: ProductId
     private var viewModel: PurchaseInfoViewModel
     
+    #if os(iOS)
+    @Binding var showRefundSheet: Bool
+    @Binding var refundRequestTransactionId: UInt64
+    #endif
+    
+    #if os(iOS)
     public init(showPurchaseInfoSheet: Binding<Bool>,
                 showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
@@ -35,6 +38,13 @@ public struct PurchaseInfoSheet: View {
         self.productId = productId
         self.viewModel = viewModel
     }
+    #else
+    public init(showPurchaseInfoSheet: Binding<Bool>, productId: ProductId, viewModel: PurchaseInfoViewModel) {
+        self._showPurchaseInfoSheet = showPurchaseInfoSheet
+        self.productId = productId
+        self.viewModel = viewModel
+    }
+    #endif
     
     public var body: some View {
         VStack {
@@ -71,6 +81,7 @@ public struct PurchaseInfoSheet: View {
                     Divider().padding(.bottom)
                     
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
+                        #if os(iOS)
                         Button(action: {
                             if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
                             if let tid = epi.transactionId {
@@ -81,8 +92,18 @@ public struct PurchaseInfoSheet: View {
                             Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Request Refund")}.padding()},
                                   icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                         }
-                        .buttonStyle(.borderedProminent)
+                        .xPlatformButtonStyleBorderedProminent()
                         .padding()
+                        #else
+                        Button(action: {
+                            if  let sRefundUrl = Configuration.requestRefundUrl.value(storeHelper: storeHelper),
+                                let refundUrl = URL(string: sRefundUrl) {
+                                NSWorkspace.shared.open(refundUrl)
+                            }
+                        }) { Label("Request Refund", systemImage: "creditcard.circle")}
+                            .xPlatformButtonStyleBorderedProminent()
+                            .padding()
+                        #endif
                         
                     }) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
@@ -105,16 +126,26 @@ public struct PurchaseInfoSheet: View {
             }
         }
         .task { extendedPurchaseInfo = await viewModel.extendedPurchaseInfo(for: productId)}
+        #if os(macOS)
+        .frame(minWidth: 650, idealWidth: 650, maxWidth: 650, minHeight: 680, idealHeight: 680, maxHeight: 680)
+        .fixedSize(horizontal: true, vertical: true)
+        #endif
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 struct PurchaseInfoFieldView: View {
     let fieldName: String
     let fieldValue: String
     let edgeInsetsFieldValue = EdgeInsets(top: 7, leading: 5, bottom: 0, trailing: 5)
+    
+    #if os(iOS)
     let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 10, bottom: 0, trailing: 5)
     let width: CGFloat = 95
+    #else
+    let edgeInsetsFieldName = EdgeInsets(top: 7, leading: 25, bottom: 0, trailing: 5)
+    let width: CGFloat = 140
+    #endif
     
     var body: some View {
         HStack {
@@ -125,14 +156,18 @@ struct PurchaseInfoFieldView: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 struct PurchaseInfoFieldText: View {
     @EnvironmentObject var storeHelper: StoreHelper
     let text: String
     
     var body: some View {
         // Note. We intentionaly don't support scalable fonts here
+        #if os(iOS)
         Text(text).font(.footnote)
+        #else
+        Text(text).font(.title2)
+        #endif
     }
 }
-#endif
+

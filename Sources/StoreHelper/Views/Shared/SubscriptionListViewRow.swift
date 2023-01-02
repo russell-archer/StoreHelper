@@ -35,7 +35,7 @@ public struct SubscriptionListViewRow: View {
     }
     
     public var body: some View {
-        Section(header: Text(headerText)) {
+        Section(header: BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(headerText).padding()}) {
             // For each product in the group, display as a row using SubscriptionView().
             // If a product is the highest subscription level then pass its SubscriptionInfo to SubscriptionView().
             ForEach(products, id: \.id) { product in

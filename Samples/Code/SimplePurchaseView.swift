@@ -12,7 +12,7 @@ import StoreHelper
 struct SimplePurchaseView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    var price = "1.99"
+    @State var product: Product?
     let productId = "com.rarcher.nonconsumable.flowers.large"
     
     var body: some View {
@@ -24,7 +24,11 @@ struct SimplePurchaseView: View {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
             
-            PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price).padding()
+            if let product {
+                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: product.displayPrice).padding()
+            } else {
+                Text("Unable to get Product for \(productId)")
+            }
             
             if purchaseState == .purchased {
                 Text("This product has already been purchased").multilineTextAlignment(.center)
@@ -38,6 +42,7 @@ struct SimplePurchaseView: View {
         .task {
             let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
             purchaseState = purchased ? .purchased : .unknown
+            product = storeHelper.product(from: productId)
         }
     }
 }

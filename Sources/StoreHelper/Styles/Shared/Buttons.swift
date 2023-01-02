@@ -1,11 +1,28 @@
 //
-//  Button.swift
+//  Buttons.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 10/12/2021.
 //
 
 import SwiftUI
+
+@available(iOS 15.0, macOS 12.0, *)
+public extension View {
+    func xPlatformButtonStyleBorderless() -> some View { self.buttonStyle(.borderless) }
+    
+    func xPlatformButtonStyleBorderedProminent(foregroundColor: Color = .white,
+                                               backgroundColor: Color = .blue,
+                                               pressedColor: Color = .secondary,
+                                               padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)) -> some View {
+        
+        #if os(iOS)
+        self.buttonStyle(.borderedProminent)
+        #else
+        self.buttonStyle(macOSButtonStyle(foregroundColor: foregroundColor, backgroundColor: backgroundColor, pressedColor: pressedColor, padding: padding))
+        #endif
+    }
+}
 
 #if os(macOS)
 @available(macOS 12.0, *)
