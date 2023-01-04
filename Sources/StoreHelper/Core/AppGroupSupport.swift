@@ -18,21 +18,27 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, *)
 public struct AppGroupSupport {
+    private static var widgetConfigurationOverrides: [String : AnyObject]?
     
-    public static func syncPurchase(storeHelper: StoreHelper, productId: String, purchased: Bool) {
+    public static func syncPurchase(productId: String, purchased: Bool) {
         // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
         // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
         // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
         // StoreKit is concerned.
-        guard let id = Configuration.appGroupBundleId.value(storeHelper: storeHelper) else { return }
+        if widgetConfigurationOverrides == nil { widgetConfigurationOverrides = readConfigurationOverride() }
+        guard let id = Configuration.appGroupBundleId.value(overrides: widgetConfigurationOverrides) else { return }
         if let defaults = UserDefaults(suiteName: id) { defaults.set(purchased, forKey: productId)}
     }
     
-    public static func isPurchased(storeHelper: StoreHelper, productId: String) -> Bool {
-        guard let id = Configuration.appGroupBundleId.value(storeHelper: storeHelper) else { return false }
+    public static func isPurchased(productId: String) -> Bool {
+        if widgetConfigurationOverrides == nil { widgetConfigurationOverrides = readConfigurationOverride() }
+        guard let id = Configuration.appGroupBundleId.value(overrides: widgetConfigurationOverrides) else { return false }
         var purchased = false
         if let defaults = UserDefaults(suiteName: id) { purchased = defaults.bool(forKey: productId)}
         return purchased
     }
+    
+    /// Read the property list provided by the host app that overrides StoreHelper default values.
+    /// - Returns: Returns a dictionary of key-value pairs, or nil if the configuration plist file cannot be found.
+    private static func readConfigurationOverride() -> [String : AnyObject]? { PropertyFile.read(filename: StoreConstants.Configuration) }
 }
-

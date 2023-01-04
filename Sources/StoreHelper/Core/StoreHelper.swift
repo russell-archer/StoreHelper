@@ -209,7 +209,7 @@ public class StoreHelper: ObservableObject {
         
         guard let product = product(from: productId) else {
             updatePurchasedProductsFallbackList(for: productId, purchased: false)
-            AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: false)
+            AppGroupSupport.syncPurchase(productId: productId, purchased: false)
             return false
         }
         
@@ -218,13 +218,13 @@ public class StoreHelper: ObservableObject {
             purchased = KeychainHelper.count(for: productId) > 0
             await updatePurchasedIdentifiers(productId, insert: purchased)
             updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
-            AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: purchased)
+            AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
             return purchased
         }
         
         guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
             // There's no transaction for the product, so it hasn't been purchased
-            AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: false)
+            AppGroupSupport.syncPurchase(productId: productId, purchased: false)
             updatePurchasedProductsFallbackList(for: productId, purchased: false)
             return false
         }
@@ -247,7 +247,7 @@ public class StoreHelper: ObservableObject {
         // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
         // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
         // StoreKit is concerned.
-        AppGroupSupport.syncPurchase(storeHelper: self, productId: product.id, purchased: purchased)
+        AppGroupSupport.syncPurchase(productId: product.id, purchased: purchased)
         
         // Update and persist our fallback list of purchased products
         updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
@@ -410,7 +410,7 @@ public class StoreHelper: ObservableObject {
                 // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
                 // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
                 // StoreKit is concerned.
-                AppGroupSupport.syncPurchase(storeHelper: self, productId: product.id, purchased: true)
+                AppGroupSupport.syncPurchase(productId: product.id, purchased: true)
                 
                 return (transaction: validatedTransaction, purchaseState: .purchased)
                 
@@ -439,7 +439,7 @@ public class StoreHelper: ObservableObject {
         Task.init { await updatePurchasedIdentifiers(productId, insert: true)}
         purchaseState = .purchased
         StoreLog.event(.purchaseSuccess, productId: productId)
-        AppGroupSupport.syncPurchase(storeHelper: self, productId: productId, purchased: true)
+        AppGroupSupport.syncPurchase(productId: productId, purchased: true)
     }
     
     /// The `Product` associated with a `ProductId`.

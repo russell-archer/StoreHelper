@@ -41,6 +41,21 @@ public enum Configuration {
         }
     }
     
+    /// Gets an overridden configuration value, or if not found, provides a default value.
+    /// - Parameter overrides: A dictionary of values which override the default values set by StoreHelper.
+    /// - Returns: Returns an overridden configuration value, or if not found, provides a default value.
+    public func value(overrides: [String : AnyObject]?) -> String? {
+        switch self {
+            case .appGroupBundleId:             return resolveOverriddenValue(overrides: overrides)
+            case .contactUsUrl:                 return resolveOverriddenValue(overrides: overrides)
+            case .requestRefundUrl:             return resolveOverriddenValue(overrides: overrides)
+            case .restorePurchasesButtonText:   return resolveOverriddenValue(overrides: overrides)
+            case .termsOfServiceUrl:            return resolveOverriddenValue(overrides: overrides)
+            case .privacyPolicyUrl:             return resolveOverriddenValue(overrides: overrides)
+            case .redeemOfferCodeButtonText:    return resolveOverriddenValue(overrides: overrides)
+        }
+    }
+    
     public func key() -> String {
         switch self {
             case .appGroupBundleId:             return "appGroupBundleId"
