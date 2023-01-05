@@ -42,7 +42,7 @@ public struct PurchaseManagement: View {
                     .disabled(purchasesRestored)
                 }
                 
-                if let sContactUrl = Configuration.contactUsUrl.value(storeHelper: storeHelper), let contactUrl = URL(string: sContactUrl) {
+                if let sContactUrl = Configuration.contactUsUrl.stringValue(storeHelper: storeHelper), let contactUrl = URL(string: sContactUrl) {
                     Button(action: { openURL(contactUrl)}) {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Contact Us")}.padding()},
                               icon:  { Image(systemName: "bubble.right").bodyImageNotRounded().frame(height: 24)})
@@ -58,7 +58,7 @@ public struct PurchaseManagement: View {
                     .foregroundColor(.secondary)
             }
         }
-        .task { restorePurchasesTxt = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) }
+        .task { restorePurchasesTxt = Configuration.restorePurchasesButtonText.stringValue(storeHelper: storeHelper) }
     }
     
     /// Restores previous user purchases. With StoreKit2 this is normally not necessary and should only be

@@ -26,13 +26,13 @@ public struct AppGroupSupport {
         // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
         // StoreKit is concerned.
         if widgetConfigurationOverrides == nil { widgetConfigurationOverrides = readConfigurationOverride() }
-        guard let id = Configuration.appGroupBundleId.value(overrides: widgetConfigurationOverrides) else { return }
+        guard let id = Configuration.appGroupBundleId.stringValue(overrides: widgetConfigurationOverrides) else { return }
         if let defaults = UserDefaults(suiteName: id) { defaults.set(purchased, forKey: productId)}
     }
     
     public static func isPurchased(productId: String) -> Bool {
         if widgetConfigurationOverrides == nil { widgetConfigurationOverrides = readConfigurationOverride() }
-        guard let id = Configuration.appGroupBundleId.value(overrides: widgetConfigurationOverrides) else { return false }
+        guard let id = Configuration.appGroupBundleId.stringValue(overrides: widgetConfigurationOverrides) else { return false }
         var purchased = false
         if let defaults = UserDefaults(suiteName: id) { purchased = defaults.bool(forKey: productId)}
         return purchased

@@ -54,11 +54,16 @@ public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
     }
     
     /// Lets us know a user initiated an in-app purchase direct from the App Store, rather than via the app itself.
-    /// This method is required if you have IAP promotions.
+    /// There is currently no StoreKit2 support for this process, so we fallback to using a StoreKit1-based approach.
+    ///
+    /// Return `true` (the default) to continue the transaction. Return `false` to defer or cancel the purchase.
+    /// This allows for non-default purchase processing, such as the display of custom product information.
+    /// If false is returned, you can continue the transaction at a later time by manually adding the `SKPayment`
+    /// payment object to the `SKPaymentQueue` queue using `SKPaymentQueue.default().add(payment)`.
+    ///
+    /// This method is required if you have in-app purchase promotions defined in App Store Connect.
     public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
-        // Return true to continue the transaction. If this IAP has been previously purchased it'll be picked up
-        // by StoreKit1 and re-purchase prevented
-        return true
+        guard let storeHelper else { return true }
+        return !Configuration.customDirectAppStorePurchasing.booleanValue(storeHelper: storeHelper)
     }
 }
-

@@ -21,12 +21,11 @@ public struct TermsOfServiceAndPrivacyPolicyView: View {
             if let privacyPolicyUrl { Link("Privacy Policy", destination: privacyPolicyUrl) }
         }
         .task {
-            if  let termsOfService = Configuration.termsOfServiceUrl.value(storeHelper: storeHelper),
+            if  let termsOfService = Configuration.termsOfServiceUrl.stringValue(storeHelper: storeHelper),
                 let tosUrl = URL(string: termsOfService) { termsOfServiceUrl = tosUrl }
             
-            if  let privacyPolicy = Configuration.privacyPolicyUrl.value(storeHelper: storeHelper),
+            if  let privacyPolicy = Configuration.privacyPolicyUrl.stringValue(storeHelper: storeHelper),
                 let ppUrl = URL(string: privacyPolicy) { privacyPolicyUrl =  ppUrl }
         }
     }
 }
-

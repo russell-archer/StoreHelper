@@ -14,7 +14,9 @@
 	<string>https://www.apple.com/legal/internet-services/itunes/dev/stdeula/</string>
 	<key>privacyPolicyUrl</key>
 	<string>https://russell-archer.github.io/privacy/</string>
-    	<key>redeemOfferCodeButtonText</key>
-    	<string>Redeem Offer Code</string>
+	<key>redeemOfferCodeButtonText</key>
+	<string>Redeem Offer Code</string>
+	<key>customDirectAppStorePurchasing</key>
+	<false/>
 </dict>
 </plist>

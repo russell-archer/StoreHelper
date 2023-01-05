@@ -96,7 +96,7 @@ public struct PurchaseInfoSheet: View {
                         .padding()
                         #else
                         Button(action: {
-                            if  let sRefundUrl = Configuration.requestRefundUrl.value(storeHelper: storeHelper),
+                            if  let sRefundUrl = Configuration.requestRefundUrl.stringValue(storeHelper: storeHelper),
                                 let refundUrl = URL(string: sRefundUrl) {
                                 NSWorkspace.shared.open(refundUrl)
                             }
