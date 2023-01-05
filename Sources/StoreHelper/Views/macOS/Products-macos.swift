@@ -67,7 +67,7 @@ public struct Products: View {
                 ProductListView(signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
                 TermsOfServiceAndPrivacyPolicyView()
                 
-                if Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) != nil {
+                if Configuration.restorePurchasesButtonText.stringValue(storeHelper: storeHelper) != nil {
                     DisclosureGroup(isExpanded: $showManagePurchases, content: {
                         PurchaseManagement() },
                                     label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
