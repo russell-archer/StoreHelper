@@ -38,13 +38,6 @@ public enum Configuration {
     /// The text to display on the redeem offer code button. If nil the button is not displayed.
     /// Default value is "Redeem an Offer".
     case redeemOfferCodeButtonText
-
-    /// If `true`, when a direct App Store purchase of an in-app purchase promotion is initiated `paymentQueue(_:shouldAddStorePayment:for:)`
-    /// will return `false`. This allows for non-default purchase processing, such as the display of custom product information.
-    /// If `false` (default), StoreHelper will process direct App Store purchases in the standard way, `paymentQueue(_:shouldAddStorePayment:for:)`
-    /// will return `true` and `paymentQueue(_:updatedTransactions)` will finish the transaction. See `AppStoreHelper` for details.
-    /// Default value is false.
-    case customDirectAppStorePurchasing
     
     // Default values:
     private static let AppGroupBundleId: String?            = nil
@@ -54,7 +47,6 @@ public enum Configuration {
     private static let TermsOfServiceUrl: String?           = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
     private static let PrivacyPolicyUrl: String?            = nil
     private static let RedeemOfferCodeButtonText: String?   = "Redeem an Offer"
-    private static let CustomDirectAppStorePurchasing: Bool = false
     
     /// Gets an overridden configuration value, or if not found, provides a default value.
     /// - Parameter storeHelper: An instance of StoreHelper
@@ -82,14 +74,13 @@ public enum Configuration {
     
     public func key() -> String {
         switch self {
-            case .appGroupBundleId:                 return "appGroupBundleId"
-            case .contactUsUrl:                     return "contactUsUrl"
-            case .requestRefundUrl:                 return "requestRefundUrl"
-            case .restorePurchasesButtonText:       return "restorePurchasesButtonText"
-            case .termsOfServiceUrl:                return "termsOfServiceUrl"
-            case .privacyPolicyUrl:                 return "privacyPolicyUrl"
-            case .redeemOfferCodeButtonText:        return "redeemOfferCodeButtonText"
-            case .customDirectAppStorePurchasing:   return "customDirectAppStorePurchasing"
+            case .appGroupBundleId:           return "appGroupBundleId"
+            case .contactUsUrl:               return "contactUsUrl"
+            case .requestRefundUrl:           return "requestRefundUrl"
+            case .restorePurchasesButtonText: return "restorePurchasesButtonText"
+            case .termsOfServiceUrl:          return "termsOfServiceUrl"
+            case .privacyPolicyUrl:           return "privacyPolicyUrl"
+            case .redeemOfferCodeButtonText:  return "redeemOfferCodeButtonText"
         }
     }
     
@@ -106,14 +97,13 @@ public enum Configuration {
         
         // We don't have a Configuration file, or it doesn't have the key we're interested in. Use our default value
         switch self {
-            case .appGroupBundleId:                 return Configuration.AppGroupBundleId
-            case .contactUsUrl:                     return Configuration.ContactUsUrl
-            case .requestRefundUrl:                 return Configuration.RequestRefundUrl
-            case .restorePurchasesButtonText:       return Configuration.RestorePurchasesButtonText
-            case .termsOfServiceUrl:                return Configuration.TermsOfServiceUrl
-            case .privacyPolicyUrl:                 return Configuration.PrivacyPolicyUrl
-            case .redeemOfferCodeButtonText:        return Configuration.RedeemOfferCodeButtonText
-            case .customDirectAppStorePurchasing:   return nil
+            case .appGroupBundleId:           return Configuration.AppGroupBundleId
+            case .contactUsUrl:               return Configuration.ContactUsUrl
+            case .requestRefundUrl:           return Configuration.RequestRefundUrl
+            case .restorePurchasesButtonText: return Configuration.RestorePurchasesButtonText
+            case .termsOfServiceUrl:          return Configuration.TermsOfServiceUrl
+            case .privacyPolicyUrl:           return Configuration.PrivacyPolicyUrl
+            case .redeemOfferCodeButtonText:  return Configuration.RedeemOfferCodeButtonText
         }
     }
     
@@ -139,7 +129,6 @@ public enum Configuration {
             case .termsOfServiceUrl:                return false
             case .privacyPolicyUrl:                 return false
             case .redeemOfferCodeButtonText:        return false
-            case .customDirectAppStorePurchasing:   return Configuration.CustomDirectAppStorePurchasing
         }
     }
 }

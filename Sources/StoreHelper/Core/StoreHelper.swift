@@ -9,6 +9,7 @@ import StoreKit
 import Collections
 
 public typealias ProductId = String
+public typealias ShouldAddStorePaymentHandler = (_ payment: SKPayment, _ product: SKProduct) -> Bool
 
 /// The state of a purchase.
 public enum PurchaseState { case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
@@ -68,6 +69,10 @@ public class StoreHelper: ObservableObject {
         get { _fontScaleFactor ?? FontUtil.baseDynamicTypeSize(for: .large)}
         set { _fontScaleFactor = newValue }
     }
+    
+    /// Optional support for overriding handling of direct App Store purchases of in-app purchase promotions.
+    /// See `AppStoreHelper.paymentQueue(_:shouldAddStorePayment:for:)`.
+    public var shouldAddStorePaymentHandler: ShouldAddStorePaymentHandler?
     
     /// Set to true if we're currently waiting for a refreshed list of localized products from the App Store.
     public private(set) var isRefreshingProducts = false

@@ -16,7 +16,5 @@
 	<string>https://russell-archer.github.io/privacy/</string>
 	<key>redeemOfferCodeButtonText</key>
 	<string>Redeem Offer Code</string>
-	<key>customDirectAppStorePurchasing</key>
-	<false/>
 </dict>
 </plist>

@@ -57,13 +57,38 @@ public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
     /// There is currently no StoreKit2 support for this process, so we fallback to using a StoreKit1-based approach.
     ///
     /// Return `true` (the default) to continue the transaction. Return `false` to defer or cancel the purchase.
-    /// This allows for non-default purchase processing, such as the display of custom product information.
+    /// This allows for custom purchase processing, such as the display of custom product information.
     /// If false is returned, you can continue the transaction at a later time by manually adding the `SKPayment`
     /// payment object to the `SKPaymentQueue` queue using `SKPaymentQueue.default().add(payment)`.
     ///
+    /// If you need to implement custom purchase handling of direct App Store purchases of IAP promotions then
+    /// define a closure for `StoreHelper.shouldAddStorePaymentHandler` as in the following example:
+    ///
+    /// ```
+    /// struct StoreHelperDemoApp: App {
+    ///     @StateObject var storeHelper = StoreHelper()
+    ///
+    ///     var body: some Scene {
+    ///         WindowGroup {
+    ///             MainView()
+    ///                 .environmentObject(storeHelper)
+    ///                 .task {
+    ///                     storeHelper.start()  // Start listening for transactions
+    ///
+    ///                     // Custom handling of direct App Store purchases of IAP promotions
+    ///                     storeHelper.shouldAddStorePaymentHandler = { payment, product in
+    ///                         // Your custom handling code goes here
+    ///                         return false
+    ///                     }
+    ///                 }
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
     /// This method is required if you have in-app purchase promotions defined in App Store Connect.
     public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
-        guard let storeHelper else { return true }
-        return !Configuration.customDirectAppStorePurchasing.booleanValue(storeHelper: storeHelper)
+        if let handler = storeHelper?.shouldAddStorePaymentHandler { return handler(payment, product) }
+        return true
     }
 }
