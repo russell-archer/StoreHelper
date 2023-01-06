@@ -26,7 +26,7 @@ support to **iOS 16/15** and **macOS 13/12** SwiftUI apps.
 
 ## License
 
-MIT license, copyright (c) 2022, Russell Archer. This software is provided "as-is" 
+MIT license, copyright (c) 2022, 2023 Russell Archer. This software is provided "as-is" 
 without warranty and may be freely used, copied, modified and redistributed, including 
 as part of commercial software. 
 
