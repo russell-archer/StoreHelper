@@ -53,7 +53,7 @@ public struct PurchaseManagement: View {
             } label: { Label("", systemImage: "line.3.horizontal").labelStyle(.iconOnly)}
             .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
             .task {
-                if let contact = Configuration.contactUsUrl.value(storeHelper: storeHelper) { contactUrl = URL(string: contact)}
+                if let contact = Configuration.contactUsUrl.stringValue(storeHelper: storeHelper) { contactUrl = URL(string: contact)}
             }
         }
     }

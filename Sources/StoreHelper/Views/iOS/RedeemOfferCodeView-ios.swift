@@ -21,7 +21,7 @@ public struct RedeemOfferCodeView: View {
     }
     public var body: some View {
         if #available(iOS 16.0, *) {
-            if let redeemOfferCodeButtonText = Configuration.redeemOfferCodeButtonText.value(storeHelper: storeHelper) {
+            if let redeemOfferCodeButtonText = Configuration.redeemOfferCodeButtonText.stringValue(storeHelper: storeHelper) {
                 Button(action: {
                     showRedeemOfferCodeButton = true
                 }) { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(redeemOfferCodeButtonText)}.padding()}

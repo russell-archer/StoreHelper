@@ -19,7 +19,7 @@ public struct RestorePurchasesView: View {
     }
     
     public var body: some View {
-        if let restorePurchasesButtonText = Configuration.restorePurchasesButtonText.value(storeHelper: storeHelper) {
+        if let restorePurchasesButtonText = Configuration.restorePurchasesButtonText.stringValue(storeHelper: storeHelper) {
             Button(action: {
                 Task.init {
                     try? await AppStore.sync()
