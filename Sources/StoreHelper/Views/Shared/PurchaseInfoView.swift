@@ -40,21 +40,20 @@ public struct PurchaseInfoView: View {
     public var body: some View {
         let viewModel = PurchaseInfoViewModel(storeHelper: storeHelper, productId: productId)
         
-        HStack(alignment: .center) {
-            Button(action: { withAnimation { showPurchaseInfoSheet.toggle()}}) {
-                HStack {
-                    Image(systemName: "creditcard.circle")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 30)
-                    
-                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText)}
-                        .foregroundColor(.blue)
-                        .lineLimit(nil)
-                }
+        Button(action: { withAnimation { showPurchaseInfoSheet.toggle()}}) {
+            HStack {
+                Image(systemName: "creditcard.circle")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 30)
+                
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText)}
+                    .foregroundColor(.blue)
+                    .lineLimit(nil)
             }
-            .xPlatformButtonStyleBorderless()
         }
+        .xPlatformButtonStyleBorderless()
+        .padding()
         .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
             #if os(iOS)

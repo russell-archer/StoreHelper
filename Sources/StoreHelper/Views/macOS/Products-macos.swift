@@ -65,12 +65,15 @@ public struct Products: View {
         ScrollView {
             VStack {
                 ProductListView(signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
-                TermsOfServiceAndPrivacyPolicyView()
+                TermsOfServiceAndPrivacyPolicyView().padding(.top)
                 
                 if Configuration.restorePurchasesButtonText.stringValue(storeHelper: storeHelper) != nil {
                     DisclosureGroup(isExpanded: $showManagePurchases, content: {
-                        PurchaseManagement() },
-                                    label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
+                        RestorePurchasesView()
+                        RefreshProductsView()
+                        ContactUsView()
+                    },
+                    label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
                     .onTapGesture { withAnimation { showManagePurchases.toggle()}}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
                 }
@@ -85,7 +88,7 @@ public struct Products: View {
             
             VersionInfo()
         }
-        .refreshable { storeHelper.refreshProductsFromAppStore() }
+        .refreshable { storeHelper.refreshProductsFromAppStore(rebuildCaches: true) }
     }
 }
 #endif

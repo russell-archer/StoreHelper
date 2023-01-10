@@ -172,7 +172,6 @@ public struct KeychainHelper {
     
     /// Removes all `ProductId` entries in the keychain associated with consumable product purchases.
     /// The StoreHelper collection of purchased product ids should be updated for each product id returned.
-    /// For example, Task.init { await updatePurchasedIdentifiers(productId, insert: false) }.
     /// - Parameter consumableProductIds: An array of consumable `ProductId`.
     /// - Returns: Returns an array of `ProductId` that has been deleted from the keychain.
     @MainActor public static func resetKeychainConsumables(for consumableProductIds: [ProductId]) -> [ProductId]? {

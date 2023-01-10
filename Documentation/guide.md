@@ -18,6 +18,13 @@ This document describes how to implement and test in-app purchases with **SwiftU
 ---
 
 # Recent Major Changes
+- 10 January, 2023
+    - Added support for caching of product purchase status in `isPurchased(productId:)` using the `purchasedProductsFallback` collection
+    - Using `purchasedProductsFallback` as a cache can be turned on/off using `StoreHelper.doUsePurchasedProductsFallbackCache`
+    - The `purchasedProductsFallback` property is now `public private(set)` rather than `public`
+    - Added "Refresh Products" button and support for pull-to-refresh to the products list
+    - UI improvements to various views and improved sharing of views between iOS and macOS 
+    - Minor documentation updates (StoreHelper Guide)
 - 13 December, 2022
     - Added proof-of-concept demo showing `StoreHelper` in a UIKit project
 - 27 November, 2022
@@ -50,21 +57,6 @@ This document describes how to implement and test in-app purchases with **SwiftU
 	- Updated documentation to reflect refactoring changes
 - 20 December, 2021
 	- Refactored throughout so that this non-private version of `StoreHelper` is in-sync with private `StoreHelper` code used in an app released to the App Store
-- Xcode 13 Beta 5
-	- Modified `StoreHelper.checkVerificationResult(result:)` to return `UnwrappedVerificationResult`. This includes a new `VerificationResult<T>.VerificationError` that is provided by StoreKit2 when the unwrapped transaction is unverified
-- Xcode 13 Beta 4
-	- None required
-- Xcode 13 Beta 3
-	- The use of `Task.Handle` has been deprecated
-	- The `StoreHelper` transaction listener now has a type of `Task<Void, Error>`
-	- The return type for `StoreHelper.handleTransactions()` changed from `Task.Handle<Void, Error>` to `Task<Void, Error>`
-	- The `detach` keyword for creating detached tasks has been deprecated
-	- The use of `detach` in `StoreHelper.handleTransactions()`  has been replaced with `Task.detached`
-	- The use of `async {}` blocks in a synchronous context has been deprecated
-	- All `async {}` blocks have been replaced with `Task.init {}`
-- Xcode 13 Beta 2
-	- `Transaction.listener` is now `Transaction.updates`
-	- `Product.request(with:)` is now `Product.products(for:)`
 
 ---
 
@@ -627,7 +619,7 @@ Using `StoreHelper` to make a purchase is pretty simple:
 			
 			// Update the list of purchased ids. Because it's is a @Published var this will cause the UI
 			// showing the list of products to update
-			await updatePurchasedIdentifiers(validatedTransaction)
+			updatePurchasedIdentifiers(validatedTransaction)
 			
 			// Tell the App Store we delivered the purchased content to the user
 			await validatedTransaction.finish()
@@ -766,6 +758,7 @@ However:
 - `StoreKit2` will NOT use the receipt to check for purchases and all checks for purchases **fail**
 
 Given the potential for unhappy customers, `StoreHelper` includes "fallback" collection of purchases (product ids) that gets persisted and is automatically and transparently used as a backup when the App Store's not available.
+This collection is also used by StoreHelper's' `isPurchased(productId:)` method as a cache of purchases.
 
 # The Receipt
 The main differences between `StoreKit1` and `StoreKit2` receipts are:

@@ -7,6 +7,51 @@
 - [Demo Project](https://github.com/russell-archer/StoreHelperDemo) - Example **Xcode 14** `StoreHelper` project
 - [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) - experimental demo showing `StoreHelper` in a UIKit project
 
+---
+
+# Recent Major Changes
+- 10 January, 2023
+    - Added support for caching of product purchase status in `isPurchased(productId:)` using the `purchasedProductsFallback` collection
+    - Using `purchasedProductsFallback` as a cache can be turned on/off using `StoreHelper.doUsePurchasedProductsFallbackCache`
+    - The `purchasedProductsFallback` property is now `public private(set)` rather than `public`
+    - Added "Refresh Products" button and support for pull-to-refresh to the products list
+    - UI improvements to various views and improved sharing of views between iOS and macOS 
+    - Minor documentation updates (StoreHelper Guide)
+- 13 December, 2022
+    - Added proof-of-concept demo showing `StoreHelper` in a UIKit project
+- 27 November, 2022
+	- Major update to the way **subscriptions** are handled
+	- Subscription prices now show **prices and renewal periods**
+	- **Promotional and Introductory offers** on subscriptions are now supported
+	- The most appropriate **promotional** or **introductory** offers or standard price and renewal period are automatically displayed
+	- Additions to `StoreHelper.SubscriptionHelper`: `hasLowerValueCurrentSubscription(than:)`, `isLapsedSubscriber(to:)`, `allSubscriptionTransactions()`
+	- Added in-app redemption of **offer codes**
+	- Added new sections to the **Guide** on "Subscription Introductory and Promotional Offers" and "Supporting In-App Offer Code Redemption"
+	- **Quick Start** and **Guide** documentation reviewed and updated for iOS16/macOS13/Xcode14 and new subscription features
+- 7 Nov, 2022
+    - Minor changes re upgrade to iOS 16 and macOS 13
+- 19 October, 2022
+	- Added new section to the Guide on "Restoring Previous Purchases"
+- 15 March, 2022
+	- Changed the initialization flow because of a new warning in Xcode 13.3 related to having `@MainActor init()`
+	- Removed the need for StoreHelper's init method to run on the main thread by moving some initialization code to a new `start()` method
+	- You should now call `StoreHelper.start()` as soon as possible after initializing `StoreHelper`
+	- The `start()` method starts listening for transactions and get localized product info from the App Store
+	- Updated all documentation because of this change
+- 25 January, 2022
+	- Refactored `StoreHelper` as a SPM Package
+	- Moved example app to separate repo ([StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo))
+	- Updated documentation re change to SPM package
+- 19 January, 2022
+	- Major updates to documentation
+	- Added Mac target
+- 21 December, 2021
+	- Updated documentation to reflect refactoring changes
+- 20 December, 2021
+	- Refactored throughout so that this non-private version of `StoreHelper` is in-sync with private `StoreHelper` code used in an app released to the App Store
+    
+---
+
 ## Overview of StoreHelper
 
 `StoreHelper` is a Swift Package Manager (SPM) package that enables developers using Xcode 14/13 to easily add in-app purchase 

@@ -39,6 +39,10 @@ public enum Configuration {
     /// Default value is "Redeem an Offer".
     case redeemOfferCodeButtonText
     
+    /// The text to display on the refresh product list button. If nil the button is not displayed.
+    /// Default value is "Refresh Product List".
+    case refreshProductsButtonText
+    
     // Default values:
     private static let AppGroupBundleId: String?            = nil
     private static let ContactUsUrl: String?                = nil
@@ -47,6 +51,7 @@ public enum Configuration {
     private static let TermsOfServiceUrl: String?           = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
     private static let PrivacyPolicyUrl: String?            = nil
     private static let RedeemOfferCodeButtonText: String?   = "Redeem an Offer"
+    private static let RefreshProductsButtonText: String?   = "Refresh Product List"
     
     /// Gets an overridden configuration value, or if not found, provides a default value.
     /// - Parameter storeHelper: An instance of StoreHelper
@@ -81,6 +86,7 @@ public enum Configuration {
             case .termsOfServiceUrl:          return "termsOfServiceUrl"
             case .privacyPolicyUrl:           return "privacyPolicyUrl"
             case .redeemOfferCodeButtonText:  return "redeemOfferCodeButtonText"
+            case .refreshProductsButtonText:  return "refreshProductsButtonText"
         }
     }
     
@@ -104,6 +110,7 @@ public enum Configuration {
             case .termsOfServiceUrl:          return Configuration.TermsOfServiceUrl
             case .privacyPolicyUrl:           return Configuration.PrivacyPolicyUrl
             case .redeemOfferCodeButtonText:  return Configuration.RedeemOfferCodeButtonText
+            case .refreshProductsButtonText:  return Configuration.RefreshProductsButtonText
         }
     }
     
@@ -122,13 +129,14 @@ public enum Configuration {
             
         // We don't have a Configuration file, or it doesn't have the key we're interested in. Use our default value
         switch self {
-            case .appGroupBundleId:                 return false
-            case .contactUsUrl:                     return false
-            case .requestRefundUrl:                 return false
-            case .restorePurchasesButtonText:       return false
-            case .termsOfServiceUrl:                return false
-            case .privacyPolicyUrl:                 return false
-            case .redeemOfferCodeButtonText:        return false
+            case .appGroupBundleId:           return false
+            case .contactUsUrl:               return false
+            case .requestRefundUrl:           return false
+            case .restorePurchasesButtonText: return false
+            case .termsOfServiceUrl:          return false
+            case .privacyPolicyUrl:           return false
+            case .redeemOfferCodeButtonText:  return false
+            case .refreshProductsButtonText:  return false
         }
     }
 }

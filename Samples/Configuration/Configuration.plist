@@ -16,5 +16,7 @@
 	<string>https://russell-archer.github.io/privacy/</string>
 	<key>redeemOfferCodeButtonText</key>
 	<string>Redeem Offer Code</string>
+	<key>refreshProductsButtonText</key>
+	<string>Refresh Product List</string>
 </dict>
 </plist>

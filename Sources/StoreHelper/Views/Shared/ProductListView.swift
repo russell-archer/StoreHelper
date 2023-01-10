@@ -83,7 +83,7 @@ public struct ProductListView: View {
                         .multilineTextAlignment(.center)
                         .padding()
                     
-                    Button(action: { storeHelper.refreshProductsFromAppStore()}) {
+                    Button(action: { storeHelper.refreshProductsFromAppStore(rebuildCaches: true)}) {
                         BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Retry App Store")}
                     }
                     .xPlatformButtonStyleBorderedProminent()

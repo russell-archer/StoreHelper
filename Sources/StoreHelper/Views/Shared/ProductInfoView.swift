@@ -38,6 +38,7 @@ public struct ProductInfoView: View {
             }
         }
         .xPlatformButtonStyleBorderless()
+        .padding()
     }
 }
 
