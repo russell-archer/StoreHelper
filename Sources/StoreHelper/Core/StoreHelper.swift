@@ -46,17 +46,15 @@ public class StoreHelper: ObservableObject {
     /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
     @Published public private(set) var purchasedProducts = [ProductId]()
     
-    /// List of purchased product ids. This list is used as a fallback when the App Store in unavailable.
-    /// The public `isPurchased(product:)` method will use this list when `products` is nil and `isAppStoreAvailable` is false.
-    /// This collection is updated with live App Store data when calls are made to `isPurchased(product:)`.
-    public var purchasedProductsFallback = [ProductId]()
-    
-    /// Set to true if we successfully retrieve a list of available products from the App Store.
-    public private(set) var isAppStoreAvailable = false
-    
+    /// List of purchased product ids. This list is used as a cache and when the App Store in unavailable.
+    public private(set) var purchasedProductsFallback = [ProductId]()
+        
     /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
     /// product ids are defined in the property list file is maintained in the set.
     public private(set) var productIds: OrderedSet<ProductId>?
+    
+    /// Set to true if we successfully retrieve a list of available products from the App Store.
+    public private(set) var isAppStoreAvailable = false
     
     /// Subscription-related helper methods.
     public var subscriptionHelper: SubscriptionHelper!
@@ -73,6 +71,11 @@ public class StoreHelper: ObservableObject {
     /// Optional support for overriding handling of direct App Store purchases of in-app purchase promotions.
     /// See `AppStoreHelper.paymentQueue(_:shouldAddStorePayment:for:)`.
     public var shouldAddStorePaymentHandler: ShouldAddStorePaymentHandler?
+    
+    /// Set to true if you want StoreHelper to use the cache of purchased products, rather than performing a full
+    /// transaction check and verification. If true, the cache will always be used for non-consumables, but not
+    /// for consumables and subscriptions unless there's a problem accessing the App Store.
+    public var doUsePurchasedProductsFallbackCache = true
     
     /// Set to true if we're currently waiting for a refreshed list of localized products from the App Store.
     public private(set) var isRefreshingProducts = false
@@ -116,6 +119,13 @@ public class StoreHelper: ObservableObject {
     
     /// Support for overriding dynamic font scale.
     private var _fontScaleFactor: Double? = nil
+    
+    /// A non-persisted list of products that have had their purchase status checked against the App Store receipt.
+    /// If a product is not in the `purchasedProductsFallback` cache we need to know if this is because it is
+    /// unpurchased, or becuase the cache is in an invalid state because the app is newly installed, etc.
+    /// If a `ProductId` is contained in the `transactionCheck` collection then we know we can safely use the
+    /// `purchasedProductsFallback` cache to check it's purchased status.
+    private var transactionCheck = [ProductId]()
     
     // MARK: - Initialization
     
@@ -163,11 +173,18 @@ public class StoreHelper: ObservableObject {
     /// in preference to `requestProductsFromAppStore(productIds:)` as you don't need to supply
     /// an ordered set of App Store-defined product ids.
     /// This method runs on the main thread because it may result in updates to the UI.
-    @MainActor public func refreshProductsFromAppStore() {
+    @MainActor public func refreshProductsFromAppStore(rebuildCaches: Bool = false) {
         Task.init {
             guard let pids = productIds else { return }
             isAppStoreAvailable = false
             isRefreshingProducts = true
+            
+            if rebuildCaches {
+                purchasedProducts = [ProductId]()
+                purchasedProductsFallback = [ProductId]()
+                transactionCheck = [ProductId]()
+            }
+            
             products = await requestProductsFromAppStore(productIds: pids)
         }
     }
@@ -193,70 +210,71 @@ public class StoreHelper: ObservableObject {
     }
     
     /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
-    ///
-    /// May throw an exception of type `StoreException.transactionVerificationFailed`.
+    /// Non-consumable products may have their purchase status checked against the `purchasedProductsFallback` cache.
+    /// May throw an exception of type `StoreException.transactionVerificationFailed` or `StoreException.productTypeNotSupported`.
     /// - Parameter productId: The `ProductId` of the product.
     /// - Returns: Returns true if the product has been purchased, false otherwise.
     @MainActor public func isPurchased(productId: ProductId) async throws -> Bool {
-        
         var purchased = false
         
-        guard hasStarted else {
-            StoreLog.event("Please call StoreHelper.start() before use.")
-            return false
-        }
-        
-        guard isAppStoreAvailable, hasProducts else {
-            // The App Store is not available, or it didn't return a list of localized products
-            // so we use the temporary fallback list of purchased products
-            return purchasedProductsFallback.contains(productId)
-        }
-        
-        guard let product = product(from: productId) else {
-            updatePurchasedProductsFallbackList(for: productId, purchased: false)
-            AppGroupSupport.syncPurchase(productId: productId, purchased: false)
-            return false
-        }
-        
-        // We need to treat consumables differently because their transactions are NOT stored in the receipt.
-        if product.type == .consumable {
-            purchased = KeychainHelper.count(for: productId) > 0
-            await updatePurchasedIdentifiers(productId, insert: purchased)
-            updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
-            AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
+        // For non-consumables, it's always safe to use the cache of purchased products as they're added to the cache
+        // when purchased and will be removed (see handleTransactions()) if access to the product is revoked by the App Store.
+        // We only use the cache if a product has previously had its purchase status checked against the App Store receipt.
+        if isNonConsumable(productId: productId), doUsePurchasedProductsFallbackCache, transactionCheck.contains(productId) {
+            purchased = purchasedProductsFallback.contains(productId)
+            updatePurchasedProducts(for: productId, purchased: purchased, updateFallbackList: false, updateTransactionCheck: false)
+            print("Using cache for \(productId). Purchased = \(purchased)")
             return purchased
         }
         
-        guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
-            // There's no transaction for the product, so it hasn't been purchased
-            AppGroupSupport.syncPurchase(productId: productId, purchased: false)
-            updatePurchasedProductsFallbackList(for: productId, purchased: false)
-            return false
+        if isNonConsumable(productId: productId) {
+            print("NOT using cache for \(productId)")
         }
         
+        // Make sure we're listening for transactions, the App Store is available, we have a list of localized products
+        // and that we can create a `Product` from the `ProductId`. If not, we have to rely on the cache of purchased products
+        guard hasStarted, isAppStoreAvailable, hasProducts, let product = product(from: productId) else {
+            return purchasedProductsFallback.contains(productId)
+        }
+
+        // Is this a consumable product? We need to treat consumables differently because their transactions are NOT stored in the receipt
+        if product.type == .consumable {
+            purchased = KeychainHelper.count(for: productId) > 0
+            updatePurchasedProducts(for: productId, purchased: purchased)
+            return purchased
+        }
+
+        // Perform a full transaction check and verification
+        guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
+            // There's no transaction for the product, so it hasn't been purchased
+            
+            if isNonConsumable(productId: productId) {
+                print("\(productId) has not been purchased")
+            }
+            updatePurchasedProducts(for: productId, purchased: false)
+            return false
+        }
+
         // See if the transaction passed StoreKit's automatic verification
         let result = checkVerificationResult(result: currentEntitlement)
         if !result.verified {
             StoreLog.transaction(.transactionValidationFailure, productId: result.transaction.productID)
             throw StoreException.transactionVerificationFailed
         }
-        
-        // Make sure our internal set of purchase pids is in-sync with the App Store
-        await updatePurchasedIdentifiers(result.transaction)
-        
+
         // See if the App Store has revoked the user's access to the product (e.g. because of a refund).
         // If this transaction represents a subscription, see if the user upgraded to a higher-level subscription.
-        purchased = result.transaction.revocationDate == nil && !result.transaction.isUpgraded
+        switch product.type {
+            case .autoRenewable: purchased = result.transaction.revocationDate == nil && !result.transaction.isUpgraded
+            case .nonConsumable: purchased = result.transaction.revocationDate == nil
+            default:             throw StoreException.productTypeNotSupported
+        }
         
-        // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
-        // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
-        // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
-        // StoreKit is concerned.
-        AppGroupSupport.syncPurchase(productId: product.id, purchased: purchased)
+        if isNonConsumable(productId: productId) {
+            print("Transaction check for \(productId) complete. Purchased = \(purchased)")
+        }
         
-        // Update and persist our fallback list of purchased products
-        updatePurchasedProductsFallbackList(for: productId, purchased: purchased)
-        
+        updatePurchasedProducts(for: productId, purchased: purchased)
         return purchased
     }
     
@@ -391,31 +409,21 @@ public class StoreHelper: ObservableObject {
                     throw StoreException.transactionVerificationFailed
                 }
                 
-                // The transaction was successfully validated.
-                let validatedTransaction = checkResult.transaction
-                
-                // Update the list of purchased ids. Because it's is a @Published var this will cause the UI
-                // showing the list of products to update
-                await updatePurchasedIdentifiers(validatedTransaction)
-                
-                // Tell the App Store we delivered the purchased content to the user
-                await validatedTransaction.finish()
+                let validatedTransaction = checkResult.transaction  // The transaction was successfully validated
+                await validatedTransaction.finish()  // Tell the App Store we delivered the purchased content to the user
+                                
+                if validatedTransaction.productType == .consumable {
+                    // We need to treat consumables differently because their transactions are NOT stored in the receipt.
+                    if KeychainHelper.purchase(product.id) { updatePurchasedProducts(for: validatedTransaction.productID, purchased: true) }
+                    else { StoreLog.event(.consumableKeychainError) }
+                } else {
+                    // For non-consumables and subscriptions
+                    updatePurchasedProducts(for: validatedTransaction.productID, purchased: true)
+                }
                 
                 // Let the caller know the purchase succeeded and that the user should be given access to the product
                 purchaseState = .purchased
                 StoreLog.event(.purchaseSuccess, productId: product.id)
-                                
-                if validatedTransaction.productType == .consumable {
-                    // We need to treat consumables differently because their transactions are NOT stored in the receipt.
-                    if KeychainHelper.purchase(product.id) { await updatePurchasedIdentifiers(product.id, insert: true) }
-                    else { StoreLog.event(.consumableKeychainError) }
-                }
-                
-                // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
-                // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
-                // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
-                // StoreKit is concerned.
-                AppGroupSupport.syncPurchase(productId: product.id, purchased: true)
                 
                 return (transaction: validatedTransaction, purchaseState: .purchased)
                 
@@ -440,11 +448,9 @@ public class StoreHelper: ObservableObject {
     /// This will be as a result of a user dirctly purchasing in IAP in the App Store ("IAP Promotion"), rather than in our app.
     /// - Parameter product: The ProductId of the purchased product.
     @MainActor public func productPurchased(_ productId: ProductId)  {
-        
-        Task.init { await updatePurchasedIdentifiers(productId, insert: true)}
+        updatePurchasedProducts(for: productId, purchased: true)
         purchaseState = .purchased
         StoreLog.event(.purchaseSuccess, productId: productId)
-        AppGroupSupport.syncPurchase(productId: productId, purchased: true)
     }
     
     /// The `Product` associated with a `ProductId`.
@@ -538,7 +544,7 @@ public class StoreHelper: ObservableObject {
     ///
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
-    @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) async {
+    @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) {
         var add = true
         
         // Has the user's access to the product been revoked by the App Store?
@@ -551,14 +557,14 @@ public class StoreHelper: ObservableObject {
         if transaction.isUpgraded { add = false }
 
         // Add or remove the ProductId to/from the list of `purchasedProducts`
-        await updatePurchasedIdentifiers(transaction.productID, insert: add)
+        updatePurchasedIdentifiers(transaction.productID, insert: add)
     }
     
     /// Update our list of purchased product identifiers (see `purchasedProducts`).
     /// - Parameters:
     ///   - productId: The `ProductId` to insert/remove.
     ///   - insert: If true the `ProductId` is inserted, otherwise it's removed.
-    @MainActor internal func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) async {
+    @MainActor internal func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) {
         
         guard let product = product(from: productId) else { return }
         
@@ -583,6 +589,55 @@ public class StoreHelper: ObservableObject {
                 purchasedProducts.remove(at: index)
             }
         }
+    }
+    
+    /// Updates and persists our fallback cache of purchased products (`purchasedProductsFallback`). Also makes sure our set of purchase
+    /// pids (`purchasedProducts`, used to trigger UI updates) is in-sync with the fallback cache. We also update UserDefaults in the
+    /// container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup, if any.
+    /// - Parameters:
+    ///   - productId: The `ProductId` to update.
+    ///   - purchased: True if the product is purchased,false otherwise.
+    ///   - updateFallbackList: If true, the fallback cache of purchased products (`purchasedProductsFallback`) is updated.
+    ///   - updateTransactionCheck: If true, the fallback cache check list has the `ProductId` added to it.
+    @MainActor internal func updatePurchasedProducts(for productId: ProductId,
+                                                     purchased: Bool,
+                                                     updateFallbackList: Bool = true,
+                                                     updateTransactionCheck: Bool = true) {
+        
+        // Update the cache check collection so we know which products have/have not had their purchase status checked against the receipt
+        if updateTransactionCheck, !transactionCheck.contains(productId) { transactionCheck.append(productId) }
+        
+        // Update and persist our fallback cache of purchased products (`purchasedProductsFallback`)
+        if updateFallbackList { updatePurchasedProductsFallbackList(for: productId, purchased: purchased) }
+
+        // Make sure our set of purchase pids (`purchasedProducts`) is in-sync with the fallback cache. This collection is used
+        // to trigger UI updates
+        updatePurchasedIdentifiers(productId, insert: purchased)
+        
+        // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
+        // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly
+        // because the they don't purchase anything and are not considered to be part of the app that did the purchasing as far as
+        // StoreKit is concerned.
+        AppGroupSupport.syncPurchase(productId: productId, purchased: purchased)
+    }
+    
+    /// Updates and persists our fallback cache of purchased products (`purchasedProductsFallback`). Also makes sure our set of purchase
+    /// pids (`purchasedProducts`, used to trigger UI updates) is in-sync with the fallback cache. We also update UserDefaults in the
+    /// container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup, if any.
+    /// - Parameters:
+    ///   - transaction: The product's transaction object.
+    ///   - purchased: True if the product is purchased,false otherwise.
+    ///   - updateFallbackList: If true, the fallback cache of purchased products (`purchasedProductsFallback`) is updated.
+    ///   - updateTransactionCheck: If true, the fallback cache check list has the `ProductId` added to it.
+    @MainActor internal func updatePurchasedProducts(transaction: Transaction,
+                                                     purchased: Bool,
+                                                     updateFallbackList: Bool = true,
+                                                     updateTransactionCheck: Bool = true) {
+        
+        if updateTransactionCheck, !transactionCheck.contains(transaction.productID) { transactionCheck.append(transaction.productID) }
+        if updateFallbackList { updatePurchasedProductsFallbackList(for: transaction.productID, purchased: purchased) }
+        updatePurchasedIdentifiers(transaction)
+        AppGroupSupport.syncPurchase(productId: transaction.productID, purchased: purchased)
     }
     
     // MARK: - Private methods
@@ -611,24 +666,27 @@ public class StoreHelper: ObservableObject {
                     // The user's access to the product has been revoked by the App Store (e.g. a refund, etc.)
                     // See transaction.revocationReason for more details if required
                     StoreLog.transaction(.transactionRevoked, productId: transaction.productID)
+                    await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     return
                 }
                 
                 if let expirationDate = transaction.expirationDate, expirationDate < Date() {
                     // The user's subscription has expired
                     StoreLog.transaction(.transactionExpired, productId: transaction.productID)
+                    await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     return
                 }
                 
                 if transaction.isUpgraded {
                     // Transaction superceeded by an active, higher-value subscription
                     StoreLog.transaction(.transactionUpgraded, productId: transaction.productID)
+                    await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     return
                 }
                     
                 // Update the list of products the user has access to
                 StoreLog.transaction(.transactionSuccess, productId: transaction.productID)
-                await self.updatePurchasedIdentifiers(transaction)
+                await self.updatePurchasedProducts(transaction: transaction, purchased: true)
                 await transaction.finish()
             }
         }

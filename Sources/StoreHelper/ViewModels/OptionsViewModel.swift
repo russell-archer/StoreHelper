@@ -23,9 +23,7 @@ public struct OptionsViewModel {
               let products = storeHelper.consumableProducts,
               let removedProducts = KeychainHelper.resetKeychainConsumables(for: products.map { $0.id }) else { return }
         
-        Task.init {
-            for product in removedProducts { await storeHelper.updatePurchasedIdentifiers(product, insert: false) }
-        }
+        for product in removedProducts { storeHelper.updatePurchasedIdentifiers(product, insert: false) }
     }
     #endif
     

@@ -26,11 +26,11 @@ public struct Products: View {
     @State private var showRefundSheet = false
     @State private var refundRequestTransactionId: UInt64 = UInt64.min
     @State private var canMakePayments: Bool = false
-    @State private var purchasesRestored: Bool = false
     @State private var showRefundAlert: Bool = false
     @State private var refundAlertText: String = ""
     @State private var showRedeemOfferCodeButton = false
     @State private var showRedeemOfferCodeError = false
+    @State private var textExpanded = false
     
     /// An app must sign any request to purchase a subscription using a promotional offer. This is an Apple-mandated requirement.
     /// StoreHelper can't do this locally because it needs access to IAP keys defined by the host app in App Store Connect.
@@ -66,9 +66,19 @@ public struct Products: View {
         ScrollView {
             VStack {
                 ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
-                TermsOfServiceAndPrivacyPolicyView()
-                RestorePurchasesView(purchasesRestored: $purchasesRestored)
-                RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
+                TermsOfServiceAndPrivacyPolicyView().padding(.top)
+
+                DisclosureGroup(isExpanded: $textExpanded, content: {
+
+                    RestorePurchasesView()
+                    RefreshProductsView()
+                    RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
+                    ContactUsView()
+
+                }, label: {
+                    Label("Manage Purchases", systemImage: "creditcard.circle")
+                })
+                .padding()
                 
                 if !canMakePayments {
                     Spacer()
@@ -87,12 +97,11 @@ public struct Products: View {
             }
             .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
             .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
-            .onAppear { canMakePayments = AppStore.canMakePayments }
+            .task { canMakePayments = AppStore.canMakePayments }
             
             VersionInfo()
         }
-        .refreshable { storeHelper.refreshProductsFromAppStore() }
+        .refreshable { storeHelper.refreshProductsFromAppStore(rebuildCaches: true) }
     }
 }
 #endif
-
