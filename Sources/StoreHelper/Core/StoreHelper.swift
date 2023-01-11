@@ -223,12 +223,7 @@ public class StoreHelper: ObservableObject {
         if isNonConsumable(productId: productId), doUsePurchasedProductsFallbackCache, transactionCheck.contains(productId) {
             purchased = purchasedProductsFallback.contains(productId)
             updatePurchasedProducts(for: productId, purchased: purchased, updateFallbackList: false, updateTransactionCheck: false)
-            print("Using cache for \(productId). Purchased = \(purchased)")
             return purchased
-        }
-        
-        if isNonConsumable(productId: productId) {
-            print("NOT using cache for \(productId)")
         }
         
         // Make sure we're listening for transactions, the App Store is available, we have a list of localized products
@@ -247,10 +242,6 @@ public class StoreHelper: ObservableObject {
         // Perform a full transaction check and verification
         guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
             // There's no transaction for the product, so it hasn't been purchased
-            
-            if isNonConsumable(productId: productId) {
-                print("\(productId) has not been purchased")
-            }
             updatePurchasedProducts(for: productId, purchased: false)
             return false
         }
@@ -268,10 +259,6 @@ public class StoreHelper: ObservableObject {
             case .autoRenewable: purchased = result.transaction.revocationDate == nil && !result.transaction.isUpgraded
             case .nonConsumable: purchased = result.transaction.revocationDate == nil
             default:             throw StoreException.productTypeNotSupported
-        }
-        
-        if isNonConsumable(productId: productId) {
-            print("Transaction check for \(productId) complete. Purchased = \(purchased)")
         }
         
         updatePurchasedProducts(for: productId, purchased: purchased)
