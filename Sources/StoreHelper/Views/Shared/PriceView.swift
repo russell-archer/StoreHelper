@@ -96,8 +96,8 @@ public struct PriceView: View {
             // promotional subscriptions offers that are available
             if product.type == .autoRenewable {
                 isSubscription = true
-                isSubscribed = (try? await storeHelper.isSubscribed(productId: productId)) ?? false
-                
+                isSubscribed = purchaseState == .purchased
+
                 if !isSubscribed {
                     prePurchaseSubInfo = await priceViewModel.getPrePurchaseSubscriptionInfo(productId: productId)
                 }
