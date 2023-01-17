@@ -15,7 +15,7 @@ import StoreKit
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @State var subscriptionInfoText = ""
+    @State var subscriptionInfoText = "Subscribed"
     @State private var showSubscriptionInfoSheet = false
     private var subscriptionInfo: SubscriptionInfo  // Set by parents
     
@@ -26,21 +26,20 @@ public struct SubscriptionInfoView: View {
     public var body: some View {
         let viewModel = SubscriptionInfoViewModel(storeHelper: storeHelper, subscriptionInfo: subscriptionInfo)
         
-        HStack(alignment: .center) {
-            Button(action: { withAnimation { showSubscriptionInfoSheet.toggle()}}) {
-                HStack {
-                    Image(systemName: "creditcard.circle")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 30)
-                    
-                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(subscriptionInfoText)}
-                        .foregroundColor(.blue)
-                        .lineLimit(nil)
-                }
+        Button(action: { withAnimation { showSubscriptionInfoSheet.toggle()}}) {
+            HStack {
+                Image(systemName: "creditcard.circle")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 30)
+                
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(subscriptionInfoText)}
+                    .foregroundColor(.blue)
+                    .lineLimit(nil)
             }
-            .xPlatformButtonStyleBorderless()
         }
+        .xPlatformButtonStyleBorderless()
+        .padding()
         .task { subscriptionInfoText = await viewModel.shortInfo()}
         .sheet(isPresented: $showSubscriptionInfoSheet) {
             if let pid = subscriptionInfo.product?.id {

@@ -61,7 +61,7 @@ public struct ProductListView: View {
                 ProductListViewRow(products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
                 #endif
             }
-            
+
             if storeHelper.hasSubscriptionProducts, let subscriptions = storeHelper.subscriptionProducts {
                 SubscriptionListViewRow(products: subscriptions, headerText: "Subscriptions", signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
             }
@@ -70,7 +70,7 @@ public struct ProductListView: View {
             
             if storeHelper.isRefreshingProducts {
                 VStack {
-                    Text("Getting products from the App Store...").font(.subheadline)
+                    Text("Getting products...").font(.subheadline)
                     ProgressView()
                 }
                 .padding()

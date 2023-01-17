@@ -78,7 +78,7 @@ public struct SubscriptionView: View {
     
     public func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
-        purchaseState = purchased ? .purchased : .unknown
+        purchaseState = purchased ? .purchased : .notPurchased
     }
 }
 

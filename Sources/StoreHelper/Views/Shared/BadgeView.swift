@@ -30,15 +30,16 @@ public struct BadgeView: View {
     
     public func badgeOptions() -> (badgeName: String, fgColor: Color)? {
         switch purchaseState {
+            case .unknown:                  return nil
             case .notStarted:               return nil
+            case .notPurchased:             return nil
             case .userCannotMakePayments:   return (badgeName: "nosign", Color.red)
-            case .inProgress:               return (badgeName: "hourglass", Color.cyan)
+            case .inProgress:               return (badgeName: "hourglass", Color.blue)
             case .purchased:                return (badgeName: "checkmark", Color.green)
             case .pending:                  return (badgeName: "hourglass", Color.orange)
             case .cancelled:                return (badgeName: "person.crop.circle.fill.badge.xmark", Color.blue)
             case .failed:                   return (badgeName: "hand.raised.slash", Color.red)
             case .failedVerification:       return (badgeName: "hand.thumbsdown.fill", Color.red)
-            case .unknown:                  return nil
         }
     }
 }

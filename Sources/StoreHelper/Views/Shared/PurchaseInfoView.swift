@@ -16,7 +16,7 @@ import StoreKit
 @available(iOS 15.0, macOS 12.0, *)
 public struct PurchaseInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @State private var purchaseInfoText = ""
+    @State private var purchaseInfoText = "Purchased"
     @State private var showPurchaseInfoSheet = false
     private var productId: ProductId
     

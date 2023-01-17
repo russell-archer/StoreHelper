@@ -12,7 +12,24 @@ public typealias ProductId = String
 public typealias ShouldAddStorePaymentHandler = (_ payment: SKPayment, _ product: SKProduct) -> Bool
 
 /// The state of a purchase.
-public enum PurchaseState { case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown }
+public enum PurchaseState {
+    case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown, notPurchased
+    
+    public func shortDescription() -> String {
+        switch self {
+            case .notStarted:               return "Purchase has not started"
+            case .userCannotMakePayments:   return "User cannot make payments"
+            case .inProgress:               return "Purchase in-progress"
+            case .purchased:                return "Purchased"
+            case .pending:                  return "Purchase pending"
+            case .cancelled:                return "Purchase cancelled"
+            case .failed:                   return "Purchase failed"
+            case .failedVerification:       return "Purchase failed verification"
+            case .unknown:                  return "Purchase status unknown"
+            case .notPurchased:             return "Not purchased"
+        }
+    }
+}
 
 /// Information on the result of unwrapping a transaction `VerificationResult`.
 @available(iOS 15.0, macOS 12.0, *)
@@ -36,8 +53,8 @@ public class StoreHelper: ObservableObject {
     /// Array of `Product` retrieved from the App Store and available for purchase.
     @Published public private(set) var products: [Product]?
     
-    /// Array of `ProductId` for products that have been purchased. Each purchased non-consumable product will appear
-    /// exactly once. Consumable products can appear more than once.
+    /// Array of `ProductId` for products that have been purchased. Each purchased non-consumable or subscription
+    /// product will appear exactly once. Consumable products can appear more than once.
     ///
     /// This array is primarily used to trigger updates in the UI. It is not persisted but re-built as required
     /// whenever a purchase successfully completes, or when a call is made to `isPurchased(product:)`.
@@ -46,7 +63,8 @@ public class StoreHelper: ObservableObject {
     /// - Call `StoreHelper.count(for:)` to see how many times a consumable product has been purchased.
     @Published public private(set) var purchasedProducts = [ProductId]()
     
-    /// List of purchased product ids. This list is used as a cache and when the App Store in unavailable.
+    /// List of purchased product ids. This list is used as a cache and when the App Store in unavailable. Products of
+    /// all types are added to this list. Each `ProductId` can appear exactly once.
     public private(set) var purchasedProductsFallback = [ProductId]()
         
     /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
@@ -175,17 +193,14 @@ public class StoreHelper: ObservableObject {
     /// This method runs on the main thread because it may result in updates to the UI.
     @MainActor public func refreshProductsFromAppStore(rebuildCaches: Bool = false) {
         Task.init {
-            guard let pids = productIds else { return }
-            isAppStoreAvailable = false
-            isRefreshingProducts = true
+            guard let productIds else { return }
             
             if rebuildCaches {
-                purchasedProducts = [ProductId]()
-                purchasedProductsFallback = [ProductId]()
-                transactionCheck = [ProductId]()
+                purchasedProducts.removeAll()
+                transactionCheck.removeAll()
             }
-            
-            products = await requestProductsFromAppStore(productIds: pids)
+                        
+            products = await requestProductsFromAppStore(productIds: productIds)
         }
     }
     
@@ -198,6 +213,9 @@ public class StoreHelper: ObservableObject {
         defer { isRefreshingProducts = false }
         
         StoreLog.event(.requestProductsStarted)
+        isAppStoreAvailable = false
+        isRefreshingProducts = true
+        
         guard let localizedProducts = try? await Product.products(for: productIds) else {
             isAppStoreAvailable = false
             StoreLog.event(.requestProductsFailure)
@@ -225,7 +243,7 @@ public class StoreHelper: ObservableObject {
             updatePurchasedProducts(for: productId, purchased: purchased, updateFallbackList: false, updateTransactionCheck: false)
             return purchased
         }
-        
+
         // Make sure we're listening for transactions, the App Store is available, we have a list of localized products
         // and that we can create a `Product` from the `ProductId`. If not, we have to rely on the cache of purchased products
         guard hasStarted, isAppStoreAvailable, hasProducts, let product = product(from: productId) else {
@@ -241,8 +259,9 @@ public class StoreHelper: ObservableObject {
 
         // Perform a full transaction check and verification
         guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
-            // There's no transaction for the product, so it hasn't been purchased
-            updatePurchasedProducts(for: productId, purchased: false)
+            // There's no transaction for the product, so it hasn't been purchased. However, the App Store does sometimes return nil,
+            // even if the user is entitled to access the product. For this reason we don't update the fallback cache and transaction
+            // check list for a negative response
             return false
         }
 
@@ -323,11 +342,9 @@ public class StoreHelper: ObservableObject {
     /// - Returns: A verified `Set<ProductId>` for all products the user is entitled to have access to. The set will be empty if the
     /// user has not purchased anything previously.
     @MainActor public func currentEntitlements() async -> Set<ProductId> {
-        
         var entitledProductIds = Set<ProductId>()
         
         for await result in Transaction.currentEntitlements {
-            
             if case .verified(let transaction) = result {
                 entitledProductIds.insert(transaction.productID)  // Ignore unverified transactions
             }
@@ -401,7 +418,7 @@ public class StoreHelper: ObservableObject {
                                 
                 if validatedTransaction.productType == .consumable {
                     // We need to treat consumables differently because their transactions are NOT stored in the receipt.
-                    if KeychainHelper.purchase(product.id) { updatePurchasedProducts(for: validatedTransaction.productID, purchased: true) }
+                    if KeychainHelper.purchase(validatedTransaction.productID) { updatePurchasedProducts(for: validatedTransaction.productID, purchased: true) }
                     else { StoreLog.event(.consumableKeychainError) }
                 } else {
                     // For non-consumables and subscriptions
@@ -532,48 +549,44 @@ public class StoreHelper: ObservableObject {
     /// This method runs on the main thread because it will result in updates to the UI.
     /// - Parameter transaction: The `Transaction` that will result in changes to `purchasedProducts`.
     @MainActor internal func updatePurchasedIdentifiers(_ transaction: Transaction) {
-        var add = true
+        var purchased = true
         
         // Has the user's access to the product been revoked by the App Store?
-        if transaction.revocationDate != nil { add = false }
+        if transaction.revocationDate != nil { purchased = false }
         
         // Has the user's subscription has expired
-        if let expirationDate = transaction.expirationDate, expirationDate < Date() { add = false }
+        if let expirationDate = transaction.expirationDate, expirationDate < Date() { purchased = false }
         
         // The transaction has been superceeded by an active, higher-value subscription
-        if transaction.isUpgraded { add = false }
+        if transaction.isUpgraded { purchased = false }
 
         // Add or remove the ProductId to/from the list of `purchasedProducts`
-        updatePurchasedIdentifiers(transaction.productID, insert: add)
+        updatePurchasedIdentifiers(transaction.productID, purchased: purchased)
     }
     
     /// Update our list of purchased product identifiers (see `purchasedProducts`).
     /// - Parameters:
     ///   - productId: The `ProductId` to insert/remove.
-    ///   - insert: If true the `ProductId` is inserted, otherwise it's removed.
-    @MainActor internal func updatePurchasedIdentifiers(_ productId: ProductId, insert: Bool) {
-        
+    ///   - insert: If true the `ProductId` is purchased.
+    @MainActor internal func updatePurchasedIdentifiers(_ productId: ProductId, purchased: Bool) {
         guard let product = product(from: productId) else { return }
         
-        if insert {
-            
+        if purchased {
             if product.type == .consumable {
-                
-                let count = KeychainHelper.count(for: productId)
-                let products = purchasedProducts.filter({ $0 == productId })
-                if count == products.count { return }
-                
+                while purchasedProducts.count < KeychainHelper.count(for: productId) {
+                    purchasedProducts.append(productId)  // Consumables can appear more than once in this list
+                }
             } else {
-                
-                if purchasedProducts.contains(productId) { return }
+                if !purchasedProducts.contains(productId) { purchasedProducts.append(productId) }
             }
             
-            purchasedProducts.append(productId)
-            
         } else {
-            
-            if let index = purchasedProducts.firstIndex(where: { $0 == productId}) {
-                purchasedProducts.remove(at: index)
+            if product.type == .consumable {
+                while purchasedProducts.count > KeychainHelper.count(for: productId) {
+                    if let index = purchasedProducts.firstIndex(where: { $0 == productId}) { purchasedProducts.remove(at: index) }
+                }
+            } else {
+                if let index = purchasedProducts.firstIndex(where: { $0 == productId}) { purchasedProducts.remove(at: index) }
             }
         }
     }
@@ -597,9 +610,8 @@ public class StoreHelper: ObservableObject {
         // Update and persist our fallback cache of purchased products (`purchasedProductsFallback`)
         if updateFallbackList { updatePurchasedProductsFallbackList(for: productId, purchased: purchased) }
 
-        // Make sure our set of purchase pids (`purchasedProducts`) is in-sync with the fallback cache. This collection is used
-        // to trigger UI updates
-        updatePurchasedIdentifiers(productId, insert: purchased)
+        // Update our set of purchased (`purchasedProducts`) productIds that are used to trigger UI updates
+        updatePurchasedIdentifiers(productId, purchased: purchased)
         
         // Update UserDefaults in the container shared between ourselves and other members of the group.com.{developer}.{appname} AppGroup.
         // Currently this is done so that widgets can tell what IAPs have been purchased. Note that widgets can't use StoreHelper directly

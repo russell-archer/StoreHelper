@@ -93,15 +93,17 @@ public struct ConsumableView: View {
             count = KeychainHelper.count(for: productId)
         }
         .onChange(of: storeHelper.purchasedProducts) { _ in
-            Task.init { await purchaseState(for: productId) }
-            count = KeychainHelper.count(for: productId)
-            WidgetCenter.shared.reloadAllTimelines()
+            Task.init {
+                await purchaseState(for: productId)
+                count = KeychainHelper.count(for: productId)
+                WidgetCenter.shared.reloadAllTimelines()
+            }
         }
     }
     
     public func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
-        purchaseState = purchased ? .purchased : .unknown
+        purchaseState = purchased ? .purchased : .notPurchased
     }
 }
 
