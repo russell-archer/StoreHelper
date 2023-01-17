@@ -118,10 +118,11 @@ public struct PurchaseInfoSheet: View {
                         .padding()
                     
                 } else {
-                    TitleFont(scaleFactor: storeHelper.fontScaleFactor) { Text("No purchase information available")}
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                        .padding(EdgeInsets(top: 1, leading: 5, bottom: 0, trailing: 5))
+                    VStack {
+                        Text("Getting purchase info...").font(.subheadline)
+                        ProgressView()
+                    }
+                    .padding()
                 }
             }
         }

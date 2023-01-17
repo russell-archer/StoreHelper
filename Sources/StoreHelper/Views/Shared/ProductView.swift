@@ -87,8 +87,7 @@ public struct ProductView: View {
                 #else
                 PurchaseInfoView(productId: productId)
                 #endif
-            }
-            else {
+            } else {
                 ProductInfoView(productId: productId, displayName: displayName, productInfoCompletion: productInfoCompletion)
             }
             
@@ -105,7 +104,7 @@ public struct ProductView: View {
     
     public func purchaseState(for productId: ProductId) async {
         let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
-        purchaseState = purchased ? .purchased : .unknown
+        purchaseState = purchased ? .purchased : .notPurchased
     }
 }
 

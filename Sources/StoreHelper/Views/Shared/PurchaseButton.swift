@@ -36,30 +36,26 @@ public struct PurchaseButton: View {
     }
     
     public var body: some View {
-        
-        let product = storeHelper.product(from: productId)
-        if product == nil {
-            
-            StoreErrorView()
-            
-        } else {
-            
+        if let product = storeHelper.product(from: productId) {
             VStack {
-                
-                if product!.type == .consumable {
-                    
+                if product.type == .consumable {
                     if purchaseState != .purchased { withAnimation { BadgeView(purchaseState: $purchaseState) }}
-                    PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!)
+                    PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product)
                     
                 } else {
                     
                     withAnimation { BadgeView(purchaseState: $purchaseState) }
-                    if purchaseState != .purchased {
-                        PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product!, signPromotionalOffer: signPromotionalOffer)
+                    switch purchaseState {
+                        case .unknown: ProgressView().padding()
+                        case .purchased: EmptyView()
+                        default: PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product, signPromotionalOffer: signPromotionalOffer)
                     }
                 }
             }
             .padding(padding)
+            
+        } else {
+            StoreErrorView()
         }
     }
 }
