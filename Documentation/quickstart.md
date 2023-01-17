@@ -157,22 +157,44 @@ import StoreHelper
 @available(iOS 15.0, macOS 12.0, *)
 struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @State private var isPurchased = false
+    @State private var purchaseState: PurchaseState = .unknown
     var productId: ProductId
     
     var body: some View {
         VStack {
-            if isPurchased {
-                Image(productId).bodyImage()
-                Text("You have purchased this product and have full access 😀").font(.title).foregroundColor(.green)
-            } else {
-                Text("Sorry, you have not purchased this product and do not have access 😢").font(.title).foregroundColor(.red)
+            Image(productId).bodyImage()
+
+            switch purchaseState {
+                case .purchased: Text("You have purchased this product and have full access.")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.green)
+                        .padding()
+                    
+                case .notPurchased: Text("Sorry, you have not purchased this product and do not have access.")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.red)
+                        .padding()
+                    
+                default:
+                    ProgressView().padding()
+                    Text("The purchase state for this product is \(purchaseState.shortDescription().lowercased())")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.orange)
+                        .padding()
             }
         }
         .padding()
         .task {
-            if let purchased = try? await storeHelper.isPurchased(productId: productId) {
-                isPurchased = purchased
+            let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+            purchaseState = isPurchased ? .purchased : .notPurchased
+        }
+        .onChange(of: storeHelper.purchasedProducts) { _ in
+            Task.init {
+                let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+                purchaseState = isPurchased ? .purchased : .notPurchased
             }
         }
     }
@@ -296,8 +318,8 @@ import StoreHelper
 
 struct SimplePurchaseView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @State var purchaseState: PurchaseState = .unknown
-    var price = "1.99"
+    @State private var purchaseState: PurchaseState = .unknown
+    @State private var product: Product?
     let productId = "com.rarcher.nonconsumable.flowers.large"
     
     var body: some View {
@@ -309,20 +331,47 @@ struct SimplePurchaseView: View {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
             
-            PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price).padding()
+            if let product { PurchaseButton(purchaseState: $purchaseState, productId: productId, price: product.displayPrice).padding() }
             
-            if purchaseState == .purchased {
-                Text("This product has already been purchased").multilineTextAlignment(.center)
-            } else {
-                Text("This product is available for purchase").multilineTextAlignment(.center)
+            switch purchaseState {
+                case .purchased: Text("This product has already been purchased")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.blue)
+                        .padding()
+                    
+                case .notPurchased: Text("This product is available for purchase")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.green)
+                        .padding()
+                    
+                case .unknown: Text("The purchase state for this product has not been determined")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.orange)
+                        .padding()
+                    
+                default: Text("The purchase state for this product is \(purchaseState.shortDescription().lowercased())")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.red)
+                        .padding()
             }
             
             Spacer()
         }
         .padding()
         .task {
-            let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
-            purchaseState = purchased ? .purchased : .unknown
+            product = storeHelper.product(from: productId)
+            let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+            purchaseState = isPurchased ? .purchased : .notPurchased
+        }
+        .onChange(of: storeHelper.purchasedProducts) { _ in
+            Task.init {
+                let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+                purchaseState = isPurchased ? .purchased : .notPurchased
+            }
         }
     }
 }

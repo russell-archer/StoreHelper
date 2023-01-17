@@ -10,6 +10,10 @@
 ---
 
 # Recent Major Changes
+- 17 January, 2023
+    - Improved support for handling extended wait times for StoreKit and App Store responses
+    - Improved caching of purchasing status
+    - Updates to many shared views to handle unknown purchases status
 - 10 January, 2023
     - Added support for caching of product purchase status in `isPurchased(productId:)` using the `purchasedProductsFallback` collection
     - Using `purchasedProductsFallback` as a cache can be turned on/off using `StoreHelper.doUsePurchasedProductsFallbackCache`
