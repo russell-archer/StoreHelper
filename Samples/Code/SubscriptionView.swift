@@ -23,19 +23,26 @@ struct SubscriptionView: View {
                 
                 Spacer()
             } else {
-                Text("You don't have any subscription products")
-                    .font(.title)
-                    .foregroundColor(.red)
+                if storeHelper.isRefreshingProducts {
+                    ProgressView().padding()
+                    Text("Getting subscription products...").font(.title).foregroundColor(.blue)
+                } else {
+                    Text("You don't have any subscription products").font(.title).foregroundColor(.red)
+                }
             }
         }
         .padding()
         .onAppear { productIds = storeHelper.subscriptionProductIds }
+        .onChange(of: storeHelper.products) { _ in
+            productIds = storeHelper.subscriptionProductIds
+        }
     }
 }
 
 @available(iOS 15.0, macOS 12.0, *)
 struct SubscriptionRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
+    @State private var subscriptionState: PurchaseState = .unknown
     @State private var isSubscribed = false
     @State private var detailedSubscriptionInfo: ExtendedSubscriptionInfo?
     var productId: ProductId
@@ -43,18 +50,29 @@ struct SubscriptionRow: View {
     var body: some View {
         VStack {
             HStack {
-                Text("You are \(isSubscribed ? "" : "not") subscribed to \(productId)")
-                    .foregroundColor(isSubscribed ? .green : .red)
-                    .multilineTextAlignment(.center)
-                    .padding()
+                if subscriptionState == .unknown {
+                    HStack {
+                        ProgressView().padding()
+                        Text(productId).foregroundColor(.orange).padding()
+                    }
+                } else {
+                    
+                    Text("You are \(isSubscribed ? "" : "not") subscribed to \(productId)")
+                        .foregroundColor(isSubscribed ? .green : .red)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
             }
         }
         .task {
             isSubscribed = await subscribed(to: productId)
             if isSubscribed {
+                subscriptionState = .purchased
                 if let subscriptionInfo = await getSubscriptionInfo() {
                     detailedSubscriptionInfo = await getDetailedSubscriptionInfo(for: subscriptionInfo)
                 }
+            } else {
+                subscriptionState = .notPurchased
             }
         }
     }

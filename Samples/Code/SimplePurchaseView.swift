@@ -11,8 +11,8 @@ import StoreHelper
 
 struct SimplePurchaseView: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    @State var purchaseState: PurchaseState = .unknown
-    @State var product: Product?
+    @State private var purchaseState: PurchaseState = .unknown
+    @State private var product: Product?
     let productId = "com.rarcher.nonconsumable.flowers.large"
     
     var body: some View {
@@ -24,25 +24,47 @@ struct SimplePurchaseView: View {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
             
-            if let product {
-                PurchaseButton(purchaseState: $purchaseState, productId: productId, price: product.displayPrice).padding()
-            } else {
-                Text("Unable to get Product for \(productId)")
-            }
+            if let product { PurchaseButton(purchaseState: $purchaseState, productId: productId, price: product.displayPrice).padding() }
             
-            if purchaseState == .purchased {
-                Text("This product has already been purchased").multilineTextAlignment(.center)
-            } else {
-                Text("This product is available for purchase").multilineTextAlignment(.center)
+            switch purchaseState {
+                case .purchased: Text("This product has already been purchased")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.blue)
+                        .padding()
+                    
+                case .notPurchased: Text("This product is available for purchase")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.green)
+                        .padding()
+                    
+                case .unknown: Text("The purchase state for this product has not been determined")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.orange)
+                        .padding()
+                    
+                default: Text("The purchase state for this product is \(purchaseState.shortDescription().lowercased())")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.red)
+                        .padding()
             }
             
             Spacer()
         }
         .padding()
         .task {
-            let purchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
-            purchaseState = purchased ? .purchased : .unknown
             product = storeHelper.product(from: productId)
+            let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+            purchaseState = isPurchased ? .purchased : .notPurchased
+        }
+        .onChange(of: storeHelper.purchasedProducts) { _ in
+            Task.init {
+                let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
+                purchaseState = isPurchased ? .purchased : .notPurchased
+            }
         }
     }
 }
