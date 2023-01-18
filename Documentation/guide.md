@@ -18,6 +18,8 @@ This document describes how to implement and test in-app purchases with **SwiftU
 ---
 
 # Recent Major Changes
+- 18 January, 2023
+    - Additional logging of various activities added
 - 17 January, 2023
     - Improved support for handling extended wait times for StoreKit and App Store responses
     - Improved caching of purchasing status

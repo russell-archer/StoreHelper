@@ -63,45 +63,42 @@ public struct Products: View {
     }
     
     @ViewBuilder public var body: some View {
-        ScrollView {
-            VStack {
-                ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
-                TermsOfServiceAndPrivacyPolicyView().padding(.top)
+        VStack {
+            ProductListView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, signPromotionalOffer: signPromotionalOffer, productInfoCompletion: productInfoCompletion)
+            TermsOfServiceAndPrivacyPolicyView().padding(.top)
 
-                DisclosureGroup(isExpanded: $textExpanded, content: {
+            DisclosureGroup(isExpanded: $textExpanded, content: {
 
-                    RestorePurchasesView()
-                    RefreshProductsView()
-                    RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
-                    ContactUsView()
+                RestorePurchasesView()
+                RefreshProductsView()
+                RedeemOfferCodeView(showRedeemOfferCodeButton: $showRedeemOfferCodeButton, showRedeemOfferCodeError: $showRedeemOfferCodeError)
+                ContactUsView()
 
-                }, label: {
-                    Label("Manage Purchases", systemImage: "creditcard.circle")
-                })
-                .padding()
-                
-                if !canMakePayments {
-                    Spacer()
-                    SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
-                }
-            }
-            .navigationBarTitle("Available Products", displayMode: .inline)
-            .toolbar { PurchaseManagement() }
-            .refundRequestSheet(for: refundRequestTransactionId, isPresented: $showRefundSheet) { refundRequestStatus in
-                switch(refundRequestStatus) {
-                    case .failure(_): refundAlertText = "Refund request submission failed"
-                    case .success(_): refundAlertText = "Refund request submitted successfully"
-                }
-                
-                showRefundAlert.toggle()
-            }
-            .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
-            .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
-            .task { canMakePayments = AppStore.canMakePayments }
+            }, label: {
+                Label("Manage Purchases", systemImage: "creditcard.circle")
+            })
+            .padding()
             
-            VersionInfo()
+            if !canMakePayments {
+                Spacer()
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Purchases are not permitted on your device.")}.foregroundColor(.secondary)
+            }
         }
-        .refreshable { storeHelper.refreshProductsFromAppStore(rebuildCaches: true) }
+        .navigationBarTitle("Available Products", displayMode: .inline)
+        .toolbar { PurchaseManagement() }
+        .refundRequestSheet(for: refundRequestTransactionId, isPresented: $showRefundSheet) { refundRequestStatus in
+            switch(refundRequestStatus) {
+                case .failure(_): refundAlertText = "Refund request submission failed"
+                case .success(_): refundAlertText = "Refund request submitted successfully"
+            }
+            
+            showRefundAlert.toggle()
+        }
+        .alert(refundAlertText, isPresented: $showRefundAlert) { Button("OK") { showRefundAlert.toggle() }}
+        .alert("Unable to redeem offer code", isPresented: $showRedeemOfferCodeError) { Button("OK") { showRedeemOfferCodeError.toggle() }}
+        .task { canMakePayments = AppStore.canMakePayments }
+        
+        VersionInfo()
     }
 }
 #endif

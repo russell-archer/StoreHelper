@@ -168,6 +168,9 @@ public class StoreHelper: ObservableObject {
         
         // Get the fallback list of purchased products in case the App Store's not available
         purchasedProductsFallback = readPurchasedProductsFallbackList()
+
+        // Log the fallback cache values we just read
+        purchasedProductsFallback.forEach { pid in StoreLog.event(.purchasedProductsCache, productId: pid) }
     }
     
     deinit { transactionListener?.cancel() }
@@ -199,8 +202,17 @@ public class StoreHelper: ObservableObject {
                 purchasedProducts.removeAll()
                 transactionCheck.removeAll()
             }
-                        
+                      
             products = await requestProductsFromAppStore(productIds: productIds)
+            
+            StoreLog.event(.requestPurchaseStatusStarted)
+            guard let products else {
+                StoreLog.event(.requestPurchaseStatusFailure)
+                return
+            }
+            
+            for product in products { let _ = try? await isPurchased(productId: product.id) }
+            StoreLog.event(.requestPurchaseStatusSucess)
         }
     }
     
@@ -217,7 +229,6 @@ public class StoreHelper: ObservableObject {
         isRefreshingProducts = true
         
         guard let localizedProducts = try? await Product.products(for: productIds) else {
-            isAppStoreAvailable = false
             StoreLog.event(.requestProductsFailure)
             return nil
         }
@@ -240,6 +251,7 @@ public class StoreHelper: ObservableObject {
         // We only use the cache if a product has previously had its purchase status checked against the App Store receipt.
         if isNonConsumable(productId: productId), doUsePurchasedProductsFallbackCache, transactionCheck.contains(productId) {
             purchased = purchasedProductsFallback.contains(productId)
+            StoreLog.event(purchased ? .productIsPurchasedFromCache : .productIsNotPurchased, productId: productId)
             updatePurchasedProducts(for: productId, purchased: purchased, updateFallbackList: false, updateTransactionCheck: false)
             return purchased
         }
@@ -247,12 +259,16 @@ public class StoreHelper: ObservableObject {
         // Make sure we're listening for transactions, the App Store is available, we have a list of localized products
         // and that we can create a `Product` from the `ProductId`. If not, we have to rely on the cache of purchased products
         guard hasStarted, isAppStoreAvailable, hasProducts, let product = product(from: productId) else {
+            StoreLog.event(.appStoreNotAvailable)
+            purchased = purchasedProductsFallback.contains(productId)
+            StoreLog.event(purchased ? .productIsPurchasedFromCache : .productIsNotPurchased, productId: productId)
             return purchasedProductsFallback.contains(productId)
         }
 
         // Is this a consumable product? We need to treat consumables differently because their transactions are NOT stored in the receipt
         if product.type == .consumable {
             purchased = KeychainHelper.count(for: productId) > 0
+            StoreLog.event(purchased ? .productIsPurchased : .productIsNotPurchased, productId: productId)
             updatePurchasedProducts(for: productId, purchased: purchased)
             return purchased
         }
@@ -262,6 +278,7 @@ public class StoreHelper: ObservableObject {
             // There's no transaction for the product, so it hasn't been purchased. However, the App Store does sometimes return nil,
             // even if the user is entitled to access the product. For this reason we don't update the fallback cache and transaction
             // check list for a negative response
+            StoreLog.event(.productIsNotPurchasedNoEntitlement, productId: productId)
             return false
         }
 
@@ -280,6 +297,7 @@ public class StoreHelper: ObservableObject {
             default:             throw StoreException.productTypeNotSupported
         }
         
+        StoreLog.event(purchased ? .productIsPurchasedFromTransaction : .productIsNotPurchased, productId: productId)
         updatePurchasedProducts(for: productId, purchased: purchased)
         return purchased
     }

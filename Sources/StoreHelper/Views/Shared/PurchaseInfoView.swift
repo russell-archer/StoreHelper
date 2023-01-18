@@ -47,7 +47,7 @@ public struct PurchaseInfoView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(height: 30)
                 
-                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText)}
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(purchaseInfoText.count > 0 ? purchaseInfoText : "Purchased")}
                     .foregroundColor(.blue)
                     .lineLimit(nil)
             }
