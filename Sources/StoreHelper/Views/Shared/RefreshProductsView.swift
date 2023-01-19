@@ -14,6 +14,8 @@ import StoreKit
 public struct RefreshProductsView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     
+    public init() {}
+    
     public var body: some View {
         if let refreshProductsButtonText = Configuration.refreshProductsButtonText.stringValue(storeHelper: storeHelper) {
             Button(action: {

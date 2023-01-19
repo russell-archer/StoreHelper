@@ -12,6 +12,8 @@ import StoreKit
 public struct RestorePurchasesView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     
+    public init() {}
+    
     public var body: some View {
         if let restorePurchasesButtonText = Configuration.restorePurchasesButtonText.stringValue(storeHelper: storeHelper) {
             

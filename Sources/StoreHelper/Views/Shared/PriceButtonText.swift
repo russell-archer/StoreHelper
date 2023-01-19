@@ -14,6 +14,11 @@ public struct PriceButtonText: View {
     var price: String
     var disabled: Bool
     
+    public init(price: String, disabled: Bool) {
+        self.price = price
+        self.disabled = disabled
+    }
+    
     public var body: some View {
         Text(disabled ? "Disabled" : price)  // Don't use scaled fonts for the price at it can lead to truncation
             .font(.body)

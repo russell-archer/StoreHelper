@@ -14,6 +14,8 @@ public struct ContactUsView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @Environment(\.openURL) var openURL
     
+    public init() {}
+    
     public var body: some View {
         if let sContactUrl = Configuration.contactUsUrl.stringValue(storeHelper: storeHelper), let contactUrl = URL(string: sContactUrl) {
             Button(action: { openURL(contactUrl)}) {

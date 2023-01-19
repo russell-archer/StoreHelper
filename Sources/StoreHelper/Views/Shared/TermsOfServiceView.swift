@@ -14,6 +14,8 @@ public struct TermsOfServiceAndPrivacyPolicyView: View {
     @State private var termsOfServiceUrl: URL?
     @State private var privacyPolicyUrl: URL?
     
+    public init() {}
+    
     public var body: some View {
         HStack {
             if let termsOfServiceUrl { Link("Terms of Service", destination: termsOfServiceUrl) }

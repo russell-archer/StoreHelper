@@ -69,7 +69,7 @@ public struct PriceView: View {
                                 }
                             }
                         }) {
-                            PriceButtonTextSubscription(disabled: !canMakePayments, price: priceForDisplay.price)
+                            PriceButtonTextSubscription(price: priceForDisplay.price, disabled: !canMakePayments)
                         }
                         .xPlatformButtonStyleBorderless()
                         .disabled(!canMakePayments)

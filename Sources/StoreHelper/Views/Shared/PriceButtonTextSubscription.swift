@@ -30,8 +30,13 @@ import StoreKit
 @available(iOS 15.0, macOS 12.0, *)
 public struct PriceButtonTextSubscription: View {
     @EnvironmentObject var storeHelper: StoreHelper
-    var disabled: Bool
     var price: String
+    var disabled: Bool
+    
+    public init(price: String, disabled: Bool) {
+        self.price = price
+        self.disabled = disabled
+    }
     
     public var body: some View {
         VStack {
