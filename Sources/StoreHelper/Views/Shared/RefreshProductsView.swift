@@ -33,17 +33,10 @@ public struct RefreshProductsView: View {
             #endif
             .padding([.top, .leading, .trailing])
             
-            #if os(iOS)
-            Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually refreshing the product list is not normally necessary. Tap \"\(refreshProductsButtonText)\" if you believe this app is not correctly listing your products.")}
+            CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually refreshing the product list is not normally necessary. \(Utils.confirmGestureText()) \"\(refreshProductsButtonText)\" if you believe this app is not correctly listing your products.")}
                 .multilineTextAlignment(.center)
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                 .foregroundColor(.secondary)
-            #else
-            CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manually refreshing the product list is not normally necessary. Click \"\(refreshProductsButtonText)\" if you believe this app is not correctly listing your products.")}
-                .multilineTextAlignment(.center)
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
-                .foregroundColor(.secondary)
-            #endif
         }
     }
 }

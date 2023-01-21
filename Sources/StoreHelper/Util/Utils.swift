@@ -16,6 +16,14 @@ public struct Utils {
     public static func isRelease() -> Bool { return !self.debug }
     public static func isSimulator() -> Bool { return self.simulator }
     
+    public static func confirmGestureText() -> String {
+        #if os(iOS)
+        "Tap"
+        #else
+        "Click"
+        #endif
+    }
+    
     #if DEBUG
     /// Simulate a lengthy async operation. Suspend the current task for the given duration. Doesn’t block the current thread.
     /// - Parameters:

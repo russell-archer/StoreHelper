@@ -29,17 +29,10 @@ public struct ContactUsView: View {
             #endif
             .padding([.top, .leading, .trailing])
             
-            #if os(iOS)
-            Caption2Font(scaleFactor: storeHelper.fontScaleFactor) { Text("Want to talk to us? Tapping \"Contact Us\" will open a web page with support and contact information.")}
+            CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Want to talk to us? \(Utils.confirmGestureText()) \"Contact Us\" to open a web page with support and contact information.")}
                 .multilineTextAlignment(.center)
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                 .foregroundColor(.secondary)
-            #else
-            CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Want to talk to us? Clicking \"Contact Us\" will open a web page with support and contact information.")}
-                .multilineTextAlignment(.center)
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
-                .foregroundColor(.secondary)
-            #endif
         }
     }
 }

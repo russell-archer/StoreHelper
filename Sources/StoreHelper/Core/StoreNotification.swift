@@ -131,4 +131,18 @@ public enum StoreNotification: Error, Equatable {
             case .purchasedProductsCache:               return "Purchased products fallback cache valid"
         }
     }
+    
+    /// Returns `true` if a notification is related to a StoreHelper.isPurchased() check.
+    /// - Returns: Returns `true` if a notification is related to a StoreHelper.isPurchased() check.
+    public func isNotificationPurchaseState() -> Bool {
+        switch self {
+            case .productIsPurchasedFromTransaction:    return true
+            case .productIsPurchasedFromCache:          return true
+            case .productIsPurchased:                   return true
+            case .productIsNotPurchased:                return true
+            case .productIsNotPurchasedNoEntitlement:   return true
+                
+            default: return false
+        }
+    }
 }
