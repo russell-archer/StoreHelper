@@ -591,17 +591,26 @@ public class StoreHelper: ObservableObject {
         
         if purchased {
             if product.type == .consumable {
-                while purchasedProducts.count < KeychainHelper.count(for: productId) {
-                    purchasedProducts.append(productId)  // Consumables can appear more than once in this list
+                let keychainCount = KeychainHelper.count(for: productId)
+                let purchasedProductsCount = purchasedProducts.filter({ $0 == productId }).count
+                if keychainCount == purchasedProductsCount || purchasedProductsCount > keychainCount { return } else {
+                    while purchasedProducts.count < KeychainHelper.count(for: productId) {
+                        purchasedProducts.append(productId)  // Consumables can appear more than once in this list
+                    }
                 }
+
             } else {
                 if !purchasedProducts.contains(productId) { purchasedProducts.append(productId) }
             }
             
         } else {
             if product.type == .consumable {
-                while purchasedProducts.count > KeychainHelper.count(for: productId) {
-                    if let index = purchasedProducts.firstIndex(where: { $0 == productId}) { purchasedProducts.remove(at: index) }
+                let keychainCount = KeychainHelper.count(for: productId)
+                let purchasedProductsCount = purchasedProducts.filter({ $0 == productId }).count
+                if keychainCount == purchasedProductsCount || purchasedProductsCount < keychainCount { return } else {
+                    while purchasedProducts.count > KeychainHelper.count(for: productId) {
+                        if let index = purchasedProducts.firstIndex(where: { $0 == productId}) { purchasedProducts.remove(at: index) }
+                    }
                 }
             } else {
                 if let index = purchasedProducts.firstIndex(where: { $0 == productId}) { purchasedProducts.remove(at: index) }
