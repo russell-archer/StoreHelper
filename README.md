@@ -10,6 +10,8 @@
 ---
 
 # Recent Major Changes
+- 27 January, 2023
+    - Fixed a bug related to isPurchased for consumable products. Caused a crash on macOS and iOS (thank you Abdullah Kardaş!) 
 - 18 January, 2023
     - Additional logging of various activities added
 - 17 January, 2023
