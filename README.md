@@ -1,3 +1,12 @@
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frussell-archer%2FStoreHelper%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/russell-archer/StoreHelper)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frussell-archer%2FStoreHelper%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/russell-archer/StoreHelper)
+
+[![](https://img.shields.io/badge/SPM-supported-DE5C43.svg?style=flat)](https://swift.org/package-manager/)
+[![](https://img.shields.io/github/issues/russell-archer/StoreHelper)](https://img.shields.io/github/issues/russell-archer/StoreHelper)
+[![](https://img.shields.io/github/license/russell-archer/StoreHelper)](https://img.shields.io/github/license/russell-archer/StoreHelper)
+
+---
+
 # StoreHelper
 
 ![](./Documentation/assets/StoreHelperDemo0.png)
