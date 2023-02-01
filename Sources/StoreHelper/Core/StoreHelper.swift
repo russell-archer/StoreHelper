@@ -178,7 +178,7 @@ public class StoreHelper: ObservableObject {
     // MARK: - Public methods
     
     /// Call this method as soon as possible after your app starts and StoreHelper has been initialized.
-    /// Failure to call` start()` may result in transactions being missed.
+    /// Failure to call` start()` or `startAsync()` may result in transactions being missed.
     /// This method starts listening for App Store transactions and requests localized product info from the App Store.
     @MainActor public func start() {
         guard !hasStarted else { return }
@@ -188,6 +188,29 @@ public class StoreHelper: ObservableObject {
         
         // Get localized product info from the App Store
         refreshProductsFromAppStore()
+    }
+    
+    /// Call this method as soon as possible after your app starts and StoreHelper has been initialized.
+    /// Failure to call` start()` or `startAsync()` may result in transactions being missed.
+    /// This method starts listening for App Store transactions and requests localized product info from the App Store.
+    @MainActor public func startAsync() async {
+        guard !hasStarted else { return }
+        
+        // Listen for App Store transactions
+        transactionListener = handleTransactions()
+        
+        // Get localized product info from the App Store
+        guard let productIds else { return }
+        products = await requestProductsFromAppStore(productIds: productIds)
+        
+        StoreLog.event(.requestPurchaseStatusStarted)
+        guard let products else {
+            StoreLog.event(.requestPurchaseStatusFailure)
+            return
+        }
+        
+        for product in products { let _ = try? await isPurchased(productId: product.id) }
+        StoreLog.event(.requestPurchaseStatusSucess)
     }
     
     /// Request refreshed localized product info from the App Store. In general, use this method
