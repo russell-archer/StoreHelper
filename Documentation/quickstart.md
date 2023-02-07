@@ -46,7 +46,9 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 - Select **File > Add Packages...**
 - Paste the URL of the `StoreHelper` package into the search box: 
 
-    - https://github.com/russell-archer/StoreHelper
+    - HTTPS: https://github.com/russell-archer/StoreHelper.git
+    - or
+    - SSH: git@github.com:russell-archer/StoreHelper.git
 
 - Click **Add Package**:
 
