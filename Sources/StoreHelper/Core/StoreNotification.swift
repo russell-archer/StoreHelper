@@ -6,10 +6,40 @@
 //
 
 import Foundation
+import StoreKit
+
+extension StoreKitError: Equatable {
+    public static func == (lhs: StoreKitError, rhs: StoreKitError) -> Bool {
+        switch (lhs, rhs) {
+        case (.unknown, .unknown): return true
+        case (.userCancelled, .userCancelled): return true
+        case (.networkError, .networkError): return true
+        case (.systemError, .systemError): return true
+        case (.notAvailableInStorefront, .notAvailableInStorefront): return true
+        case (.notEntitled, .notEntitled): return true
+        default: return false
+        }
+    }
+}
+
+public enum UnderlyingError: Equatable {
+    case purchase(Product.PurchaseError)
+    case storeKit(StoreKitError)
+
+    public init?(error: Error) {
+        if let purchaseError = error as? Product.PurchaseError {
+            self = .purchase(purchaseError)
+        } else if let skError = error as? StoreKitError {
+            self = .storeKit(skError)
+        } else {
+            return nil
+        }
+    }
+}
 
 /// StoreHelper exceptions
 public enum StoreException: Error, Equatable {
-    case purchaseException
+    case purchaseException(UnderlyingError?)
     case purchaseInProgressException
     case transactionVerificationFailed
     case productTypeNotSupported

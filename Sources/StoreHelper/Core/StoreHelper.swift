@@ -425,27 +425,30 @@ public class StoreHelper: ObservableObject {
         // Start a purchase transaction
         purchaseState = .inProgress
         StoreLog.event(.purchaseInProgress, productId: product.id)
-        
-        guard let result = try? await product.purchase(options: options) else {
+
+        let result: Product.PurchaseResult
+        do {
+            result = try await product.purchase(options: options)
+        } catch {
             purchaseState = .failed
             StoreLog.event(.purchaseFailure, productId: product.id)
-            throw StoreException.purchaseException
+            throw StoreException.purchaseException(.init(error: error))
         }
-        
+
         // Every time an app receives a transaction from StoreKit 2, the transaction has already passed through a
         // verification process to confirm whether the payload is signed by the App Store for my app for this device.
         // That is, Storekit2 does transaction (receipt) verification for you (no more OpenSSL or needing to send
         // a receipt to an Apple server for verification).
-        
+
         // We now have a PurchaseResult value. See if the purchase suceeded, failed, was cancelled or is pending.
         switch result {
             case .success(let verificationResult):
-                
+
                 // The purchase seems to have succeeded. StoreKit has already automatically attempted to validate
                 // the transaction, returning the result of this validation wrapped in a `VerificationResult`.
                 // We now need to check the `VerificationResult<Transaction>` to see if the transaction passed the
                 // App Store's validation process. This is equivalent to receipt validation in StoreKit1.
-                
+
                 // Did the transaction pass StoreKit’s automatic validation?
                 let checkResult = checkVerificationResult(result: verificationResult)
                 if !checkResult.verified {
@@ -453,10 +456,10 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionValidationFailure, productId: checkResult.transaction.productID)
                     throw StoreException.transactionVerificationFailed
                 }
-                
+
                 let validatedTransaction = checkResult.transaction  // The transaction was successfully validated
                 await validatedTransaction.finish()  // Tell the App Store we delivered the purchased content to the user
-                                
+
                 if validatedTransaction.productType == .consumable {
                     // We need to treat consumables differently because their transactions are NOT stored in the receipt.
                     if KeychainHelper.purchase(validatedTransaction.productID) { updatePurchasedProducts(for: validatedTransaction.productID, purchased: true) }
@@ -465,23 +468,23 @@ public class StoreHelper: ObservableObject {
                     // For non-consumables and subscriptions
                     updatePurchasedProducts(for: validatedTransaction.productID, purchased: true)
                 }
-                
+
                 // Let the caller know the purchase succeeded and that the user should be given access to the product
                 purchaseState = .purchased
                 StoreLog.event(.purchaseSuccess, productId: product.id)
-                
+
                 return (transaction: validatedTransaction, purchaseState: .purchased)
-                
+
             case .userCancelled:
                 purchaseState = .cancelled
                 StoreLog.event(.purchaseCancelled, productId: product.id)
                 return (transaction: nil, .cancelled)
-                
+
             case .pending:
                 purchaseState = .pending
                 StoreLog.event(.purchasePending, productId: product.id)
                 return (transaction: nil, .pending)
-                
+
             default:
                 purchaseState = .unknown
                 StoreLog.event(.purchaseFailure, productId: product.id)
