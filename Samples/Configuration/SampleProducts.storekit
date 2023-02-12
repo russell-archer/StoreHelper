@@ -129,8 +129,8 @@
           "codeOffers" : [
             {
               "eligibility" : [
-                "expired",
                 "new",
+                "expired",
                 "existing"
               ],
               "internalID" : "7638AFBA",
@@ -212,6 +212,90 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Bronze",
           "subscriptionGroupID" : "8126C4BB",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    },
+    {
+      "id" : "1A156646",
+      "localizations" : [
+
+      ],
+      "name" : "Standard",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "C766AFC0",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "A lovely green product",
+              "displayName" : "Perfect Green",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.green",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Green",
+          "subscriptionGroupID" : "1A156646",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "1.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "B13AAE77",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "A nice amber product",
+              "displayName" : "Warning Amber",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.amber",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Amber",
+          "subscriptionGroupID" : "1A156646",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "0.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "89E7058E",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "A dangerous red product",
+              "displayName" : "Dangerous Red",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.rarcher.red",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Red",
+          "subscriptionGroupID" : "1A156646",
           "type" : "RecurringSubscription"
         }
       ]
