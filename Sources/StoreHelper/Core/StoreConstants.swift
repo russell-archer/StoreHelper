@@ -18,5 +18,14 @@ public struct StoreConstants {
     
     /// The UserDefaults key used to store the fallback list of purchased products.
     public static let PurchasedProductsFallbackKey = "PurchasedProductsFallback"
+    
+    /// The name of the section of the Products.plist file that contains product ids
+    public static let ProductsConfiguration = "Products"
+
+    /// The name of the optional section of the Products.plist file that contains subscription product ids
+    public static let SubscriptionsConfiguration = "Subscriptions"
+    
+    /// The name of the optional section of the Products.plist file that contains a subscription group
+    public static let SubscriptionGroupConfiguration = "Group"
 }
 

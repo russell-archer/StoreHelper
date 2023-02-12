@@ -168,9 +168,6 @@ public class StoreHelper: ObservableObject {
         
         // Get the fallback list of purchased products in case the App Store's not available
         purchasedProductsFallback = readPurchasedProductsFallbackList()
-
-        // Log the fallback cache values we just read
-        purchasedProductsFallback.forEach { pid in StoreLog.event(.purchasedProductsCache, productId: pid) }
     }
     
     deinit { transactionListener?.cancel() }
@@ -182,10 +179,10 @@ public class StoreHelper: ObservableObject {
     /// This method starts listening for App Store transactions and requests localized product info from the App Store.
     @MainActor public func start() {
         guard !hasStarted else { return }
-        
+
         // Listen for App Store transactions
         transactionListener = handleTransactions()
-        
+
         // Get localized product info from the App Store
         refreshProductsFromAppStore()
     }
