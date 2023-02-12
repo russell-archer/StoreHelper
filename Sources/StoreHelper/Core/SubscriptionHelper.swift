@@ -9,36 +9,123 @@ import StoreKit
 import OrderedCollections
 import SwiftUI
 
-/// Helper class for subscriptions.
+/// Holds information on a subscription group and the associated subscription products.
+@available(iOS 15.0, macOS 12.0, *)
+public struct SubscriptionGroupInfo {
+    
+    public var group: String
+    public var productIds: OrderedSet<ProductId>
+    
+    public init(group: String, productIds: OrderedSet<ProductId>? = nil) {
+        self.group = group
+        self.productIds = productIds ?? OrderedSet<ProductId>()
+    }
+}
+
+/// Helper class for auto-renewing subscriptions defined in the product definition property list (e.g. `Products.plist`).
+/// The structure of the product definition property list may take one of two alternative formats, as described below.
 ///
-/// The methods in this class require that auto-renewing subscription product ids adopt the naming
-/// convention: "com.{author}.subscription.{subscription-group-name}.{product-name}".
-/// For example, "com.rarcher.subscription.vip.bronze".
+/// Format 1.
+/// All in-app purchase products (consumable, non-consumable and subscription) are listed together under the top-level
+/// "Products" key. When using this format all subscriptions must use the
+/// `com.{author}.subscription.{subscription-group-name}.{product-name}` naming convention, so that subscription group
+/// names can be determined. Other products do not need to adhere to a naming convention.
+///
+/// Format 2.
+/// Consumable and non-consumable products are listed together under the top-level "Products" key.
+/// Subscriptions are listed under the top-level "Subscriptions" key.
+///
+/// Example 1. Products listed together. Subscriptions must use the required naming convention:
+///
+/// ```
+/// <?xml version="1.0" encoding="UTF-8"?>
+/// <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+/// <plist version="1.0">
+/// <dict>
+///     <key>Products</key>
+///     <array>
+///         <string>com.rarcher.nonconsumable.flowers.large</string>
+///         <string>com.rarcher.nonconsumable.flowers.small</string>
+///         <string>com.rarcher.consumable.plant.installation</string>
+///         <string>com.rarcher.subscription.vip.gold</string>
+///         <string>com.rarcher.subscription.vip.silver</string>
+///         <string>com.rarcher.subscription.vip.bronze</string>
+///     </array>
+/// </dict>
+/// </plist>
+/// ```
+///
+/// Example 2. All consumables and non-consumables listed together. Subscriptions listed separately,
+/// with two subscription groups named "vip" and "standard" defined:
+///
+/// ```
+/// <?xml version="1.0" encoding="UTF-8"?>
+/// <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+/// <plist version="1.0">
+/// <dict>
+///     <key>Products</key>
+///     <array>
+///         <string>com.rarcher.nonconsumable.flowers.large</string>
+///         <string>com.rarcher.nonconsumable.flowers.small</string>
+///         <string>com.rarcher.consumable.plant.installation</string>
+///     </array>
+///     <key>Subscriptions</key>
+///     <array>
+///         <dict>
+///             <key>Group</key>
+///             <string>vip</string>
+///             <key>Products</key>
+///             <array>
+///                 <string>com.rarcher.gold</string>
+///                 <string>com.rarcher.silver</string>
+///                 <string>com.rarcher.bronze</string>
+///             </array>
+///         </dict>
+///         <dict>
+///             <key>Group</key>
+///             <string>standard</string>
+///             <key>Products</key>
+///             <array>
+///                 <string>com.rarcher.sub1</string>
+///                 <string>com.rarcher.sub2</string>
+///                 <string>com.rarcher.sub3</string>
+///             </array>
+///         </dict>
+///     </array>
+/// </dict>
+/// </plist>
+/// ```
 ///
 /// Also, service level relies on the ordering of product ids within a subscription group in the
 /// Products.plist file. A product appearing higher (towards the top of the group) will have a higher
 /// service level than one appearing lower down. If a group has three subscription products then the
 /// highest service level product will have a service level of 2, while the third product will have
 /// a service level of 0.
+///
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionHelper {
-    
     weak public var storeHelper: StoreHelper?
     
     private static let productIdSubscriptionName = "subscription"
     private static let productIdSeparator = "."
     
-    public init(storeHelper: StoreHelper) {
-        self.storeHelper = storeHelper
-    }
+    public init(storeHelper: StoreHelper) { self.storeHelper = storeHelper }
     
-    /// Determines the group name(s) present in the set of subscription product ids defined in Products.plist.
-    /// - Returns: Returns the group name(s) present in the `OrderedSet` of subscription product ids held by `StoreHelper`.
+    /// Determines the subscription group names defined in Products.plist.
+    /// - Returns: Returns the subscription group names defined in Products.plist.
     public func groups() -> OrderedSet<String>? {
         
         guard let store = storeHelper else { return nil }
-        var subscriptionGroups = OrderedSet<String>()
         
+        // Are we going to use the subscription naming convention to identify groups, or use the "Subscriptions"
+        // section of the product definition file "Products.plist"?
+        if let subscriptionGroupInfo = StoreConfiguration.readConfiguredSubscriptionGroups() {
+            // Found a "Subscriptions" section in "Products.plist"
+            return OrderedSet<String>(subscriptionGroupInfo.map { group in group.group })
+        }
+        
+        // Use the naming convention to identify subscription groups
+        var subscriptionGroups = OrderedSet<String>()
         if let spids = store.subscriptionProductIds {
             spids.forEach { productId in
                 if let group = SubscriptionHelper.groupName(from: productId) {
@@ -56,8 +143,17 @@ public struct SubscriptionHelper {
     public func subscriptions(in group: String) -> OrderedSet<ProductId>? {
         
         guard let store = storeHelper else { return nil }
-        var matchedProductIds = OrderedSet<ProductId>()
         
+        // Use the subscription naming convention to identify groups, or the "Subscriptions"
+        // section of the product definition file "Products.plist"?
+        if let subscriptionGroupInfo = StoreConfiguration.readConfiguredSubscriptionGroups() {
+            // Found a "Subscriptions" section in "Products.plist"
+            let targetGroups = subscriptionGroupInfo.filter { subInfo in subInfo.group == group }
+            if targetGroups.count > 0, let targetGroup = targetGroups.first { return targetGroup.productIds }
+        }
+        
+        // Use the naming convention to identify subscription groups
+        var matchedProductIds = OrderedSet<ProductId>()
         if let spids = store.subscriptionProductIds {
             spids.forEach { productId in
                 if let matchedGroup = SubscriptionHelper.groupName(from: productId), matchedGroup.lowercased() == group.lowercased() {
@@ -69,11 +165,25 @@ public struct SubscriptionHelper {
         return matchedProductIds.count > 0 ? matchedProductIds : nil
     }
     
-    /// Extracts the name of the subscription group present in the `ProductId`.
-    /// - Parameter productId: The `ProductId` from which to extract a subscription group name.
-    /// - Returns: Returns the lowercased name of the subscription group present in the `ProductId`, or nil if the group name cannot be determined.
+    /// Determines the name of the subscription group for a given `ProductId`.
+    /// - Parameter productId: The `ProductId` for which you require the subscription group name.
+    /// - Returns: Returns the lowercased the name of the subscription group for a given `ProductId`, or nil if the group name cannot be determined.
     public static func groupName(from productId: ProductId) -> String? {
         
+        // Use the subscription naming convention to identify groups, or the "Subscriptions"
+        // section of the product definition file "Products.plist"?
+        if let subscriptionGroupInfo = StoreConfiguration.readConfiguredSubscriptionGroups() {
+            // Found a "Subscriptions" section in "Products.plist". Search all product ids in all groups for a match for `productId`
+            for subInfo in subscriptionGroupInfo {
+                for pid in subInfo.productIds {
+                    if pid == productId { return subInfo.group }
+                }
+            }
+            
+            return nil  // No match found
+        }
+        
+        // Use the naming convention to identify the subscription group
         let components = productId.components(separatedBy: SubscriptionHelper.productIdSeparator)
         for i in 0...components.count-1 {
             if components[i].lowercased() == SubscriptionHelper.productIdSubscriptionName {
@@ -81,7 +191,7 @@ public struct SubscriptionHelper {
             }
         }
         
-        return nil
+        return nil  // No match found
     }
     
     /// Information on the highest service level auto-renewing subscription the user is subscribed to
@@ -171,11 +281,10 @@ public struct SubscriptionHelper {
     
     /// Gets all the subscription groups from the list of subscription products.
     /// For each group, gets the highest subscription level product.
+    /// - Returns: For each subscription group, returns the highest subscription level auto-renewing subscription the user is subscribed to.
     public func groupSubscriptionInfo() async -> OrderedSet<SubscriptionInfo>? {
-        
-        guard let store = storeHelper else { return nil }
         var subscriptionInfoSet = OrderedSet<SubscriptionInfo>()
-        let subscriptionGroups = store.subscriptionHelper.groups()
+        let subscriptionGroups = groups()
         
         if let groups = subscriptionGroups {
             subscriptionInfoSet = OrderedSet<SubscriptionInfo>()

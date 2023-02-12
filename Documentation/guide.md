@@ -1014,8 +1014,14 @@ Open `Products.storekit` and review the "VIP" subscription group:
 Notice how we adopt the following naming convention for our subscription products:
 
 ```xml
-com.{developer}.subscription.{subscriptionGroupName}.{productName}"
+com.{developer}.subscription.{subscriptionGroupName}.{productName}
 ```
+
+> [!note]
+> As of version 2.3 of `StoreHelper` you may either adopt the `com.{developer}.subscription.{subscriptionGroupName}.{productName}` naming
+> convention, or use the expanded format for `Products.plist` which provides a separate `Subscriptions` section.
+>  
+> See the Samples/Configuration/SampleProducts.plist file for details and examples.
 
 The **order** in which products are defined in both `Products.storekit` and `Products.plist` is important (and this is why we use an `OrderedSet<ProductId>` in `StoreHelper`). As we'll discuss shortly, we need to be able to distinguish the service level of a product *within* a subscription group. For this reason, the product with the highest service level is defined at the top of the group, with products of decreasing service level placed below it.
 
