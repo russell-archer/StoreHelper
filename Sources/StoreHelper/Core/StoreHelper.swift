@@ -145,6 +145,9 @@ public class StoreHelper: ObservableObject {
     /// `purchasedProductsFallback` cache to check it's purchased status.
     private var transactionCheck = [ProductId]()
     
+    /// Used to read the Products.plist configuration file for products and subscriptions
+    private var storeConfiguration = StoreConfiguration()
+    
     // MARK: - Initialization
     
     /// StoreHelper enables support for working with in-app purchases and StoreKit2 using the async/await pattern.
@@ -161,7 +164,7 @@ public class StoreHelper: ObservableObject {
         subscriptionHelper = SubscriptionHelper(storeHelper: self)
         
         // Read our list of product ids
-        productIds = StoreConfiguration.readConfigFile()
+        productIds = storeConfiguration.readConfigFile()
         
         // Read the hosts Configuration.plist file that overrides our default values
         configurationOverride = readConfigurationOverride()

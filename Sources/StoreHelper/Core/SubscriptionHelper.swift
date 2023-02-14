@@ -104,8 +104,8 @@ public struct SubscriptionGroupInfo {
 ///
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionHelper {
-    weak public var storeHelper: StoreHelper?
-    
+    weak private var storeHelper: StoreHelper!
+    private var storeConfiguration = StoreConfiguration()
     private static let productIdSubscriptionName = "subscription"
     private static let productIdSeparator = "."
     
@@ -114,21 +114,18 @@ public struct SubscriptionHelper {
     /// Determines the subscription group names defined in Products.plist.
     /// - Returns: Returns the subscription group names defined in Products.plist.
     public func groups() -> OrderedSet<String>? {
-        
-        guard let store = storeHelper else { return nil }
-        
         // Are we going to use the subscription naming convention to identify groups, or use the "Subscriptions"
         // section of the product definition file "Products.plist"?
-        if let subscriptionGroupInfo = StoreConfiguration.readConfiguredSubscriptionGroups() {
+        if let subscriptionGroupInfo = storeConfiguration.readConfiguredSubscriptionGroups() {
             // Found a "Subscriptions" section in "Products.plist"
             return OrderedSet<String>(subscriptionGroupInfo.map { group in group.group })
         }
         
         // Use the naming convention to identify subscription groups
         var subscriptionGroups = OrderedSet<String>()
-        if let spids = store.subscriptionProductIds {
+        if let spids = storeHelper.subscriptionProductIds {
             spids.forEach { productId in
-                if let group = SubscriptionHelper.groupName(from: productId) {
+                if let group = groupName(from: productId) {
                     subscriptionGroups.append(group)
                 }
             }
@@ -146,7 +143,7 @@ public struct SubscriptionHelper {
         
         // Use the subscription naming convention to identify groups, or the "Subscriptions"
         // section of the product definition file "Products.plist"?
-        if let subscriptionGroupInfo = StoreConfiguration.readConfiguredSubscriptionGroups() {
+        if let subscriptionGroupInfo = storeConfiguration.readConfiguredSubscriptionGroups() {
             // Found a "Subscriptions" section in "Products.plist"
             let targetGroups = subscriptionGroupInfo.filter { subInfo in subInfo.group == group }
             if targetGroups.count > 0, let targetGroup = targetGroups.first { return targetGroup.productIds }
@@ -156,7 +153,7 @@ public struct SubscriptionHelper {
         var matchedProductIds = OrderedSet<ProductId>()
         if let spids = store.subscriptionProductIds {
             spids.forEach { productId in
-                if let matchedGroup = SubscriptionHelper.groupName(from: productId), matchedGroup.lowercased() == group.lowercased() {
+                if let matchedGroup = groupName(from: productId), matchedGroup.lowercased() == group.lowercased() {
                     matchedProductIds.append(productId)
                 }
             }
@@ -168,11 +165,11 @@ public struct SubscriptionHelper {
     /// Determines the name of the subscription group for a given `ProductId`.
     /// - Parameter productId: The `ProductId` for which you require the subscription group name.
     /// - Returns: Returns the lowercased the name of the subscription group for a given `ProductId`, or nil if the group name cannot be determined.
-    public static func groupName(from productId: ProductId) -> String? {
+    public func groupName(from productId: ProductId) -> String? {
         
         // Use the subscription naming convention to identify groups, or the "Subscriptions"
         // section of the product definition file "Products.plist"?
-        if let subscriptionGroupInfo = StoreConfiguration.readConfiguredSubscriptionGroups() {
+        if let subscriptionGroupInfo = storeConfiguration.readConfiguredSubscriptionGroups() {
             // Found a "Subscriptions" section in "Products.plist". Search all product ids in all groups for a match for `productId`
             for subInfo in subscriptionGroupInfo {
                 for pid in subInfo.productIds {
@@ -250,7 +247,7 @@ public struct SubscriptionHelper {
             guard renewalInfoResult.verified else { continue }  // Subscription not verified by StoreKit so ignore it
             
             // Make sure this product is from the same subscription group as the product we're searching for
-            let currentGroup = SubscriptionHelper.groupName(from: renewalInfoResult.transaction.currentProductID)
+            let currentGroup = groupName(from: renewalInfoResult.transaction.currentProductID)
             guard currentGroup == subscriptionGroup.lowercased() else { continue }
             
             // Get the Product for this subscription
@@ -350,7 +347,7 @@ public struct SubscriptionHelper {
     /// - Parameter product: See if the user is subscribed to a lower-value subscription than this product
     /// - Returns: Returns true if the user is currently subscribed to a lower-value subscription than the subscription provided, false otherwise.
     public func hasLowerValueCurrentSubscription(than product: Product) async -> Bool {
-        guard let group = SubscriptionHelper.groupName(from: product.id), let storeHelper else { return false }
+        guard let group = groupName(from: product.id), let storeHelper else { return false }
         
         // Sanity check. Make sure the user's not subscribed to the provided subscription
         guard let subscribed = try? await storeHelper.isSubscribed(product: product), !subscribed else { return false }
@@ -403,7 +400,7 @@ public struct SubscriptionHelper {
 
         for await transaction in StoreKit.Transaction.all {
             let unwrapped = await storeHelper.checkVerificationResult(result: transaction)
-            if let subscriptionTransactionInfo = await SubscriptionTransactionInfo(unwrappedTransaction: unwrapped) {
+            if let subscriptionTransactionInfo = await SubscriptionTransactionInfo(unwrappedTransaction: unwrapped, storeHelper: storeHelper) {
                 transactions.append(subscriptionTransactionInfo)
             }
         }

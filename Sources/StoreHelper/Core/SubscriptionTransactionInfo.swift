@@ -49,10 +49,14 @@ public struct SubscriptionTransactionInfo: Hashable {
     public var subscriptionGroupID: String? { unwrappedTransaction.transaction.subscriptionGroupID }
     
     /// The subscription group that the subscription belongs to.
-    public var subscriptionGroup: String? { SubscriptionHelper.groupName(from: productId) }
+    public var subscriptionGroup: String? { storeHelper.subscriptionHelper.groupName(from: productId) }
     
-    public init?(unwrappedTransaction: UnwrappedVerificationResult<StoreKit.Transaction>) async {
+    /// Weak reference to StoreHelper
+    weak private var storeHelper: StoreHelper!
+    
+    public init?(unwrappedTransaction: UnwrappedVerificationResult<StoreKit.Transaction>, storeHelper: StoreHelper) async {
         self.unwrappedTransaction = unwrappedTransaction
+        self.storeHelper = storeHelper
         
         // Check that the transaction has been verified and that it's for a subscription. If not, fail initialization
         guard unwrappedTransaction.verified, unwrappedTransaction.transaction.productType == .autoRenewable else { return nil }

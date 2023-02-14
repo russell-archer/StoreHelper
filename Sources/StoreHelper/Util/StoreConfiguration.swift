@@ -8,7 +8,7 @@
 import Foundation
 import OrderedCollections
 
-/// Provides static methods for reading the contents of the product definition property list (e.g. `Products.plist`).
+/// Provides methods for reading the contents of the product definition property list (e.g. `Products.plist`).
 /// The structure of the product definition property list may take one of two alternative formats, as described below.
 ///
 /// Format 1.
@@ -82,13 +82,17 @@ import OrderedCollections
 /// </plist>
 /// ```
 @available(iOS 15.0, macOS 12.0, *)
-public struct StoreConfiguration {
+public class StoreConfiguration {
+    private var productIdsCache: OrderedSet<ProductId>?
+    private var subscriptionGroupInfoCache: [SubscriptionGroupInfo]?
     
     public init() {}
     
     /// Read the contents of the product definition property list (e.g. `Products.plist`).
     /// - Returns: Returns a set of ProductId if the list was read, nil otherwise.
-    public static func readConfigFile(filename: String? = nil) -> OrderedSet<ProductId>? {
+    public func readConfigFile(filename: String? = nil) -> OrderedSet<ProductId>? {
+        if productIdsCache != nil { return productIdsCache!.count > 0 ? productIdsCache : nil }
+        
         guard let result = PropertyFile.read(filename: filename == nil ? StoreConstants.StoreConfiguration : filename!) else {
             StoreLog.event(.configurationNotFound)
             StoreLog.event(.configurationFailure)
@@ -108,15 +112,14 @@ public struct StoreConfiguration {
             return nil
         }
         
-        var productIds = OrderedSet<ProductId>(values.compactMap { $0 })
-
         // Do we have an optional "Subscriptions" list?
+        productIdsCache = OrderedSet<ProductId>(values.compactMap { $0 })
         if let subscriptions = result[StoreConstants.SubscriptionsConfiguration] as? [[String : AnyObject]] {
             for subscriptionGroup in subscriptions {
                 if subscriptionGroup[StoreConstants.SubscriptionGroupConfiguration] is String {
                     if let subscriptionsInGroup = subscriptionGroup[StoreConstants.ProductsConfiguration] as? [String] {
                         for subscription in subscriptionsInGroup {
-                            productIds.append(subscription)
+                            productIdsCache!.append(subscription)
                         }
                     }
                 }
@@ -125,7 +128,7 @@ public struct StoreConfiguration {
         
         StoreLog.event(.configurationSuccess)
 
-        return productIds
+        return productIdsCache
     }
     
     /// Read the contents of the product definition property list (e.g. `Products.plist`) and returns the
@@ -133,25 +136,24 @@ public struct StoreConfiguration {
     /// - Returns: Returns an array of `SubscriptionGroupInfo` that represent a subscription group and the
     /// products within it. Returns nil if the product definition property list cannot be found or it doesn't
     /// contain an optional `Subscriptions` section.
-    public static func readConfiguredSubscriptionGroups(filename: String? = nil) -> [SubscriptionGroupInfo]? {
+    public func readConfiguredSubscriptionGroups(filename: String? = nil) -> [SubscriptionGroupInfo]? {
+        if subscriptionGroupInfoCache != nil { return subscriptionGroupInfoCache!.count > 0 ? subscriptionGroupInfoCache : nil }
+        
         let file = filename == nil ? StoreConstants.StoreConfiguration : filename!
         guard let result = PropertyFile.read(filename: file), result.count > 0 else { return nil }
         guard let subscriptions = result[StoreConstants.SubscriptionsConfiguration] as? [[String : AnyObject]] else { return nil }
         
-        var foundSubscriptionGroups = [SubscriptionGroupInfo]()
-        
+        subscriptionGroupInfoCache = [SubscriptionGroupInfo]()
         for subscriptionGroup in subscriptions {
             if let group = subscriptionGroup[StoreConstants.SubscriptionGroupConfiguration] as? String {
                 if let subscriptionsInGroup = subscriptionGroup[StoreConstants.ProductsConfiguration] as? [String] {
                     var foundSubscriptionGroup = SubscriptionGroupInfo(group: group)
                     for subscription in subscriptionsInGroup { foundSubscriptionGroup.productIds.append(subscription) }
-                    if group.count > 0, foundSubscriptionGroup.productIds.count > 0 { foundSubscriptionGroups.append(foundSubscriptionGroup) }
+                    if group.count > 0, foundSubscriptionGroup.productIds.count > 0 { subscriptionGroupInfoCache!.append(foundSubscriptionGroup) }
                 }
             }
         }
         
-        // TODO: Cache this:
-        
-        return foundSubscriptionGroups.count > 0 ? foundSubscriptionGroups : nil
+        return subscriptionGroupInfoCache!.count > 0 ? subscriptionGroupInfoCache : nil
     }
 }
