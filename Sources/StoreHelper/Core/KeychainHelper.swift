@@ -59,7 +59,7 @@ public struct KeychainHelper {
         // Create a query of what we want to search for. Note we don't restrict the search (kSecMatchLimitAll)
         let query = [kSecClass as String : kSecClassGenericPassword,
                      kSecAttrAccount as String : productId,
-                     kSecMatchLimit as String: kSecMatchLimitOne] as CFDictionary
+                     kSecMatchLimit as String: kSecMatchLimitOne] as [String : Any] as CFDictionary
         
         // Search for the item in the keychain
         var item: CFTypeRef?
@@ -77,7 +77,7 @@ public struct KeychainHelper {
                      kSecAttrAccount as String : productId,
                      kSecMatchLimit as String: kSecMatchLimitOne,
                      kSecReturnAttributes as String: true,
-                     kSecReturnData as String: true] as CFDictionary
+                     kSecReturnData as String: true] as [String : Any] as CFDictionary
         
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query, &item)
@@ -131,7 +131,7 @@ public struct KeychainHelper {
         let query = [kSecClass as String : kSecClassGenericPassword,
                      kSecMatchLimit as String: kSecMatchLimitAll,
                      kSecReturnAttributes as String: true,
-                     kSecReturnData as String: true] as CFDictionary
+                     kSecReturnData as String: true] as [String : Any] as CFDictionary
         
         // Search for all the items created by this app in the keychain
         var item: CFTypeRef?

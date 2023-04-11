@@ -429,7 +429,7 @@ Running the app's iOS target produces:
 
 ![](./assets/StoreHelperDemo11.png)
 
-Note that prices are in US dollars. This is because, by default in test environment, the App Store `Storefront` is **United States (USD)** and the localization is **English (US)**. To support testing other locales you can change this. Make sure the `Products.storekit` file is open, then select **Editor > Default Storefront** and change this to another value. You can also changed the localization from **English (US**) with **Editor > Default Localization**.
+Note that prices are in US dollars. This is because, by default in the test environment, the App Store `Storefront` is **United States (USD)** and the localization is **English (US)**. To support testing other locales you can change this. Make sure the `Products.storekit` file is open, then select **Editor > Default Storefront** and change this to another value. You can also changed the localization from **English (US**) with **Editor > Default Localization**.
 
 Here I selected **United Kingdom (GBP)** as the storefront and **English (UK)** as the localization. I also created some UK-specific descriptions of the products. Notice how prices are now in UK Pounds:
 
@@ -1211,12 +1211,14 @@ struct ContentView: View {
     @State private var productId: ProductId = ""
     
     var body: some View {
-        Products() { productId, promoId in
-            // Get the app-server to sign the promotional offer with your App Store Connect key
-            return getSignature(productId: productId, promotionId: promoId)
-            
-        } productInfoCompletion: { id in
-            // User wants more info on a product. Show the info sheet...
+        ScrollView {
+            Products() { productId, promoId in
+                // Get the app-server to sign the promotional offer with your App Store Connect key
+                return getSignature(productId: productId, promotionId: promoId)
+                
+            } productInfoCompletion: { id in
+                // User wants more info on a product. Show the info sheet...
+            }
         }
     }
     

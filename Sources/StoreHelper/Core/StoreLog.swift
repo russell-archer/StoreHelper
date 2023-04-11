@@ -41,7 +41,9 @@ public struct StoreLog {
     /// - Parameters:
     ///   - event:      A StoreNotification.
     ///   - productId:  A ProductId associated with the event.
-    public static func event(_ event: StoreNotification, productId: ProductId) { logEvent(event, productId: productId) }
+    public static func event(_ event: StoreNotification, productId: ProductId, transactionId: String? = nil) {
+        logEvent(event, productId: productId, transactionId: transactionId)
+    }
     
     /// Logs an StoreNotification. Note that the text (shortDescription) and the productId for the
     /// log entry will be publically available in the Console app.
@@ -49,23 +51,25 @@ public struct StoreLog {
     ///   - event:      A StoreNotification.
     ///   - productId:  A ProductId associated with the event.
     ///   - webOrderLineItemId: A unique ID that identifies subscription purchase events across devices, including subscription renewals
-    public static func event(_ event: StoreNotification, productId: ProductId, webOrderLineItemId: String?) { logEvent(event, productId: productId, webOrderLineItemId: webOrderLineItemId) }
+    public static func event(_ event: StoreNotification, productId: ProductId, webOrderLineItemId: String?, transactionId: String? = nil) {
+        logEvent(event, productId: productId, webOrderLineItemId: webOrderLineItemId, transactionId: transactionId)
+    }
     
     public static var transactionLog: Set<TransactionLog> = []
     
-    /// Logs a StoreNotification as a transaction. Multiple transactions for the same event and product id will only be logged once.
+    /// Logs a StoreNotification as a transaction. Multiple transactions for the same event, product id and transaction id will only be logged once.
     /// Note that the text (shortDescription) and the productId for the log entry will be publically available in the Console app.
     /// - Parameters:
     ///   - event:      A StoreNotification.
     ///   - productId:  A ProductId associated with the event.
-    public static func transaction(_ event: StoreNotification, productId: ProductId) {
+    public static func transaction(_ event: StoreNotification, productId: ProductId, transactionId: String? = nil) {
         
         let t = TransactionLog(notification: event, productId: productId)
         if transactionLog.contains(t) { return }
         transactionLog.insert(t)
         
         #if DEBUG
-        print("\(event.shortDescription()) for product \(productId)")
+        print("\(event.shortDescription()) for product \(productId) \(transactionId == nil ? "" : "with transaction id \(transactionId!)")")
         #else
         os_log("%{public}s for product %{public}s", log: storeLog, type: .default, event.shortDescription(), productId)
         #endif
@@ -76,9 +80,9 @@ public struct StoreLog {
     /// - Parameters:
     ///   - exception:  A StoreException.
     ///   - productId:  A ProductId associated with the event.
-    public static func exception(_ exception: StoreException, productId: ProductId) {
+    public static func exception(_ exception: StoreException, productId: ProductId, transactionId: String? = nil) {
         #if DEBUG
-        print("\(exception.shortDescription()). For product \(productId)")
+        print("\(exception.shortDescription()). For product \(productId) \(transactionId == nil ? "" : "with transaction id \(transactionId!)")")
         #else
         os_log("%{public}s for product %{public}s", log: storeLog, type: .default, exception.shortDescription(), productId)
         #endif
@@ -106,11 +110,11 @@ public struct StoreLog {
         #endif
     }
     
-    private static func logEvent(_ event: StoreNotification, productId: ProductId) {
+    private static func logEvent(_ event: StoreNotification, productId: ProductId, transactionId: String? = nil) {
         #if DEBUG
         var doLog = true
         if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { print("\(event.shortDescription()) for product \(productId)") }
+        if doLog { print("\(event.shortDescription()) for product \(productId) \(transactionId == nil ? "" : "with transaction id \(transactionId!)")") }
         #else
         var doLog = true
         if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
@@ -118,11 +122,11 @@ public struct StoreLog {
         #endif
     }
     
-    private static func logEvent(_ event: StoreNotification, productId: ProductId, webOrderLineItemId: String?) {
+    private static func logEvent(_ event: StoreNotification, productId: ProductId, webOrderLineItemId: String?, transactionId: String? = nil) {
         #if DEBUG
         var doLog = true
         if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { print("\(event.shortDescription()) for product \(productId) with webOrderLineItemId \(webOrderLineItemId ?? "none")") }
+        if doLog { print("\(event.shortDescription()) for product \(productId) with webOrderLineItemId \(webOrderLineItemId ?? "none") \(transactionId == nil ? "" : "and transaction id \(transactionId!)")") }
         #else
         var doLog = true
         if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
