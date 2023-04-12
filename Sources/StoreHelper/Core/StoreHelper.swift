@@ -304,7 +304,7 @@ public class StoreHelper: ObservableObject {
             
             // If this is a subscription product, before giving up see if it was renewed while the app was offline and the
             // transaction hasn't yet been sent to us
-            if isSubscription(productId: productId) {
+            if product.type == .autoRenewable {
                 if purchasedProductsFallback.contains(productId) {
                     StoreLog.event(.productIsPurchasedFromCache, productId: productId)
                     return true
