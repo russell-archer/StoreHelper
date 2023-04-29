@@ -248,7 +248,7 @@ public struct SubscriptionHelper {
             
             // Make sure this product is from the same subscription group as the product we're searching for
             let currentGroup = groupName(from: renewalInfoResult.transaction.currentProductID)
-            guard currentGroup.lowercased() == subscriptionGroup.lowercased() else { continue }
+            guard currentGroup?.lowercased() == subscriptionGroup.lowercased() else { continue }
             
             // Get the Product for this subscription
             guard let candidateSubscription = storeHelper.product(from: renewalInfoResult.transaction.currentProductID) else { continue }
