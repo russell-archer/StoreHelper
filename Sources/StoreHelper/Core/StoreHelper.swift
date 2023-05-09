@@ -10,6 +10,7 @@ import Collections
 
 public typealias ProductId = String
 public typealias ShouldAddStorePaymentHandler = (_ payment: SKPayment, _ product: SKProduct) -> Bool
+public typealias TransactionNotification = (_ notification: StoreNotification, _ productId: ProductId, _ transactionId: String) -> Void
 
 /// The state of a purchase.
 public enum PurchaseState {
@@ -89,6 +90,44 @@ public class StoreHelper: ObservableObject {
     /// Optional support for overriding handling of direct App Store purchases of in-app purchase promotions.
     /// See `AppStoreHelper.paymentQueue(_:shouldAddStorePayment:for:)`.
     public var shouldAddStorePaymentHandler: ShouldAddStorePaymentHandler?
+    
+    /// Optional support for receiving transaction notifications. The following `StoreNotification` notifications
+    /// are supported:
+    /// - .purchaseSuccess               The purchase successfully completed
+    /// - .purchaseFailure               The purchase failed
+    /// - .purchaseCancelled             The user cancelled the purchase before it completed
+    /// - .purchasePending               The purchase is pending (e.g. awaiting parental permission)
+    /// - .transactionFailure            StoreKit failed to validate the transaction
+    /// - .transactionReceived           The transaction was successfully validated by StoreKit
+    /// - .transactionRevoked            The user's access to the product has been revoked by the App Store (e.g. a refund, etc.)
+    /// - .transactionExpired            The user's subscription has expired
+    /// - .transactionUpgraded           The transaction has been superceeded by an active, higher-value subscription
+    /// - .transactionSuccess            The transaction completed successfully
+    ///
+    /// Example usage:
+    /// ```
+    /// struct StoreHelperDemoApp: App {
+    ///     @StateObject var storeHelper = StoreHelper()
+    ///
+    ///     var body: some Scene {
+    ///         WindowGroup {
+    ///             MainView()
+    ///                 .environmentObject(storeHelper)
+    ///                 .task {
+    ///                     storeHelper.start()  // Start listening for transactions
+    ///
+    ///                     // Optional custom handling of transaction notifications
+    ///                     storeHelper.transactionNotification = { notification, productId, transactionId in
+    ///                         if notification == .purchaseSuccess {
+    ///                             print("Purchase success for \(productId)")
+    ///                         }
+    ///                     }
+    ///                 }
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    public var transactionNotification: TransactionNotification?
     
     /// Set to true if you want StoreHelper to use the cache of purchased products, rather than performing a full
     /// transaction check and verification. If true, the cache will always be used for non-consumables, but not
@@ -442,6 +481,7 @@ public class StoreHelper: ObservableObject {
         } catch {
             purchaseState = .failed
             StoreLog.event(.purchaseFailure, productId: product.id)
+            if let handler = transactionNotification { handler(.purchaseFailure, product.id, "0") }
             throw StoreException.purchaseException(.init(error: error))
         }
 
@@ -464,6 +504,7 @@ public class StoreHelper: ObservableObject {
                 if !checkResult.verified {
                     purchaseState = .failedVerification
                     StoreLog.transaction(.transactionValidationFailure, productId: checkResult.transaction.productID, transactionId: String(checkResult.transaction.id))
+                    if let handler = transactionNotification { handler(.transactionValidationFailure, product.id, String(checkResult.transaction.id)) }
                     throw StoreException.transactionVerificationFailed
                 }
 
@@ -482,22 +523,26 @@ public class StoreHelper: ObservableObject {
                 // Let the caller know the purchase succeeded and that the user should be given access to the product
                 purchaseState = .purchased
                 StoreLog.event(.purchaseSuccess, productId: product.id, transactionId: String(validatedTransaction.id))
+                if let handler = transactionNotification { handler(.purchaseSuccess, product.id, String(validatedTransaction.id)) }
 
                 return (transaction: validatedTransaction, purchaseState: .purchased)
 
             case .userCancelled:
                 purchaseState = .cancelled
                 StoreLog.event(.purchaseCancelled, productId: product.id)
+                if let handler = transactionNotification { handler(.purchaseCancelled, product.id, "0") }
                 return (transaction: nil, .cancelled)
 
             case .pending:
                 purchaseState = .pending
                 StoreLog.event(.purchasePending, productId: product.id)
+                if let handler = transactionNotification { handler(.purchasePending, product.id, "0") }
                 return (transaction: nil, .pending)
 
             default:
                 purchaseState = .unknown
                 StoreLog.event(.purchaseFailure, productId: product.id)
+                if let handler = transactionNotification { handler(.purchaseFailure, product.id, "0") }
                 return (transaction: nil, .unknown)
         }
     }
@@ -712,19 +757,21 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns a task for the transaction handling loop task.
     @MainActor private func handleTransactions() -> Task<Void, Error> {
         
-        return Task.detached {
+        return Task.detached { [self] in
             
             for await verificationResult in Transaction.updates {
                 // See if StoreKit validated the transaction
                 let checkResult = await self.checkVerificationResult(result: verificationResult)
                 guard checkResult.verified else {
                     // StoreKit's attempts to validate the transaction failed
+                    if let handler = transactionNotification { handler(.transactionFailure, checkResult.transaction.productID, String(checkResult.transaction.id)) }
                     StoreLog.transaction(.transactionFailure, productId: checkResult.transaction.productID, transactionId: String(checkResult.transaction.id))
                     return
                 }
                 
                 // The transaction was validated by StoreKit
                 let transaction = checkResult.transaction
+                if let handler = transactionNotification { handler(.transactionReceived, transaction.productID, String(transaction.id)) }
                 StoreLog.transaction(.transactionReceived, productId: transaction.productID, transactionId: String(transaction.id))
                     
                 if transaction.revocationDate != nil {
@@ -732,6 +779,7 @@ public class StoreHelper: ObservableObject {
                     // See transaction.revocationReason for more details if required
                     StoreLog.transaction(.transactionRevoked, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
+                    if let handler = transactionNotification { handler(.transactionRevoked, transaction.productID, String(transaction.id)) }
                     return
                 }
                 
@@ -739,6 +787,7 @@ public class StoreHelper: ObservableObject {
                     // The user's subscription has expired
                     StoreLog.transaction(.transactionExpired, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
+                    if let handler = transactionNotification { handler(.transactionExpired, transaction.productID, String(transaction.id)) }
                     return
                 }
                 
@@ -746,12 +795,14 @@ public class StoreHelper: ObservableObject {
                     // Transaction superceeded by an active, higher-value subscription
                     StoreLog.transaction(.transactionUpgraded, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: true)
+                    if let handler = transactionNotification { handler(.transactionUpgraded, transaction.productID, String(transaction.id)) }
                     return
                 }
                     
                 // Update the list of products the user has access to
                 StoreLog.transaction(.transactionSuccess, productId: transaction.productID, transactionId: String(transaction.id))
                 await self.updatePurchasedProducts(transaction: transaction, purchased: true)
+                if let handler = transactionNotification { handler(.transactionSuccess, transaction.productID, String(transaction.id)) }
                 await transaction.finish()
             }
         }

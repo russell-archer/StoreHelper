@@ -42,15 +42,28 @@ public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
     ///   - transactions: Collection of updated transactions (e.g. `purchased`)
     public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
+            let transactionId = transaction.transactionIdentifier ?? "0"
+            let productId = transaction.payment.productIdentifier
+            
             switch (transaction.transactionState) {
                 case .purchased:
                     SKPaymentQueue.default().finishTransaction(transaction)
                     
                     // Let the StoreKit2-based StoreHelper know about this purchase or subscription renewal
-                    Task { await storeHelper?.productPurchased(transaction.payment.productIdentifier, transactionId: transaction.transactionIdentifier ?? "0") }
+                    Task { @MainActor in
+                        storeHelper?.productPurchased(productId, transactionId: transactionId)
+                        if let handler = storeHelper?.transactionNotification { handler(.purchaseSuccess, productId, transactionId) }
+                    }
 
-                case .restored: fallthrough
-                case .failed: SKPaymentQueue.default().finishTransaction(transaction)
+                case .restored:
+                    SKPaymentQueue.default().finishTransaction(transaction)
+                    
+                case .failed:
+                    SKPaymentQueue.default().finishTransaction(transaction)
+                    Task { @MainActor in
+                        if let handler = storeHelper?.transactionNotification { handler(.purchaseFailure, productId, transactionId) }
+                    }
+
                 default: break
             }
         }
