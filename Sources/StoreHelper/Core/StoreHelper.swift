@@ -67,6 +67,19 @@ public class StoreHelper: ObservableObject {
     /// List of purchased product ids. This list is used as a cache and when the App Store in unavailable. Products of
     /// all types are added to this list. Each `ProductId` can appear exactly once.
     public private(set) var purchasedProductsFallback = [ProductId]()
+    
+    /// A non-persisted cache of transactions used as a fallback.
+    ///
+    /// In Xcode StoreKit Testing and Sandbox Testing subscription renewal transactions that happen when the app's not running
+    /// are NEVER picked up by StoreKit2. That is, the transactions don't appear in `StoreKit.Transaction.all` or
+    /// `Transaction.currentEntitlement(for:)`. This seems to have been a known issue since the release of StoreKit2 and can lead
+    /// to the situation where a user has paid to renew their subscription but StoreKit2 has no knowledge of it.
+    ///
+    /// **Note that production builds using the live App Store DO NOT appear to suffer from this issue**.
+    ///
+    /// As a workaround, we maintain `transactionUpdateCache` to keep track of subscription renewals that happen when the app's
+    /// not running.
+    public private(set) var transactionUpdateCache = [TransactionUpdate]()
         
     /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
     /// product ids are defined in the property list file is maintained in the set.
@@ -80,7 +93,7 @@ public class StoreHelper: ObservableObject {
     
     /// True if StoreHelper has been initialized correctly by calling start().
     public var hasStarted: Bool { transactionListener != nil && isAppStoreAvailable }
-    
+
     /// Optional support for overriding dynamic font size.
     public var fontScaleFactor: Double {
         get { _fontScaleFactor ?? FontUtil.baseDynamicTypeSize(for: .large)}
@@ -343,8 +356,8 @@ public class StoreHelper: ObservableObject {
             
             // If this is a subscription product, before giving up see if it was renewed while the app was offline and the
             // transaction hasn't yet been sent to us
-            if product.type == .autoRenewable {
-                if purchasedProductsFallback.contains(productId) {
+            if product.type == .autoRenewable, let mruStatus = subscriptionHelper.mostRecentSubscriptionUpdate(for: productId) {
+                if mruStatus == .purchased || mruStatus == .subscribed || mruStatus == .inGracePeriod || mruStatus == .inBillingRetryPeriod {
                     StoreLog.event(.productIsPurchasedFromCache, productId: productId)
                     return true
                 }
@@ -549,6 +562,7 @@ public class StoreHelper: ObservableObject {
     
     /// Should be called only when a purchase is handled by the StoreKit1-based AppHelper.
     /// This will be as a result of a user dirctly purchasing in IAP in the App Store ("IAP Promotion"), rather than in our app.
+    /// It will also happen when a subscription-related transaction (renewal,cancellation, etc.) happens when the app is not running.
     /// - Parameter product: The ProductId of the purchased product.
     @MainActor public func productPurchased(_ productId: ProductId, transactionId: String)  {
         updatePurchasedProducts(for: productId, purchased: true)
@@ -639,6 +653,68 @@ public class StoreHelper: ObservableObject {
         }
         
         return nil
+    }
+    
+    /// Handles notifications from the StoreKit1-related `AppStoreHelper` related to subscription transactions that happen
+    /// when the app's not running. It also handles direct App Store purchases made outside of the app.
+    ///
+    /// Note that in Xcode StoreKit Testing and Sandbox Testing subscription renewal or cancellation transactions that
+    /// happen when the app's not running are NEVER picked up by StoreKit2. That is, the transactions don't appear
+    /// in `StoreKit.Transaction.all` or `Transaction.currentEntitlement(for:)`. This seems to have been a known issue
+    /// since the release of StoreKit2 and can lead to the situation where a user has paid to renew their subscription
+    /// but StoreKit2 has no knowledge of it.
+    ///
+    /// As a workaround, `StoreHelper` maintains a `transactionUpdateCache` that keeps track of subscription renewals
+    /// that happen when the app's not running. See `AppStoreHelper.paymentQueue(_:updatedTransactions:)`.
+    ///
+    /// **Note that production builds using the live App Store DO NOT appear to suffer from this issue**.
+    ///
+    /// - Parameters:
+    ///   - productId: The `ProductId` that the transaction relates to.
+    ///   - date: The date and time of the transaction update.
+    ///   - status: The new status (subscribed, expired, etc.) of the sunscription.
+    @MainActor public func handleStoreKit1Transactions(productId: ProductId, date: Date, status: TransactionStatus, transaction: SKPaymentTransaction) async {
+        var isPurchased = false
+        var transactionStatus = TransactionStatus.unknown
+        let transactionId = transaction.transactionIdentifier ?? "-1"
+        
+        switch status {
+            case .purchased:
+                StoreLog.transaction(.transactionSuccess, productId: productId, transactionId: transactionId)
+                isPurchased = true
+                transactionStatus = .purchased
+                
+            case .subscribed:
+                StoreLog.transaction(.transactionSubscribed, productId: productId, transactionId: transactionId)
+                isPurchased = true
+                transactionStatus = .subscribed
+                
+            case .inGracePeriod:
+                StoreLog.transaction(.transactionInGracePeriod, productId: productId, transactionId: transactionId)
+                isPurchased = true
+                transactionStatus = .inGracePeriod
+                
+            case .inBillingRetryPeriod:
+                StoreLog.transaction(.transactionInGracePeriod, productId: productId, transactionId: transactionId)
+                isPurchased = true
+                transactionStatus = .inBillingRetryPeriod
+                
+            case .revoked:
+                StoreLog.transaction(.transactionRevoked, productId: productId, transactionId: transactionId)
+                transactionStatus = .revoked
+                
+            case .expired:
+                StoreLog.transaction(.transactionExpired, productId: productId, transactionId: transactionId)
+                transactionStatus = .expired
+                
+            default: return
+        }
+        
+        updatePurchasedProducts(for: productId, purchased: isPurchased)
+        
+        if transactionUpdateCache.filter({ t in t.transactionId == transactionId && t.status == transactionStatus }).count == 0 {
+            transactionUpdateCache.append(TransactionUpdate(productId: productId, date: Date(), status: transactionStatus, transactionId: transactionId))
+        }
     }
     
     // MARK: - Internal methods
@@ -743,11 +819,11 @@ public class StoreHelper: ObservableObject {
                                                      purchased: Bool,
                                                      updateFallbackList: Bool = true,
                                                      updateTransactionCheck: Bool = true) {
-        
-        if updateTransactionCheck, !transactionCheck.contains(transaction.productID) { transactionCheck.append(transaction.productID) }
-        if updateFallbackList { updatePurchasedProductsFallbackList(for: transaction.productID, purchased: purchased) }
-        updatePurchasedIdentifiers(transaction)
-        AppGroupSupport.syncPurchase(productId: transaction.productID, purchased: purchased)
+
+        updatePurchasedProducts(for: transaction.productID,
+                                purchased: purchased,
+                                updateFallbackList: updateFallbackList,
+                                updateTransactionCheck: updateTransactionCheck)
     }
     
     // MARK: - Private methods

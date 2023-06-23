@@ -9,6 +9,29 @@ import StoreKit
 import OrderedCollections
 import SwiftUI
 
+/// The status of a StoreKit1 or StoreKit2 subscription
+public enum TransactionStatus { case purchased, subscribed, inGracePeriod, inBillingRetryPeriod, revoked, expired, unknown
+    public func shortDescription() -> String {
+        switch self {
+            case .purchased:            return "Purchased"
+            case .subscribed:           return "Subscribed"
+            case .inGracePeriod:        return "In grace period"
+            case .inBillingRetryPeriod: return "In billing retry period"
+            case .revoked:              return "Revoked"
+            case .expired:              return "Expired"
+            case .unknown:              return "Unknwon"
+        }
+    }
+}
+
+/// Information on a transaction update (e.g. subscription renewal, cancellation, etc.)
+public struct TransactionUpdate: Hashable {
+    let productId: ProductId
+    let date: Date
+    let status: TransactionStatus
+    let transactionId: String
+}
+
 /// Holds information on a subscription group and the associated subscription products.
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionGroupInfo {
@@ -410,5 +433,22 @@ public struct SubscriptionHelper {
     
     public func createOfferSignature() -> String {
         return ""
+    }
+    
+    /// Gets the most recent update for a subscription and returns the status for that update.
+    /// - Parameter ProductId: The subscription's ProductId.
+    /// - Returns: Gets the most recent update for a subscription and returns the status for that update,
+    /// or nil if the subscription has no updates.
+    public func mostRecentSubscriptionUpdate(for productId: ProductId) -> TransactionStatus? {
+        guard let storeHelper else { return nil }
+        guard storeHelper.transactionUpdateCache.count > 0 else { return nil }
+        
+        let relevantUpdates = storeHelper.transactionUpdateCache.filter { $0.productId == productId }
+        guard relevantUpdates.count > 0 else { return nil }
+        
+        let sortedUpdates = relevantUpdates.sorted { $0.date < $1.date }
+        guard let mostRecent = sortedUpdates.last else { return nil }
+
+        return mostRecent.status
     }
 }
