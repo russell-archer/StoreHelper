@@ -16,13 +16,16 @@
 ---
 
 # Recent Major Changes
+- 23 June, 2023
+    - Improved handling of subscription renewals and expirations that happen when the app's not running
+    - See `AppStoreHelper.paymentQueue(_:updatedTransactions:)` and `StoreHelper.handleStoreKit1Transactions(productId:date:status:transaction:)`
 - 12 February, 2023
     - Made the configuration of subscription products more flexible
     - You can now either rely on a naming convention (as before) or use a "Subscriptions" section in "Products.plist"
-    - See the Samples/Configuration/SampleProducts.plist file for details 
+    - See the Samples/Configuration/SampleProducts.plist file for details
     - Added unit tests to StoreHelperDemo project
 - 27 January, 2023
-    - Fixed a bug related to isPurchased for consumable products. Caused a crash on macOS and iOS (thank you Abdullah Kardaş!) 
+    - Fixed a bug related to isPurchased for consumable products. Caused a crash on macOS and iOS (thank you Abdullah Kardaş!)    
 - 18 January, 2023
     - Additional logging of various activities added
 - 17 January, 2023
