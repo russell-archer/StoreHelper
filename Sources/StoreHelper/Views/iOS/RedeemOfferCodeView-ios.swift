@@ -37,7 +37,7 @@ public struct RedeemOfferCodeView: View {
                     }
                 }
                 
-                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Have an offer code for Writerly? \(Utils.confirmGestureText()) \"\(redeemOfferCodeButtonText)\" to redeem your code and get instant access to the associated product.")}
+                CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Have an offer code? \(Utils.confirmGestureText()) \"\(redeemOfferCodeButtonText)\" to redeem your code and get instant access to the associated product.")}
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 0, leading: 10, bottom: 10, trailing: 10))
                     .foregroundColor(.secondary)
