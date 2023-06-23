@@ -8,11 +8,15 @@
 import StoreKit
 
 /// Support for StoreKit1. Tells the observer that a user initiated an in-app purchase direct from the App Store,
-/// rather than via the app itself. Also picks up subscriptions auto-renewals. StoreKit2 does not (yet) provide
-/// support for this feature so we need to use StoreKit1. This is a requirement in order to promote in-app purchases
-/// on the App Store. If your app doesn't have a class that implements `SKPaymentTransactionObserver` and the
-/// `paymentQueue(_:updatedTransactions:)` and `paymentQueue(_:shouldAddStorePayment:for:)` delegate methods then
-/// you'll get an error when you submit the app to the App Store and you have IAP promotions.
+/// rather than via the app itself. StoreKit2 does not (yet) provide support for direct purchases, so we need to
+/// use StoreKit1. This is a requirement in order to promote in-app purchases on the App Store. If your app doesn't
+/// have a class that implements `SKPaymentTransactionObserver` and the `paymentQueue(_:updatedTransactions:)` and
+/// `paymentQueue(_:shouldAddStorePayment:for:)` delegate methods then you'll get an error when you submit the app
+/// to the App Store and you have IAP promotions.
+///
+/// `AppStoreHelper` also handles subscription auto-renewal transactions that happen when the app's not running.
+/// For whatever reason, these transactions are not handled by StoreKit2 so the `paymentQueue(_:updatedTransactions)`
+/// method handles renewal transactions and passes them on to the StoreKit2-based `StoreHelper`.
 ///
 /// Note that any IAPs made from **inside** the app are processed by StoreKit2 and do not involve this helper class.
 @available(iOS 15.0, macOS 12.0, *)
@@ -33,10 +37,24 @@ public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
         SKPaymentQueue.default().add(self)
     }
     
-    /// Delegate method for the StoreKit1 payment queue. Note that because our main StoreKit processing is done
-    /// via StoreKit2 in StoreHelper, all we have to do here is signal to StoreKit1 to finish purchased, restored
-    /// or failed transactions. StoreKit1 purchases are (in theory) immediately available to StoreKit2 (and vice
-    /// versa), so any purchase will be picked up by StoreHelper as required.
+    /// Delegate method for the StoreKit1 payment queue. This method handles subscription transactions (e.g. renewals)
+    /// that happen when the app's not running. It also handles in-app purchases made directly from the App Store,
+    ///
+    /// Because our main StoreKit processing is done via StoreKit2 in StoreHelper, all we have to do here is signal to
+    /// StoreKit1 to finish purchased, restored or failed transactions. StoreKit1 purchases are (in theory) immediately
+    /// available to StoreKit2 (and vice versa), so any purchase will be picked up by StoreHelper as required.
+    ///
+    /// Note on subscription transactions: In Xcode StoreKit Testing and Sandbox Testing subscription renewal transactions
+    /// that happen when the app's not running are NEVER picked up by StoreKit2. That is, the transactions don't appear
+    /// in `StoreKit.Transaction.all` or `Transaction.currentEntitlement(for:)`. This seems to have been a known issue
+    /// since the release of StoreKit2 and can lead to the situation where a user has paid to renew their subscription
+    /// but StoreKit2 has no knowledge of it.
+    ///
+    /// **Note that production builds using the live App Store DO NOT appear to suffer from this issue**.
+    ///
+    /// As a workaround, `StoreHelper` maintains a `transactionUpdateCache` that keeps track of subscription renewals
+    /// that happen when the app's not running.
+    ///
     /// - Parameters:
     ///   - queue: StoreKit1 payment queue
     ///   - transactions: Collection of updated transactions (e.g. `purchased`)
@@ -51,8 +69,11 @@ public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
                     
                     // Let the StoreKit2-based StoreHelper know about this purchase or subscription renewal
                     Task { @MainActor in
-                        storeHelper?.productPurchased(productId, transactionId: transactionId)
-                        if let handler = storeHelper?.transactionNotification { handler(.purchaseSuccess, productId, transactionId) }
+                        if let storeHelper {
+                            storeHelper.productPurchased(productId, transactionId: transactionId)
+                            await storeHelper.handleStoreKit1Transactions(productId: productId, date: Date(), status: .purchased, transaction: transaction)
+                            if let handler = storeHelper.transactionNotification { handler(.purchaseSuccess, productId, transactionId) }
+                        }
                     }
 
                 case .restored:

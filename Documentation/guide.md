@@ -18,6 +18,9 @@ This document describes how to implement and test in-app purchases with **SwiftU
 ---
 
 # Recent Major Changes
+- 23 June, 2023
+    - Improved handling of subscription renewals and expirations that happen when the app's not running
+    - See `AppStoreHelper.paymentQueue(_:updatedTransactions:)` and `StoreHelper.handleStoreKit1Transactions(productId:date:status:transaction:)`
 - 18 January, 2023
     - Additional logging of various activities added
 - 17 January, 2023
