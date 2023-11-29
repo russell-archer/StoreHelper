@@ -20,8 +20,19 @@ public struct RestorePurchasesView: View {
             Button(action: {
                 Task.init { try? await AppStore.sync() }
             }) {
-                Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(restorePurchasesButtonText)}.padding([.top, .bottom, .trailing])},
-                      icon:  { Image(systemName: "purchased").bodyImageNotRounded().frame(height: 24).padding(.leading)})
+                Label(
+                    title: {
+                        BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text(restorePurchasesButtonText)
+                        }
+                        .padding([.top, .bottom, .trailing])
+                    },
+                    icon: {
+                        Image(systemName: "purchased")
+                            .bodyImageNotRounded()
+                            .frame(height: 24)
+                            .padding(.leading)
+                    }
+                )
             }
             #if os(iOS)
             .xPlatformButtonStyleBorderless()
