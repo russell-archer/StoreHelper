@@ -10,7 +10,7 @@ Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in 
 
 This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**.
 
-- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 16/macOS 13 SwiftUI** app
+- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS/macOS SwiftUI** app
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with Xcode and **iOS 15 - 17**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with `StoreKit1` in **iOS 14**
 - See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
