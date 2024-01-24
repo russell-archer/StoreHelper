@@ -5,8 +5,8 @@
 ![](./assets/StoreHelperDemo0.png)
 
 - See [StoreHelper](https://github.com/russell-archer/StoreHelper) for an overview of the `StoreHelper` package
-- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 14**, **iOS 16** and **macOS 13**
-- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 14** and **iOS 16**
+- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**
+- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with Xcode and **iOS 17**
 - See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
 
 # Contents
@@ -36,7 +36,7 @@ The following steps show to use `StoreHelper` to create a bare-bones SwiftUI dem
 See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using `StoreHelper` with Xcode 14.
 
 ## What you'll need
-- **Xcode 14** installed on your Mac
+- **Xcode 13 - 15** installed on your Mac
 - Basic familiarity with **Xcode**, **Swift** and **SwiftUI**
 - About 15-minutes!
 
