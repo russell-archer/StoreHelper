@@ -1,6 +1,6 @@
 # StoreHelper Guide
 
-Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 13 - 15** with **SwiftUI**, **Swift 5.7 =  5.9**, **iOS 15 -  17** and **macOS 12 - 14**.
+Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 13 - 15** with **SwiftUI**, **Swift 5.7 - 5.9**, **iOS 15 -  17** and **macOS 12 - 14**.
 
 ---
 
