@@ -16,6 +16,8 @@
 ---
 
 # Recent Major Changes
+- 24 January, 2024
+    - Basic support for visionOS added by Hengyu (thank you!)
 - 23 June, 2023
     - Improved handling of subscription renewals and expirations that happen when the app's not running
     - See `AppStoreHelper.paymentQueue(_:updatedTransactions:)` and `StoreHelper.handleStoreKit1Transactions(productId:date:status:transaction:)`
@@ -76,8 +78,8 @@
 
 ## Overview of StoreHelper
 
-`StoreHelper` is a Swift Package Manager (SPM) package that enables developers using Xcode 14/13 to easily add in-app purchase 
-support to **iOS 16/15** and **macOS 13/12** SwiftUI apps.
+`StoreHelper` is a Swift Package Manager (SPM) package that enables developers using **Xcode 13 - 15** to easily add in-app purchase 
+support to **iOS 15 - 17** and **macOS 12 - 14** SwiftUI apps.
 
 `StoreHelper` is used to provide in-app purchase support in **Writerly** (iOS/macOS), which is available on the [App Store](https://apps.apple.com/app/writerly/id1143101981?ls=1).
 
@@ -93,7 +95,7 @@ support to **iOS 16/15** and **macOS 13/12** SwiftUI apps.
 
 ## License
 
-MIT license, copyright (c) 2022, 2023 Russell Archer. This software is provided "as-is" 
+MIT license, copyright (c) 2022, 2023, 2024 Russell Archer. This software is provided "as-is" 
 without warranty and may be freely used, copied, modified and redistributed, including 
 as part of commercial software. 
 
@@ -101,7 +103,7 @@ See [License](https://github.com/russell-archer/StoreHelper/blob/main/LICENSE.md
 
 ## Requirements
 
-`StoreHelper` uses Apple's `StoreKit2`, which requires **iOS 16/15**, **macOS 13/12** and **Xcode 14/13**.
+`StoreHelper` uses Apple's `StoreKit2`, which requires **iOS 15 - 17**, **macOS 12 - 14** and **Xcode 13 - 15**.
 
 ## Getting Started
 
