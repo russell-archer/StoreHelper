@@ -1,6 +1,6 @@
 # StoreHelper Guide
 
-Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 14/13** with **SwiftUI**, **Swift 5.7**, **iOS 16/15** and **macOS 13/12**.
+Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 13 - 15** with **SwiftUI**, **Swift 5.7 =  5.9**, **iOS 15 -  17** and **macOS 12 - 14**.
 
 ---
 
@@ -8,16 +8,18 @@ Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in 
 
 ![](./assets/StoreHelperDemo0.png)
 
-This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 14/13**, **iOS 16/15** and **macOS 13/12**.
+This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**.
 
 - See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS 16/macOS 13 SwiftUI** app
-- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with **Xcode 14** and **iOS 16**
+- See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with Xcode and **iOS 15 - 17**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with `StoreKit1` in **iOS 14**
 - See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
 
 ---
 
 # Recent Major Changes
+- 24 January, 2024
+    - Added support for visionOS
 - 23 June, 2023
     - Improved handling of subscription renewals and expirations that happen when the app's not running
     - See `AppStoreHelper.paymentQueue(_:updatedTransactions:)` and `StoreHelper.handleStoreKit1Transactions(productId:date:status:transaction:)`
