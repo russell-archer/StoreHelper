@@ -19,12 +19,12 @@ public struct ProductListViewRow: View {
     private var headerText: String
     private var productInfoCompletion: ((ProductId) -> Void)
     
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
     public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, products: [Product], headerText: String, productInfoCompletion: @escaping ((ProductId) -> Void)) {
         self._showRefundSheet = showRefundSheet
         self._refundRequestTransactionId = refundRequestTransactionId
@@ -51,7 +51,7 @@ public struct ProductListViewRow: View {
                     }
                 } else {
                     ForEach(products, id: \.id) { product in
-                        #if os(iOS)
+                        #if os(iOS) || os(visionOS)
                         ProductView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: product.id, displayName: product.displayName, description: product.description, price: product.displayPrice, productInfoCompletion: productInfoCompletion)
                             .contentShape(Rectangle())
                             .onTapGesture { productInfoCompletion(product.id) }

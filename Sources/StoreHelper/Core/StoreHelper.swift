@@ -488,9 +488,22 @@ public class StoreHelper: ObservableObject {
         purchaseState = .inProgress
         StoreLog.event(.purchaseInProgress, productId: product.id)
 
+        #if os(visionOS)
+        let scene: UIScene
+        if let scene2 = UIApplication.shared.connectedScenes.first {
+            scene = scene2
+        } else {
+            throw StoreException.noAvailableScene
+        }
+        #endif
+
         let result: Product.PurchaseResult
         do {
+            #if os(visionOS)
+            result = try await product.purchase(confirmIn: scene, options: options)
+            #else
             result = try await product.purchase(options: options)
+            #endif
         } catch {
             purchaseState = .failed
             StoreLog.event(.purchaseFailure, productId: product.id)

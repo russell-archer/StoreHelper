@@ -43,13 +43,15 @@ public enum StoreException: Error, Equatable {
     case purchaseInProgressException
     case transactionVerificationFailed
     case productTypeNotSupported
-    
+    case noAvailableScene
+
     public func shortDescription() -> String {
         switch self {
-            case .purchaseException:             return "Exception. StoreKit throw an exception while processing a purchase"
-            case .purchaseInProgressException:   return "Exception. You can't start another purchase yet, one is already in progress"
-            case .transactionVerificationFailed: return "Exception. A transaction failed StoreKit's automatic verification"
-            case .productTypeNotSupported:       return "Exception. Products of type nonRenewable are not supported"
+        case .purchaseException:             return "Exception. StoreKit throw an exception while processing a purchase"
+        case .purchaseInProgressException:   return "Exception. You can't start another purchase yet, one is already in progress"
+        case .transactionVerificationFailed: return "Exception. A transaction failed StoreKit's automatic verification"
+        case .productTypeNotSupported:       return "Exception. Products of type nonRenewable are not supported"
+        case .noAvailableScene:              return "Exception. No available scenes for product view to present"
         }
     }
 }

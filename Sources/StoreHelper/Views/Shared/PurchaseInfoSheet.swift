@@ -20,12 +20,12 @@ public struct PurchaseInfoSheet: View {
     private var productId: ProductId
     private var viewModel: PurchaseInfoViewModel
     
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
     public init(showPurchaseInfoSheet: Binding<Bool>,
                 showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
@@ -81,7 +81,7 @@ public struct PurchaseInfoSheet: View {
                     Divider().padding(.bottom)
                     
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
-                        #if os(iOS)
+                        #if os(iOS) || os(visionOS)
                         Button(action: {
                             if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
                             if let tid = epi.transactionId {

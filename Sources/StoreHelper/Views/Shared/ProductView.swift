@@ -11,7 +11,9 @@
 
 import SwiftUI
 import StoreKit
+#if canImport(WidgetKit)
 import WidgetKit
+#endif
 
 /// Displays a single row of product information for the main content List.
 @available(iOS 15.0, macOS 12.0, *)
@@ -24,12 +26,12 @@ public struct ProductView: View {
     private var price: String
     private var productInfoCompletion: ((ProductId) -> Void)
     
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
     public init(showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
                 productId: ProductId,
@@ -82,7 +84,7 @@ public struct ProductView: View {
             PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             
             if purchaseState == .purchased {
-                #if os(iOS)
+                #if os(iOS) || os(visionOS)
                 PurchaseInfoView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId)
                 #else
                 PurchaseInfoView(productId: productId)
@@ -97,7 +99,9 @@ public struct ProductView: View {
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init {
                 await purchaseState(for: productId)
+                #if canImport(WidgetKit)
                 WidgetCenter.shared.reloadAllTimelines()
+                #endif
             }
         }
     }
