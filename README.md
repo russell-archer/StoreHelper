@@ -10,7 +10,7 @@
 
 - [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) - `StoreHelper` quick-start guide 
 - [StoreHelper In-Depth Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - `StoreHelper` and `StoreKit2` in-depth guide
-- [StoreHelper Demo Project](https://github.com/russell-archer/StoreHelperDemo) - Example **Xcode 14** `StoreHelper` project
+- [StoreHelper Demo Project](https://github.com/russell-archer/StoreHelperDemo) - Example Xcode `StoreHelper` project
 - [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) - experimental demo showing `StoreHelper` in a UIKit project
 
 ---
