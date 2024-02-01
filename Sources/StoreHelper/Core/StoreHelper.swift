@@ -869,6 +869,7 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionRevoked, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     if let handler = transactionNotification { handler(.transactionRevoked, transaction.productID, String(transaction.id)) }
+                    await transaction.finish()
                     return
                 }
                 
@@ -877,6 +878,7 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionExpired, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     if let handler = transactionNotification { handler(.transactionExpired, transaction.productID, String(transaction.id)) }
+                    await transaction.finish()
                     return
                 }
                 
@@ -885,6 +887,7 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionUpgraded, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: true)
                     if let handler = transactionNotification { handler(.transactionUpgraded, transaction.productID, String(transaction.id)) }
+                    await transaction.finish()
                     return
                 }
                     
