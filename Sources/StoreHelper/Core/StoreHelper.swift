@@ -862,6 +862,9 @@ public class StoreHelper: ObservableObject {
                 let transaction = checkResult.transaction
                 if let handler = transactionNotification { handler(.transactionReceived, transaction.productID, String(transaction.id)) }
                 StoreLog.transaction(.transactionReceived, productId: transaction.productID, transactionId: String(transaction.id))
+                
+                // Finish the transaction for all cases, including access revoked, subscription expired, subscription upgraded and successful purchase
+                await transaction.finish()
                     
                 if transaction.revocationDate != nil {
                     // The user's access to the product has been revoked by the App Store (e.g. a refund, etc.)
@@ -892,7 +895,6 @@ public class StoreHelper: ObservableObject {
                 StoreLog.transaction(.transactionSuccess, productId: transaction.productID, transactionId: String(transaction.id))
                 await self.updatePurchasedProducts(transaction: transaction, purchased: true)
                 if let handler = transactionNotification { handler(.transactionSuccess, transaction.productID, String(transaction.id)) }
-                await transaction.finish()
             }
         }
     }
