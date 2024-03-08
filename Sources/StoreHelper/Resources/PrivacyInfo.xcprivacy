@@ -4,11 +4,60 @@
 <dict>
 	<key>NSPrivacyTracking</key>
 	<false/>
-	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
-	<key>NSPrivacyTrackingDomains</key>
-	<array/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
 	<key>NSPrivacyAccessedAPITypes</key>
-	<array/>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>1C8F.1</string>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
+
+<!--
+
+Notes on the StoreHelper privacy manifest.
+
+Ref: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+
+* NSPrivacyTracking *
+A Boolean that indicates whether your app or third-party SDK uses data for tracking.
+StoreHelper does not collect any data and no tracking takes place.
+This value is set to false.
+
+* NSPrivacyTrackingDomains *
+An array of strings that lists the internet domains your app or third-party SDK connects to that engage in tracking.
+This value is set to an empty array.
+
+* NSPrivacyCollectedDataTypes *
+An array of dictionaries that describes the data types collected.
+This value is set to an empty array.
+
+* NSPrivacyAccessedAPITypes *
+API types that have been designated as APIs that require privacy reasons to access.
+This value is set to UserDefaults (NSPrivacyAccessedAPICategoryUserDefaults).
+
+UserDefaults are used for the following purposes:
+
+- To share data between the host app and any associated widgets. See AppGroupSupport.
+  This is done so that widgets can tell what products have been purchased.
+  The data shared is a list of product ids (1C8F.1).
+
+- To store the fallback list of purchased products that's used when the App Store cannot be accessed.
+  The data consists of a list of product ids (CA92.1)
+
+Applicable Privacy manifest reason keys:
+
+- 1C8F.1: Access user defaults to read and write data that's only accessible to the app, app extensions, and App Clips that are members of the same App Group as the app itself.
+- CA92.1: Access user defaults to read and write data that's only accessible to the app itself.
+
+-->
