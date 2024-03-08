@@ -16,6 +16,8 @@
 ---
 
 # Recent Major Changes
+- 8 March, 2024
+    - Added Privacy Policy Manifest
 - 24 January, 2024
     - Basic support for visionOS added by Hengyu (thank you!)
 - 23 June, 2023
