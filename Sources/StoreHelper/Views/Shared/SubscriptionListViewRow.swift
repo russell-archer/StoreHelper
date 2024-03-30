@@ -47,7 +47,7 @@ public struct SubscriptionListViewRow: View {
                                  signPromotionalOffer: signPromotionalOffer,
                                  productInfoCompletion: productInfoCompletion)
                     .contentShape(Rectangle())
-                    .onTapGesture { productInfoCompletion(product.id) }
+                    .xPlatformOnTapGesture { productInfoCompletion(product.id) }
             }
         }
         .task { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}

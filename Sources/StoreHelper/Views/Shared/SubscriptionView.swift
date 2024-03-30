@@ -50,7 +50,7 @@ public struct SubscriptionView: View {
                 .foregroundColor(.secondary)
                 .lineLimit(2)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
+                .xPlatformOnTapGesture { productInfoCompletion(productId) }
 
             Image(productId)
                 .resizable()
@@ -58,7 +58,7 @@ public struct SubscriptionView: View {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
+                .xPlatformOnTapGesture { productInfoCompletion(productId) }
             
             PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price, signPromotionalOffer: signPromotionalOffer)
             

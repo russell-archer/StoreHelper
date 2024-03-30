@@ -20,12 +20,12 @@ public struct PurchaseInfoSheet: View {
     private var productId: ProductId
     private var viewModel: PurchaseInfoViewModel
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     public init(showPurchaseInfoSheet: Binding<Bool>,
                 showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
@@ -79,9 +79,10 @@ public struct PurchaseInfoSheet: View {
                     }
                     
                     Divider().padding(.bottom)
-                    
+
+                    #if !os(tvOS)
                     DisclosureGroup(isExpanded: $showManagePurchase, content: {
-                        #if os(iOS) || os(visionOS)
+                        #if os(iOS) || os(tvOS) || os(visionOS)
                         Button(action: {
                             if Utils.isSimulator() { StoreLog.event("Warning: You cannot request refunds from the simulator. You must use the sandbox environment.")}
                             if let tid = epi.transactionId {
@@ -109,9 +110,10 @@ public struct PurchaseInfoSheet: View {
                         Label(title: { BodyFont(scaleFactor: storeHelper.fontScaleFactor) { Text("Manage Purchase")}.padding()},
                               icon:  { Image(systemName: "creditcard.circle").bodyImageNotRounded().frame(height: 24)})
                     }
-                    .onTapGesture { withAnimation { showManagePurchase.toggle() }}
+                    .xPlatformOnTapGesture { withAnimation { showManagePurchase.toggle() }}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
-                    
+                    #endif
+
                     CaptionFont(scaleFactor: storeHelper.fontScaleFactor) { Text("You may request a refund from the App Store if a purchase does not perform as expected. This requires you to authenticate with the App Store. Note that this app does not have access to credentials used to sign-in to the App Store.")}
                         .multilineTextAlignment(.center)
                         .foregroundColor(.secondary)
