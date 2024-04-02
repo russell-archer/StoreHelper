@@ -6,7 +6,7 @@
 
 # StoreHelper
 
-![](./Documentation/assets/StoreHelperDemo0.png)
+![](./Sources/Documentation/assets/StoreHelperDemo0.png)
 
 - [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) - `StoreHelper` quick-start guide 
 - [StoreHelper In-Depth Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - `StoreHelper` and `StoreKit2` in-depth guide
@@ -18,6 +18,8 @@
 # Recent Major Changes
 - 2 April, 2024
     - Basic support for tvOS added by Hengyu (thank you!)
+- 15 March, 2024
+    - Reorganization of documentation to support DocC
 - 8 March, 2024
     - Added Privacy Policy Manifest
 - 24 January, 2024
