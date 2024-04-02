@@ -6,7 +6,7 @@
 
 # StoreHelper
 
-![](./Sources/StoreHelper/Documentation/Resources/images/StoreHelperDemo0.png)
+![](./Sources/StoreHelper/Documentation.docc/Resources/images/StoreHelperDemo0.png)
 
 - [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) - `StoreHelper` quick-start guide 
 - [StoreHelper In-Depth Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) - `StoreHelper` and `StoreKit2` in-depth guide
