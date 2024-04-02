@@ -1,95 +1,91 @@
 # StoreHelper Quick Start
 
-# Description
+@Metadata {
+    @PageImage(purpose: icon, source: storehelper-logo)
+    @CallToAction(url: "https://github.com/russell-archer/StoreHelperDemo", purpose: link, label: "View StoreHelperDemo on GitHub")
+}
 
-![](./assets/StoreHelperDemo0.png)
+The Quick Start guide shows how to use `StoreHelper` to create a bare-bones SwiftUI app that supports in-app purchases on **iOS 17** and **macOS 14**.
 
-- See [StoreHelper](https://github.com/russell-archer/StoreHelper) for an overview of the `StoreHelper` package
-- See [StoreHelper Guide](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/guide.md) for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**
+## Description
+
+![](StoreHelperDemo0.png)
+
+- See <doc:guide> for in-depth discussion and tutorial on using `StoreHelper`, `StoreKit2` with **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with Xcode and **iOS 17**
-- See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
+- See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit #project
 
-# Contents
+## Contents
 
-- [Description](#Description)
-- [Contents](#Contents)
-- [Quick Start](#Quick-Start)
-	- [Use StoreHelper to support in-app purchases](#Use-StoreHelper-to-support-in-app-purchases)
-	- [What you'll need](#What-you'll-need)
-	- [Steps](#Steps)
-		- [Getting the StoreHelper Package](#Getting-the-StoreHelper-Package)
-		- [Create the App struct](#Create-the-App-struct)
-		- [Create MainView](#Create-MainView)
-		- [Create ProductView](#Create-ProductView)
-		- [Modify ContentView](#Modify-ContentView)
-		- [Create the ProductInfo View](#Create-the-ProductInfo-View)
-		- [Create SimplePurchaseView](#Create-SimplePurchaseView)
-		- [Add Product Images](#Add-Product-Images)
-		- [Add Product Configuration Files](#Add-Product-Configuration-Files)
-		- [Run the App](#Run-the-App)
+- <doc:#Description>
+- <doc:#Contents>
+- <doc:#Quick-Start>
+	- <doc:#What-you'll-need>
+	- <doc:#Steps>
+		- <doc:#Getting-the-StoreHelper-Package>
+		- <doc:#Create-the-App-struct>
+		- <doc:#Create-MainView>
+		- <doc:#Create-ProductView>
+		- <doc:#Modify-ContentView>
+		- <doc:#Create-the-ProductInfo-View>
+		- <doc:#Create-SimplePurchaseView>
+		- <doc:#Add-Product-Images>
+		- <doc:#Add-Product-Configuration-Files>
+		- <doc:#Run-the-App>
 
 ---
 
-# Quick Start
-The following steps show to use `StoreHelper` to create a bare-bones SwiftUI demo app that supports in-app purchases on **iOS 16** and **macOS 13**.
+## Quick Start
+The following steps show to use `StoreHelper` to create a bare-bones SwiftUI demo app that supports in-app purchases on **iOS 17** and **macOS 14**.
 
-See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using `StoreHelper` with Xcode 14.
+See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using `StoreHelper` with Xcode 15.
 
-## What you'll need
+### What you'll need
 - **Xcode 13 - 15** installed on your Mac
 - Basic familiarity with **Xcode**, **Swift** and **SwiftUI**
 - About 15-minutes!
 
-# Steps
-## Getting the StoreHelper Package
-- Open Xcode and create a new project. Use either the **iOS app**, **macOS app** or **multi-platform app** template. These steps use the multi-platform template to create an app named **"StoreHelperDemo"**
+## Steps
+### Getting the StoreHelper Package
+- Open Xcode and create a new project
+- Select the **multi-platform** template and create an app named **"StoreHelperDemo"**
 - Select **File > Add Packages...**
 - Paste the URL of the `StoreHelper` package into the search box: 
 
-    - HTTPS: https://github.com/russell-archer/StoreHelper.git
-    - or
-    - SSH: git@github.com:russell-archer/StoreHelper.git
+    - For HTTPS use: https://github.com/russell-archer/StoreHelper.git
+    - For SSH use: git@github.com:russell-archer/StoreHelper.git
 
 - Click **Add Package**:
 
-![](./assets/StoreHelperDemo101.png)
+![](StoreHelperDemo101.png)
 
 - Xcode will fetch the package from GitHub and then display a confirmation. Click **Add Package**:
 
-![](./assets/StoreHelperDemo102.png)
+![](StoreHelperDemo102.png)
 
 - The project should now look like this:
 
-![](./assets/StoreHelperDemo103.png)
+![](StoreHelperDemo103.png)
 
 - Notice that the `StoreHelper` and `swift-collections` packages have been added to the project. `swift-collections` is a package dependency for `StoreHelper`
 - If you expand the `StoreHelper` package you'll be able to see the source:
 
-![](./assets/StoreHelperDemo104.png)
+![](StoreHelperDemo104.png)
 
-- Select the project's **target**. Notice that `StoreHelper` has been added as a library for the **iOS**, iPad **and** **macOS** targets:
+- Select the project's **target**. Notice that `StoreHelper` has been added as a library for the **iOS**, **iPad** and **macOS** targets:
 
-![](./assets/StoreHelperDemo109.png)
+![](StoreHelperDemo109.png)
 
 - With the project's target selected, add the **In-App Purchase** capability:
 
-![](./assets/StoreHelperDemo105.png)
+![](StoreHelperDemo105.png)
 
 - Adding the in-app purchase capability will automatically add the `StoreKit` framework to your project:
 
-![](./assets/StoreHelperDemo110.png)
+![](StoreHelperDemo110.png)
 
 ## Create the App struct
-- Open `StoreHelperExampleApp.swift` and replace the existing code with the following:
-
-> Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
-> - Delete **ContentView.swift** and **Your-Project-NameApp.swift** from your project and move them to the trash
-> - Select any file in the **StoreHelper > Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
-> - In Finder, select all the files in the **Code** directory and drag them into into your project's main folder in Xcode. Select **Copy items if needed** when prompted
-> - Rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StoreHelperDemoApp` to `Your-Project-NameApp`
-> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
-> - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
-> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
+- Open `StoreHelperDemoApp.swift` and replace the existing code with the following:
 
 ```swift
 import SwiftUI
@@ -117,8 +113,18 @@ struct StoreHelperDemoApp: App {
 - Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class and add it to the SwiftUI view hierarchy using the `.environment()` modifier 
 - We also call `storeHelper.start()` to begin listening for App Store transactions. This should be done as soon as possible during app start-up
 
-## Create MainView
-- Create a new SwiftUI `View` in the **Shared** folder named `MainView` and replace the existing code with the following:
+> Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
+> - Delete **ContentView.swift** and **StoreHelperDemoApp.swift** from your project and move them to the trash
+> - Select any file in the **StoreHelper > Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
+> - In Finder, select all the files in the **Code** directory and drag them into into your project's main folder in Xcode. Select **Copy items if needed** when prompted
+> - If you've not named your project "**StoreHelperDemo**", rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StoreHelperDemoApp` to `Your-Project-NameApp`
+> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
+> - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
+> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
+
+### Create MainView
+- Create a folder named **"Shared"**, then add a new SwiftUI `View` in the new folder named `MainView`
+- Replace the existing code with the following:
 
 ```swift
 import SwiftUI
@@ -149,7 +155,7 @@ struct MainView: View {
 - `MainView` provides simple navigation to `ContentView`, which shows a list of available products, and `ProductView` which gives the user access to a particular product if they've purchased it
 - Notice how we pass the `ProductId` for either the "Large Flowers" or "Small Flowers" product to `ProductView`
 
-## Create ProductView
+### Create ProductView
 - Create a new SwiftUI `View` named `ProductView` and save it to the **Shared** folder. Replace the existing code with the following:
 
 ```swift
@@ -205,7 +211,7 @@ struct ProductView: View {
 
 - Notice that when the `VStack` appears we asynchronously call `StoreHelper.isPurchased(productId:)` to see if the user has purchased the product 
 
-## Modify ContentView
+### Modify ContentView
 - Open `ContentView.swift` and replace the existing code with the following:
 
 ```swift
@@ -239,7 +245,7 @@ struct ContentView: View {
 - If the user taps on a product's **More Info** button, the `Products` view provides the unique `ProductId` of that product to our app via a closure. We can then display a view or (as in this example) sheet showing details of the product, and why the user might want to purchase it
 - We hand-off the presentation of our product information details to the (as yet undefined) `ProductInfo` view
 
-## Create the ProductInfo View
+### Create the ProductInfo View
 - Create a new SwiftUI view in the **Shared** folder named `ProductInfo.swift`. Replace the existing code with the following:
 
 ```swift
@@ -310,7 +316,7 @@ struct ProductInfoDefault: View {
 
 - `ProductInfo` uses `StoreHelper.product(from:)` to retrieve a `StoreKit2 Product` struct, which gives localized information about the product
 
-## Create SimplePurchaseView
+### Create SimplePurchaseView
 - Create a new SwiftUI view in the **Shared** folder named `SimplePurchaseView.swift`. Replace the existing code with the following:
 
 ```swift
@@ -379,27 +385,26 @@ struct SimplePurchaseView: View {
 }
 ```
 
-## Add Product Images
+### Add Product Images
 - Select any file in the **StoreHelper > Samples > Images** folder in Xcode, right-click it and select **Show in Finder**
 - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
 - These images have filenames that are the same as the product ids for the products which they represent
 
-## Add Product Configuration Files
+### Add Product Configuration Files
 - Select any file in the **StoreHelper > Samples > Configuration** folder in Xcode, right-click it and select **Show in Finder**
 - In Finder, select all files (except readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
 - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
 - Select your project's **target** and then select **Product > Scheme> Edit Scheme**
 - Select the `Products.storekit` file in the **StoreKit Configuration** field:
 
-![](./assets/StoreHelperDemo107.png)
+![](StoreHelperDemo107.png)
 
-## Run the App
+### Run the App
 - Select the **iOS target** and run it in the simulator:
-    - The MainView provides navigation to the **Products List** and product access views
-    - The **Products List** view displays a list of products, along with images and descriptions
+    - `MainView` provides navigation to `ContentView` (the products list) and product access views
+    - `ContentView` displays a list of products, along with images and descriptions
     - Try purchasing the **Large Flowers** product
-    - Your demo app supports a complete range of in-app purchase-related features. See the documentation for `StoreHelper` for a full list of features
-    - Try selecting "Large Flowers" from the main view. If you've purchased it you should see that you have access, otherwise you'll see a "no access" error 
+    - Your demo app supports a complete range of in-app purchase-related features
+    - Try selecting "Large Flowers" from `MainView`. If you've purchased it you should see that you have access, otherwise you'll see a "no access" error 
 
-![](./assets/StoreHelperDemo108.png)
-
+![](StoreHelperDemo108.png)

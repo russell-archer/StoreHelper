@@ -15,6 +15,11 @@ public struct SheetBarView: View {
     private let title: String?
     private let sysImg: String?
     private let insetsTitle = EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
+    
+    /// <#Description#>
+    /// - Parameters:
+    ///   - showSheet: <#showSheet description#>
+    ///   - title: <#title description#>
 
     public init(showSheet: Binding<Bool>, title: String? = nil, sysImage: String? = nil) {
         self._showSheet = showSheet

@@ -2,11 +2,14 @@
 
 Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in **Xcode 13 - 15** with **SwiftUI**, **Swift 5.7 - 5.9**, **iOS 15 -  17** and **macOS 12 - 14**.
 
----
+@Metadata {
+    @PageImage(purpose: icon, source: storehelper-logo)
+    @CallToAction(url: "https://github.com/russell-archer/StoreHelper", purpose: link, label: "View StoreHelper on GitHub")    
+}
 
-# Description
+## Description
 
-![](./assets/StoreHelperDemo0.png)
+![](StoreHelperDemo0.png)
 
 This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**.
 
@@ -17,7 +20,7 @@ This document describes how to implement and test in-app purchases with **SwiftU
 
 ---
 
-# Recent Major Changes
+## Recent Major Changes
 - 24 January, 2024
     - Added support for visionOS
 - 23 June, 2023
@@ -78,7 +81,7 @@ This document describes how to implement and test in-app purchases with **SwiftU
 
 ---
 
-# Source Code
+## Source Code
 The latest version of `StoreHelper` is always available [on GitHub](https://github.com/russell-archer/StoreHelper). 
 
 > **Disclaimer**. The source code presented here is for educational purposes. 
@@ -86,7 +89,7 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 
 ---
 
-# Contents
+## Contents
 
 - [Description](#Description)
 - [Recent Changes](#Recent-Changes)
@@ -131,9 +134,10 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 - [Managing Subscriptions](#Managing-Subscriptions)   
 - [Refunds](#Refunds)
 - [Direct purchases of App Store Promotions](#Direct-purchases-of-App-Store-Promotions)
+
 ---
 
-# References
+## References
 - https://developer.apple.com/in-app-purchase/
 - https://developer.apple.com/documentation/storekit/in-app_purchase
 - https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase
@@ -144,7 +148,8 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 - https://developer.apple.com/support/universal-purchase/
 
 ---
-# Overview
+
+## Overview
 This document discusses how to use Apple's `StoreKit2` framework to provide in-app purchases in your **iOS** or **macOS** **SwiftUI**-based apps. 
 
 Specifically, we'll cover:
@@ -165,10 +170,10 @@ Specifically, we'll cover:
 - Testing purchases locally using **StoreKit configuration** files
 - Support for direct App Store purchases of **promoted in-app purchases**
 
-# What's changed from the original StoreKit?
+## What's changed from the original StoreKit?
 There are two **huge** changes from the previous (original) version of StoreKit (`StoreKit1` hereafter):
 
-## Receipt validation
+### Receipt validation
 With `StoreKit1` validating the receipt issued by the App Store was a tricky process that required:
 
 - Working with the C-based `OpenSSL` library to decrypt, read and validate receipt data (on-device validation), or
@@ -181,7 +186,7 @@ See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-arche
 - JWS is easy to read - no need for a third-party cryptography library!
 - Better still, transactions are now **automatically** validated by `StoreKit2`!!
 
-## Async/Await support
+### Async/Await support
 `StoreKit1` uses a delegate-based method of working with async APIs and notifications:
 
 - This leads to code that is difficult to read, with program flow being somewhat disjointed
@@ -190,7 +195,7 @@ See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-arche
 
 - This makes working with async APIs much easier and results in a more natural flow to your code
 
-## Should I use StoreKit1 or StoreKit2?
+### Should I use StoreKit1 or StoreKit2?
 Working with in-app purchases using `StoreKit2` is a ***vastly*** superior experience over using `StoreKit1` and you should choose to use it if possible.
 However, `StoreKit2` requires that your app targets **iOS 15/macOS 12**. If you need to support iOS 14 and lower you'll need to continue using `StoreKit1`.
 
@@ -202,18 +207,18 @@ The good news is that although there are two versions of the StoreKit, both fram
 - Both versions of StoreKit provide the exact same UI experience for users
 - Transactions made with one version of StoreKit are immediately available in the other version
 
-# StoreHelperDemo App
-![](./assets/StoreHelperDemo2.png)
+## StoreHelperDemo App
+![](StoreHelperDemo2.png)
 
 The best way to get familiar with `StoreKit2` is to create a simple, but full-featured (from an in-app purchase perspective) demo app. You may be surprised how little "app code" is required to implement in-app purchases: `StoreHelper` and `StoreKit2` handle all the heavy-lifting!
 
-# Get Started
+## Get Started
 To get started, create a new multi-platform Xcode project and add the `StoreHelper` package. See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for details.
 Make sure that both the iOS and macOS targets include the `StoreHelper` library, and that both targets support the **In-App Purchase** capability. Adding this capability also adds the `StoreKit2` framework to your project:
 
-![](./assets/StoreHelperDemo5.png)
+![](StoreHelperDemo5.png)
 
-# Defining our Products
+## Defining our Products
 Before we do anything else we need to define the products we'll be selling. Ultimately, this will be done in **App Store Connect**. However, testing in-app purchases (IAPs) using an **App Store Sandbox** environment takes quite a bit of setting up and is rather frustrating to work with. 
 
 > The sandbox test environment requires you to create multiple **sandbox test accounts** in App Store Connect. Each sandbox account has to have a unique email address and be validated as an AppleID. In addition, sandbox tests must be on a real device, not the simulator.
@@ -229,30 +234,30 @@ Fortunately, there's now a much better way.
 
 Introduced in Xcode 12, a new **local** StoreKit test environment allows you to do early testing of IAPs in the simulator without having to set anything up in App Store Connect. You define your products locally in a **StoreKit Configuration** file. Furthermore, you can view and delete transactions, issue refunds, and a whole lot more. There’s also a new `StoreKitTest` framework that enables you to do automated testing of IAPs. We'll use this approach to test IAPs in our app.
 
-# The StoreKit configuration file
+## The StoreKit configuration file
 You create a **StoreKit Configuration File** by selecting **File > New > File** and choosing the **StoreKit Configuration File** template:
 
-![](./assets/StoreHelperDemo111.png)
+![](StoreHelperDemo111.png)
 
 Starting with Xcode 14, you can choose to create a **synced** `.storekit` configuration file that is linked to in-app purchases already defined in App Store Connect. Once you've created the synced `.storekit` configuration file you can't edit it locally in Xcode, all changes have to be made in App Store Connect.
 
 After clicking **Next** you'll be asked if you want to create a synced `.storekit` configuration file:
 
-![](./assets/StoreHelperDemo112.png)
+![](StoreHelperDemo112.png)
 
 For the purposes of this documentation it's assumed that you'll create a local (non-synced) `.storekit` configuration file.
 
 `StoreHelper` includes a sample `Products.storekit` file in the `StoreHelper/Samples/Configuration` folder which you should copy to the `Shared/Configuration` folder of your project:
 
-![](./assets/StoreHelperDemo6b.png)
+![](StoreHelperDemo6b.png)
 
 When you want to modify the list of products, open the `Products.storekit` configuration file and click **+** to add an in-app purchase. For example, select the **Add Non-Consumable In-App Purchase** option:
 
-![](./assets/StoreHelperDemo7.png)
+![](StoreHelperDemo7.png)
 
 You can now define your products in the StoreKit configuration file. Here's an example of a non-consumable product:
 
-![](./assets/StoreHelperDemo8.png)
+![](StoreHelperDemo8.png)
 
 The fields available are as follows:
 
@@ -284,18 +289,18 @@ The name for the product that users see.
 
 > Note that none of the data defined in the local (non-synced) `.storekit` file is ever uploaded to App Store Connect. It’s only used when testing in-app purchases locally in Xcode.
 
-# Enable StoreKit Testing via the Project Scheme
+## Enable StoreKit Testing via the Project Scheme
 You need to enable StoreKit testing in Xcode, as it’s disabled by default.
 
 Select **Product > Scheme > Edit Scheme**. 
 Now select **Run** and the **Options** tab. 
 You can now select your configuration file from the **StoreKit Configuration** list:
 
-![](./assets/StoreHelperDemo9.png)
+![](StoreHelperDemo9.png)
 
 Should you wish to disable StoreKit testing then repeat the above steps and remove the StoreKit configuration file from the **StoreKit Configuration** list.
 
-# Creating a Production Product List
+## Creating a Production Product List
 We'll see shortly how one of the first things our app has to do on starting is request localized product information from the App Store. This is the case both when 
 using the local StoreKit test environment and the live App Store environment. This requires a list of our **product identifiers** (`ProductId`). 
 
@@ -342,7 +347,7 @@ struct PropertyFile {
 }
 ```
 
-# Logging
+## Logging
 While researching and testing `StoreKit2` I found it really helpful to see informational messages about what's going. Rather than use `print()` statements I created a simple logging `StoreLog` struct that would work for both debug and release builds.
 
 I use Apple's unified logging system to log errors, notifications and general messages. This system works on simulators and real devices for both debug and release builds. You can view the logs in the Console app by selecting the test device in the left console pane.
@@ -351,7 +356,7 @@ If running on the simulator, select the machine the simulator is running on. Typ
 
 When running the app on a real device that's not attached to the Xcode debugger, dynamic strings (i.e. the error, event or message parameter you send to the event() function) will not be publicly viewable. They're automatically redacted with the word "private" in the console. This prevents the accidental logging of potentially sensitive user data. Because we know in advance that `StoreNotificaton` enums do not contain sensitive information, we let the unified logging system know it's OK to log these strings through the use of the "%{public}s" keyword. However, we don't know what the event(message:) function will be used to display, so its logs will be redacted.
 
-# Getting a list of Products from the App Store
+## Getting a list of Products from the App Store
 The first thing our app needs to do is get a list of our products that our app has for sale from the App Store. If you've not worked with in-app purchases before this it might seem a bit strange. Surely, our app would store a list of product details and then display them for the user. However, the key concept here is that we want ***localized*** information about our products. For example, we define the general *price band* that we want each product to be in, and the App Store gives our app an up-to-date price in the **user's local language and currency**. That way our app is freed from having to know anything about the user's location, local currencies, etc. So, we generically define our products and the App Store provides our app with locally-specific product data.
 
 This procedure is the same whether you're using a local StoreKit test environment, sandbox testing or the live App Store:
@@ -426,33 +431,33 @@ public private(set) var productIds: OrderedSet<ProductId>?
 
 The following diagram shows the flow for requesting localized product information from the App Store using `StoreHelper`:
 
-![](./assets/StoreHelperDemo12.png)
+![](StoreHelperDemo12.png)
 
-# Displaying Products
+## Displaying Products
 The `StoreHelper` package includes some images for example products (see `Samples/Images`). They're named with the same unique product ids defined in the `Products.storekit` and `Products.plist` files. See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for details. Add these sample images to your demo app's **Asset Catalog**:
 
-![](./assets/StoreHelperDemo10.png)
+![](StoreHelperDemo10.png)
 
 The hierarchy of views used to display products is broken into a number of small, specialized views that each deal with relatively simple tasks. Here's how non-consumable products are displayed:
 
-![](./assets/StoreHelperDemo15.png)
+![](StoreHelperDemo15.png)
 
 Running the app's iOS target produces:
 
-![](./assets/StoreHelperDemo11.png)
+![](StoreHelperDemo11.png)
 
 Note that prices are in US dollars. This is because, by default in the test environment, the App Store `Storefront` is **United States (USD)** and the localization is **English (US)**. To support testing other locales you can change this. Make sure the `Products.storekit` file is open, then select **Editor > Default Storefront** and change this to another value. You can also changed the localization from **English (US**) with **Editor > Default Localization**.
 
 Here I selected **United Kingdom (GBP)** as the storefront and **English (UK)** as the localization. I also created some UK-specific descriptions of the products. Notice how prices are now in UK Pounds:
 
-![](./assets/StoreHelperDemo13.png)
+![](StoreHelperDemo13.png)
 
-# The Product type
+## The Product type
 The `Product` struct is a an important object in `StoreKit2`. We've seen how the `static` `Product.products(for:)` method is used to request product information from the App Store. It's also used for several other key operations:
 
-![](./assets/StoreHelperDemo14.png)
+![](StoreHelperDemo14.png)
 
-# Purchasing Products
+## Purchasing Products
 To purchase a product we need to call the `purchase()` method on the `StoreKit2` `Product` object that represents the product we want to purchase. The `PriceView` view displays the product's price on a button that makes the purchase via a `PriceViewModel`. Here's a simplified version of `PriceView` that shows how easy it is to make a purchase:
 
 ```swift
@@ -550,7 +555,7 @@ struct PriceViewModel {
 }
 ```
 
-# Purchase support in StoreHelper
+## Purchase support in StoreHelper
 We now need to see how purchasing is handled by `StoreHelper`. The main things to note are:
 
 - A `@Published` array of `ProductId` that holds the ids of purchased products:
@@ -604,7 +609,7 @@ deinit { transactionListener?.cancel() }
 @MainActor private func handleTransactions() -> Task<Void, Error> { ... }
 ```
 
-# Making a Purchase and Validating the Transaction
+## Making a Purchase and Validating the Transaction
 Using `StoreHelper` to make a purchase is pretty simple:
 
 1. The user taps the `PriceView` button, which calls `PriceViewModel.purchase(product:)`, passing the `Product` to purchase:
@@ -683,7 +688,7 @@ If the verification process is a success we update our collection of purchased p
 
 The simplified purchase process flow (showing mainly the "success" path) is as follows:
 
-![](./assets/StoreHelperDemo16.png)
+![](StoreHelperDemo16.png)
 
 1. The user taps the `PriceView` button, which calls `PriceViewModel.purchase(product:)`, passing the `Product` to purchase
 2. `PriceViewModel` calls `purchase(_:)` in `StoreHelper`, passing the `Product` to purchase
@@ -701,7 +706,7 @@ The simplified purchase process flow (showing mainly the "success" path) is as f
 11. ... the collection of purchase product ids is updated to add the newly purchased product
 12. `StoreHelper` tells `StoreKit2` the `Transaction` is finished and returns the `Transaction` object to `PriceViewModel`. It sets a binding property to show the purchase was a success and the UI is re-rendered
 
-# Ask-to-buy support
+## Ask-to-buy support
 The App Store supports the concept of "ask-to-buy" purchases, where parents can configure an Apple ID to require their permission to make a purchases. 
 When a user makes this type of purchase the `PurchaseResult` returned by StoreKit's `product.purchase()` method will have a value of `.pending`. This
 state can also be applicable when a user is required to make banking changes before a purchase is confirmed.
@@ -710,34 +715,34 @@ With `StoreKit` testing (which works with both `StoreKit1` and `StoreKit2`) we c
 
 To enable ask-to-buy support in `StoreKit` select the `.storekit` configuration file and then select **Editor > Enable Ask To Buy**:
 
-![](./assets/StoreHelperDemo17.png)
+![](StoreHelperDemo17.png)
 
 Now run the demo app and attempt to make a purchase. You'll find that the purchase proceeds as normal. 
 However, instead of receiving a purchase confirmation you'll see an **Ask Permission** alert:
 
-![](./assets/StoreHelperDemo17b.png)
+![](StoreHelperDemo17b.png)
 
 Tap **Ask** and you'll see that the purchase enters a `.pending` state, as denoted by the orange hourglass next to the product purchase button:
 
-![](./assets/StoreHelperDemo18.png)
+![](StoreHelperDemo18.png)
 
 With the app still running, click the **Manage StoreKit Transaction** button on the Xcode debug area pane:
 
-![](./assets/StoreHelperDemo19.png)
+![](StoreHelperDemo19.png)
 
 You'll now be able to see the transaction that is "Pending Approval". Right-click the transaction that is pending approval and select **Approve Transaction**:
 
-![](./assets/StoreHelperDemo23.png)
+![](StoreHelperDemo23.png)
 
 You should see the purchase confirmed as `StoreHelper` processes the transaction:
 
-![](./assets/StoreHelperDemo23b.png)
+![](StoreHelperDemo23b.png)
 
 The console shows how `StoreHelper` handled the process:
 
-![](./assets/StoreHelperDemo23c.png)
+![](StoreHelperDemo23c.png)
 
-# What Products has the user purchased?
+## What Products has the user purchased?
 What happens if we quit and restart the demo app? How do we know what purchases the user has previously made?
 
 If you stop and re-run the app you'll see that without any work on our part it seems to remember what's been purchased. This is because the UI calls `StoreHelper.isPurchased(product:)` for each product when it's displayed. This checks `Transaction.currentEntitlement(for:)` to get a list of transactions for the user. This supports both non-consumable in-app purchases and active subscriptions.
@@ -748,7 +753,7 @@ In my testing of production apps that use `StoreHelper` I found that under certa
 
 When an app is installed (or re-installed) the App Store issues a receipt at the same time which *includes any previous transactions*. That is, purchases made by the user previously on the same device, or purchases made on another device belonging to the same user (i.e. using the same Apple ID). This is a change from how things worked previously with `StoreKit1` where, in order to sync with the App Store and receive an up-to-date receipt, the user would have to "restore" previous purchases (see **Restoring Previous Purchases**). With `StoreKit2`, users don't need to restore previous transactions when your app is installed/reinstalled. 
 
-# Restoring Previous Purchases
+## Restoring Previous Purchases
 Apples's documentation states that apps **must** provide a mechanism to allow users to manually restore previous in-app purchases. 
 
 > **Important**
@@ -759,7 +764,7 @@ With Xcode 14 and iOS16/macOS13 Apple states that manually (and programmatically
 
 Programmatically restoring purchases simply requires an `async` call to `AppStore.sync()`. However, it's not a good idea to initiate a restore unless the user *specifically* requests it. This is because the user will immediately be prompted to authenticate with the App Store. This behaviour can be very disconcerting for the user, as it may not be obvious *why* they're being asked for their credentials.
 
-# Network connectivity issues
+## Network connectivity issues
 I have found that if you have:
 
 - made purchases, and
@@ -778,7 +783,7 @@ However:
 Given the potential for unhappy customers, `StoreHelper` includes "fallback" collection of purchases (product ids) that gets persisted and is automatically and transparently used as a backup when the App Store's not available.
 This collection is also used by StoreHelper's' `isPurchased(productId:)` method as a cache of purchases.
 
-# The Receipt
+## The Receipt
 The main differences between `StoreKit1` and `StoreKit2` receipts are:
 
 - `StoreKit1` 
@@ -809,29 +814,29 @@ The `receipt` directory will contain the old-style `StoreKit1` encrypted receipt
 
 If you navigate to `...{app-id}/Library/Caches/StoreKit` you should see the `StoreKit2` receipts database:
 
-![](./assets/StoreHelperDemo25.png)
+![](StoreHelperDemo25.png)
 
 If you have a SQLite client installed (I used **SQLPro for SQLite**) you can open the database. Here's what it looks like having made two purchases:
 
-![](./assets/StoreHelperDemo26.png)
+![](StoreHelperDemo26.png)
 
 We can immediately see how each transaction is structured, with the `product_id` column showing the `ProductId` of the purchase. 
 The `receipt` column is a plain text field where the contents are clearly encrypted:
 
-![](./assets/StoreHelperDemo27.png)
+![](StoreHelperDemo27.png)
 
-![](./assets/StoreHelperDemo28.png)
+![](StoreHelperDemo28.png)
 
 So, because we know an up-to-date version of the receipts database will always be present, we can use it (via `StoreKit2`) to find out a user's product entitlements.
 
-# Consumables
+## Consumables
 Now we have the basics of the app working, we can move onto looking at another type of product: **consumables**.
 
 Consumables are products that are used once, or for a limited time and then expire. If the user wants to use the product again they need to re-purchase. A typical consumable product would be a token in game that temporarily gives you more lives or higher powers. Once the token's used up the user would lose the abilities it confers.
 
 The demo app contains a consumable called "VIP plant installation service". It lasts for one appointment and then expires. We define the product like this:
 
-![](./assets/StoreHelperDemo30.png)
+![](StoreHelperDemo30.png)
 
 It's also included in our **Products.plist**:
 
@@ -899,12 +904,12 @@ public struct KeychainHelper {
 
 Every time you purchase a consumable, the demo app simply shows a purchase-count badge like this:
 
-![](./assets/StoreHelperDemo43.png)
+![](StoreHelperDemo43.png)
 
-# Displaying Non-Consumable Purchase Information
+## Displaying Non-Consumable Purchase Information
 At the bottom of each purchased product we show some purchase summary information. The user can tap on the purchase info to display a sheet with more detailed information:
 
-![](./assets/StoreHelperDemo46b.png)
+![](StoreHelperDemo46b.png)
 
 Getting purchase information for non-consumables is very straightforward. The `latestTransaction` property of a `Product` gives you a `VerificationResult<Transaction>` for the most recent transaction on the product:
 
@@ -1012,16 +1017,16 @@ struct PurchaseInfoView: View {
 
 Tapping the `PurchaseInfoView` button displays a sheet with more detailed purchase information, along with a refund request button (see [Refunds](#Refunds) below):
 
-![](./assets/StoreHelperDemo46c.png)
+![](StoreHelperDemo46c.png)
 
-# Subscriptions
+## Subscriptions
 Subscriptions are an important class of in-app purchase that are becoming more and more widely used by developers. 
 
 In the demo app we include a group of auto-renewable subscriptions (Apple discourages the use of the older, non-renewing subscriptions) for a "VIP Home Plant Care Visit". The subscription offers three different levels of service: Gold, Silver and Bronze.
 
 Open `Products.storekit` and review the "VIP" subscription group:
 
-![](./assets/StoreHelperDemo53.png)
+![](StoreHelperDemo53.png)
 
 Notice how we adopt the following naming convention for our subscription products:
 
@@ -1039,7 +1044,7 @@ The **order** in which products are defined in both `Products.storekit` and `Pro
 
 Here's how our products should look in `Products.storekit`. Notice the "gold" product is at the top of the list and we've assigned a level value of 1 to it:
 
-![](./assets/StoreHelperDemo54.png)
+![](StoreHelperDemo54.png)
 
 `Products.plist` includes the same product ids and order:
 
@@ -1065,7 +1070,7 @@ Here's how our products should look in `Products.storekit`. Notice the "gold" pr
 
 Subscription purchasing works in a very similar manner to purchasing non-consumables:
 
-![](./assets/StoreHelperDemo46.png)
+![](StoreHelperDemo46.png)
 
 Notice that when we purchase the "Gold" subscription we'll be charged a trial rate of $9.99 for two months, and then $19.99 per month thereafter.
 
@@ -1074,7 +1079,7 @@ Notice that when we purchase the "Gold" subscription we'll be charged a trial ra
 > 
 > See **Introductory and Promotional Subscription Offers** below for a discussion on how the availability of promotional and introductory offers affects the way we display subscription prices and renewal dates.
 
-## Displaying Subscription information
+### Displaying Subscription information
 Displaying information on what product a user is subscribed to, when it renews, how much it costs, and so on is not *quite* as straightforward as it first appears. For example, what happens when a user is subscribed to one level of service and then purchases a higher service level product? The user will expect immediate access to a higher level of service, but how can we tell which subscription is "current"? 
 
 Let's walk through the flow of gathering subscription data.
@@ -1089,7 +1094,7 @@ Essentially, we enumerate all the statuses in order to find the subscription pro
 
 The `StoreHelper.subscriptionInfo(for:)` method performs the required processing and returns a `SubscriptionInfo` struct the summarizes the information we need to display to the user:
 
-![](./assets/StoreHelperDemo56.png)
+![](StoreHelperDemo56.png)
 
 We return the data in a `SubscriptionInfo` object that neatly packages everything required in one easy-to-use `struct`:
 
@@ -1132,10 +1137,10 @@ Tells you if the product has been upgraded, the purchase date, etc.
 
 `StoreHelper` includes `SubscriptionListViewRow`, `SubscriptionView`, `SubscriptionInfoViewModel`, `SubscriptionInfoView` and `SubscriptionInfoSheet` to manage the display of subscriptions.
 
-## Upgrading a Subscription
+### Upgrading a Subscription
 So, what happens when the user attempts to upgrade a subscription?
 
-![](./assets/StoreHelperDemo49.gif)
+![](StoreHelperDemo49.gif)
 
 When the user upgrades from the "Silver" subscription to "Gold" StoreKit the App Store will:
 
@@ -1154,7 +1159,7 @@ For *each subscription product* you may optionally define:
 - 1 **introductory offer** 
 - **Offer codes**
 
-### Signing Promotional Offers
+#### Signing Promotional Offers
 
 > **Important note on signing promotional subscription offers**
 > 
@@ -1168,7 +1173,7 @@ For *each subscription product* you may optionally define:
 
 `StoreHelper` supports **introductory** and **promotional offers** for subscriptions:
 
-![](./assets/StoreHelperDemo140.png)
+![](StoreHelperDemo140.png)
 
 However, Apple requires that every request to purchase a subscription using a promotional offer must be **digitally signed**. Currently (Xcode 14), the only mechanism to achieve this is a server-based solution as described in  [Generating a Signature for Promotional Offers](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/generating_a_signature_for_promotional_offers). Until `StoreKit2` provides a more convenient solution based on local signing of promotional offers, `StoreHelper` will pass-off the signing request to a `signPromotionalOffer` closure provided by your app. This will happen whenever the user initiates a purchase request for a subscription which has an eligible promotional offer.
 
@@ -1296,14 +1301,14 @@ See the following Apple documentation references for more information:
 - [Generating a Signature for Promotional Offers](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/generating_a_signature_for_promotional_offers)
 - [Generating a Promotional Offer Signature on the Server](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/generating_a_promotional_offer_signature_on_the_server)
 
-### Defining offers in App Store Connect
+#### Defining offers in App Store Connect
 First, setup basic app information in App Store Connect, then define your in-app purchases.
 Select **Subscriptions** in the left-pane and define a `subscription group`. 
 Here we've created a subscription group named "VIP" and defined three subscriptions in order of value or service level:
 
-![](./assets/StoreHelperDemo114.png)
+![](StoreHelperDemo114.png)
 
-![](./assets/StoreHelperDemo115.png)
+![](StoreHelperDemo115.png)
 
 Once you've setup your subscriptions you can create promotional and introductory offers.
 The types of offer available are:
@@ -1314,51 +1319,51 @@ The types of offer available are:
 
 For example, edit the "Gold" subscription, click on the **Subscription Prices +** button and select **Create Promotional Offer**:
 
-![](./assets/StoreHelperDemo116.png)
+![](StoreHelperDemo116.png)
 
 Provide an **Offer Reference Name** (which is just for your reference and not seen by the user) for the promotion, along with a unique **Promotional Offer Identifier** for the offer:
 
-![](./assets/StoreHelperDemo117.png)
+![](StoreHelperDemo117.png)
 
 Next, choose the pricing model (pay-as-you-go, up-front, or free) and the price. Notice that you'll see at the bottom of the window how the user will pay during the promotion:
 
-![](./assets/StoreHelperDemo118.png)
+![](StoreHelperDemo118.png)
 
 App Store Connect will now calculate prices for all the different regions, which you can override if you wish:
 
-![](./assets/StoreHelperDemo119.png)
+![](StoreHelperDemo119.png)
 
 Confirm the prices:
 
-![](./assets/StoreHelperDemo120.png)
+![](StoreHelperDemo120.png)
 
-### Subscription Offer Keys
+#### Subscription Offer Keys
 Your promotional offer has been created. However, you'll see a warning that you need to create a **subscription key** for signing offers:
 
-![](./assets/StoreHelperDemo121.png)
+![](StoreHelperDemo121.png)
 
 Every request to purchase a subscription using a promotional offer must be **digitally signed**. 
 Click **Create Key** to jump to **Users and Access > Keys**, then click **Generate In-App Purchase Key**:
 
-![](./assets/StoreHelperDemo122.png)
+![](StoreHelperDemo122.png)
 
 Create a reference name for the key and click **Generate**:
 
-![](./assets/StoreHelperDemo123.png)
+![](StoreHelperDemo123.png)
 
 The key is generated. You should now download and save the key. Note that you will not be able to download the again, so make sure to store it safely:
 
-![](./assets/StoreHelperDemo124.png)
+![](StoreHelperDemo124.png)
 
-![](./assets/StoreHelperDemo125.png)
+![](StoreHelperDemo125.png)
 
 This key should be used the **production** and the **sandbox** test environment.
 Note that you can ask Xcode to create a test key for the StoreKit Testing environment. 
 With your `Products.storekit` file open, select **Editor > Subscription Offers Key**:
 
-![](./assets/StoreHelperDemo126.png)
+![](StoreHelperDemo126.png)
 
-![](./assets/StoreHelperDemo127.png)
+![](StoreHelperDemo127.png)
 
 Creating an **Introductory Offer** is a very similar process, which we won't bother to describe in detail here.
 
@@ -1366,21 +1371,21 @@ Creating an **Introductory Offer** is a very similar process, which we won't bot
 > Note that although you can create an introductory offer for each subscription product in App Store Connect, each user is only eligible to redeem **one** introductory offer per subscription group. 
 > See [Set up an introductory offer](https://help.apple.com/app-store-connect/#/deve1d49254f) for details.
 
-## Defining offers in the StoreKit Testing environment
+### Defining offers in the StoreKit Testing environment
 Promotional and Introductory Offers can also be setup in Xcode for the StoreKit Testing environment by opening the `Products.storekit` file:
 
-![](./assets/StoreHelperDemo128.png)
+![](StoreHelperDemo128.png)
 
-## How StoreHelper displays Standard, Promotional or Introductory Offer Prices
+### How StoreHelper displays Standard, Promotional or Introductory Offer Prices
 By default, `StoreHelper` automatically does all the work required to determine which price and renewal period to display for each subscription product. It also makes a handy `struct` available (`PrePurchaseSubscriptionInfo`) which contains information related to subscription pricing and promotional and introductory offers. In addition, `SubscriptionHelper` provides a number of methods that are helpful if you wish to create a custom UI solution, including `hasLowerValueCurrentSubscription(than:)`, `isLapsedSubscriber(to:)` and `allSubscriptionTransactions()`.
 
 Referring to the image below, `PriceView` is responsible for displaying prices (e.g. "$1.99"), and in the case of standard subscriptions prices and renewal periods (e.g. "$2.99 / month"). Promotional and introductory offers are displayed in form "3 months at a promotional price of $2.99":
 
-![](./assets/StoreHelperDemo15.png)
+![](StoreHelperDemo15.png)
 
 Looking in further detail, when `PriceView` appears it decides if the product it's being asked to display a price for is a subscription. If it is, it calls `StoreHelper.isSubscribed(productId:)` to see if the user is already subscribed. If they're not subscribed, it calls `PriceViewModel.getPrePurchaseSubscriptionInfo(productId:)` to construct a `PrePurchaseSubscriptionInfo` object containing detailed information about the subscription, including price and renewal period, plus any eligible promotional or introductory offers that have been defined:
 
-![](./assets/StoreHelperDemo55.png)
+![](StoreHelperDemo55.png)
 
 The following rules (in order of precedence) determine which price or offers are displayed by `PriceView`:
 
@@ -1394,40 +1399,40 @@ The following rules (in order of precedence) determine which price or offers are
 
 - If none of the above rules apply, the **standard price** and renewal period are displayed 
 
-## Supporting In-App Offer Code Redemption 
+### Supporting In-App Offer Code Redemption 
 You may create **Offer Codes** for subscriptions in App Store Connect and in Xcode for the StoreKit Testing environment. Offer codes are alpha numeric codes that can be distributed to selected users offering free or discounted products. Codes can be redeemed by users through the App Store via the *Redeem Gift Card or Code* page, in-app through the use of the `presentCodeRedemptionSheet()` method, or by the creation of special one-time code redemption URLs.
 
 To create offer codes in App Store Connect, navigate to the in-app purchase product for which you want to create offer codes, click the **Subscription Prices +** button and select **Create Offer Codes**:
 
-![](./assets/StoreHelperDemo129.png)
+![](StoreHelperDemo129.png)
 
 Give the offer a reference name and select eligibility:
 
-![](./assets/StoreHelperDemo130.png)
+![](StoreHelperDemo130.png)
 
 Select the countries and regions where the offer will be available:
 
-![](./assets/StoreHelperDemo131.png)
+![](StoreHelperDemo131.png)
 
 Then setup the type of offer you want to provide:
 
-![](./assets/StoreHelperDemo132.png)
+![](StoreHelperDemo132.png)
 
 Confirm the pricing:
 
-![](./assets/StoreHelperDemo133.png)
+![](StoreHelperDemo133.png)
 
 You offer codes are now available for use:
 
-![](./assets/StoreHelperDemo134.png)
+![](StoreHelperDemo134.png)
 
 To create codes for use in the StoreKit Testing environment, open the `Products.storekit` file, select your subscription product and define your offer:
 
-![](./assets/StoreHelperDemo135.png)
+![](StoreHelperDemo135.png)
 
 If you are building for **iOS 16 or macOS 13** or higher, `StoreHelper` now provides an in-app sheet that enables the user to redeem promotional codes. A button for the user to redeem codes is displayed at the bottom of the product listing:
 
-![](./assets/StoreHelperDemo136.png)
+![](StoreHelperDemo136.png)
 
 `RedeemOfferCodeView` view handles the display of the sheet using `.offerCodeRedemption(isPresented:)`:
 
@@ -1467,20 +1472,20 @@ public struct RedeemOfferCodeView: View {
 
 When the user taps of the redeem offer code button the following sheet is presented:
 
-![](./assets/StoreHelperDemo137.png)
+![](StoreHelperDemo137.png)
 
 The user can select the offer ("Special Winter Offer") and then tap **Redeem Code**:
 
-![](./assets/StoreHelperDemo138.png)
+![](StoreHelperDemo138.png)
 
 Notice how the offer code gives the user a 1 week free trial, then the 3-month introductory offer, followed by the standard monthly subscription price.
 
-![](./assets/StoreHelperDemo139.png)
+![](StoreHelperDemo139.png)
 
-# Managing Subscriptions
+## Managing Subscriptions
 If you want to see ALL your Apple subscriptions you can navigate to **Settings > AppleID > Subscriptions**. From here you can view, upgrade, downgrade, or cancel subscriptions.
 
-![](./assets/StoreHelperDemo50.png)
+![](StoreHelperDemo50.png)
 
 You can also manage subscriptions from your Mac using the **App Store** app. See https://support.apple.com/en-us/HT202039 for more details. 
 
@@ -1490,7 +1495,7 @@ What's required is some way of managing subscriptions from *within* the app.
 
 `StoreHelper` provides a **Manage Subscriptions** button at the bottom of the **Subscription Information** sheet:
 
-![](./assets/StoreHelperDemo58.png)
+![](StoreHelperDemo58.png)
 
 With iOS 15 we can now display a sheet to allow to the user to manage a subscription using the `.manageSubscriptionsSheet(isPresented:)` view modifier (this view modifier is not available for macOS or tvOS):
 
@@ -1519,13 +1524,13 @@ Apple's documentation says it doesn't (yet) work with StoreKit testing in Xcode,
 
 Tapping **Manage Subscription** displays the following sheet:
 
-![](./assets/StoreHelperDemo59.png)
+![](StoreHelperDemo59.png)
 
 If you tap **Cancel Subscription**, `StoreKit2` and `StoreHelper` correctly see that the subscription has been cancelled:
 
-![](./assets/StoreHelperDemo60.png)
+![](StoreHelperDemo60.png)
 
-# Refunds
+## Refunds
 Another issue that has been a source of annoyance for many years is the ability to issue users with a refund. The only resources available for developers are App Store support, via a [support article](https://support.apple.com/en-us/HT204084), or Apple's [dedicated refund website](https://reportaproblem.apple.com/?s=6).
 
 In iOS15 (but not macOS or tvOS) we now have the ability to display a refund request sheet from within our apps. The refund sheet shows the user’s transaction details, along with a list of "why I want a refund" codes for the customer to choose from. 
@@ -1534,11 +1539,11 @@ In iOS15 (but not macOS or tvOS) we now have the ability to display a refund req
 
 The `PurchaseInfoSheet` displays a **Request Refund** button at the bottom of the sheet:
 
-![](./assets/StoreHelperDemo61.png)
+![](StoreHelperDemo61.png)
 
 Tapping **Request Refund** shows:
 
-![](./assets/StoreHelperDemo62.png)
+![](StoreHelperDemo62.png)
 
 The following shows how to display the refund request sheet:
 
@@ -1564,7 +1569,7 @@ Apple normally responds to the user within 48 hours of a refund request.
 
 More details are available in the WWDC21 video [Support customers and handle refunds](https://developer.apple.com/videos/play/wwdc2021/10175/#:~:text=We%20are%20now%20introducing%20a,notification%20from%20the%20App%20Store).
 
-# Direct purchases of App Store Promotions
+## Direct purchases of App Store Promotions
 Apple allows you to promote in-app purchases for sale directly on the App Store. This allows users to purchase your products from the App Store itself, rather than from within your app. 
 
 The requirement for supporting this feature is that your app must include a class that implements `SKPaymentTransactionObserver`, and the `paymentQueue(_:updatedTransactions:)`

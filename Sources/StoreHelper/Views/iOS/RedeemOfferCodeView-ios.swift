@@ -19,6 +19,7 @@ public struct RedeemOfferCodeView: View {
         self._showRedeemOfferCodeButton = showRedeemOfferCodeButton
         self._showRedeemOfferCodeError = showRedeemOfferCodeError
     }
+    
     public var body: some View {
         if #available(iOS 16.0, *) {
             if let redeemOfferCodeButtonText = Configuration.redeemOfferCodeButtonText.stringValue(storeHelper: storeHelper) {

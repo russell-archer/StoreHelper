@@ -1,4 +1,13 @@
-MIT License
+# License
+
+Terms and conditions of usage.
+
+StoreHelper is licensed for use under the MIT license.
+
+@Metadata {
+    @PageImage(purpose: icon, source: storehelper-logo)
+    @CallToAction(url: "https://github.com/russell-archer/StoreHelper", purpose: link, label: "View StoreHelper on GitHub")    
+}
 
 Copyright (c) 2022, 2023, 2024 Russell Archer
 
