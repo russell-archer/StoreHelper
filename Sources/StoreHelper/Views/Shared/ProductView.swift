@@ -26,12 +26,12 @@ public struct ProductView: View {
     private var price: String
     private var productInfoCompletion: ((ProductId) -> Void)
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     public init(showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
                 productId: ProductId,
@@ -71,7 +71,7 @@ public struct ProductView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
+                .xPlatformOnTapGesture { productInfoCompletion(productId) }
             
             Image(productId)
                 .resizable()
@@ -79,12 +79,12 @@ public struct ProductView: View {
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(25)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
+                .xPlatformOnTapGesture { productInfoCompletion(productId) }
             
             PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
             
             if purchaseState == .purchased {
-                #if os(iOS) || os(visionOS)
+                #if os(iOS) || os(tvOS) || os(visionOS)
                 PurchaseInfoView(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId)
                 #else
                 PurchaseInfoView(productId: productId)

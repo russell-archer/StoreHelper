@@ -74,7 +74,7 @@ public struct Products: View {
                         ContactUsView()
                     },
                     label: { Label("Manage Purchases", systemImage: "creditcard.circle")})
-                    .onTapGesture { withAnimation { showManagePurchases.toggle()}}
+                    .xPlatformOnTapGesture { withAnimation { showManagePurchases.toggle()}}
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20))
                 }
                 

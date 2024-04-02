@@ -20,12 +20,12 @@ public struct PurchaseInfoView: View {
     @State private var showPurchaseInfoSheet = false
     private var productId: ProductId
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     public init(showRefundSheet: Binding<Bool>, refundRequestTransactionId: Binding<UInt64>, productId: ProductId) {
         self._showRefundSheet = showRefundSheet
         self._refundRequestTransactionId = refundRequestTransactionId
@@ -56,7 +56,7 @@ public struct PurchaseInfoView: View {
         .padding()
         .task { purchaseInfoText = await viewModel.info(for: productId)}
         .sheet(isPresented: $showPurchaseInfoSheet) {
-            #if os(iOS) || os(visionOS)
+            #if os(iOS) || os(tvOS) || os(visionOS)
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, productId: productId, viewModel: viewModel)
             #else
             PurchaseInfoSheet(showPurchaseInfoSheet: $showPurchaseInfoSheet, productId: productId, viewModel: viewModel)

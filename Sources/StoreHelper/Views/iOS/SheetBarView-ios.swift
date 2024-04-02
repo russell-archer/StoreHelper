@@ -7,16 +7,15 @@
 
 import SwiftUI
 
-#if os(iOS) || os(visionOS)
-@available(iOS 15.0, visionOS 1.0, *)
+#if os(iOS) || os(tvOS) || os(visionOS)
+@available(iOS 15.0, tvOS 15.0, visionOS 1.0, *)
 public struct SheetBarView: View {
     @State private var showXmark = false
     @Binding var showSheet: Bool
-    private var title: String?
-    private var sysImg: String?
-    private var insets = EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10)
-    private var insetsTitle = EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
-    
+    private let title: String?
+    private let sysImg: String?
+    private let insetsTitle = EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
+
     public init(showSheet: Binding<Bool>, title: String? = nil, sysImage: String? = nil) {
         self._showSheet = showSheet
         self.title = title
@@ -31,10 +30,19 @@ public struct SheetBarView: View {
                 
                 HStack {
                     Spacer()
+                    #if os(tvOS)
+                    Button {
+                        withAnimation { showSheet.toggle() }
+                    } label: {
+                        Image(systemName: "xmark.circle")
+                            .foregroundColor(.secondary)
+                    }
+                    #else
                     Image(systemName: "xmark.circle")
                         .foregroundColor(.secondary)
-                        .padding(insets)
-                        .onTapGesture { withAnimation { showSheet.toggle() }}
+                        .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
+                        .xPlatformOnTapGesture { withAnimation { showSheet.toggle() }}
+                    #endif
                 }
             }
         }

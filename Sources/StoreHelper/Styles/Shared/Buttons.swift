@@ -7,19 +7,36 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, *)
 public extension View {
-    func xPlatformButtonStyleBorderless() -> some View { self.buttonStyle(.borderless) }
-    
-    func xPlatformButtonStyleBorderedProminent(foregroundColor: Color = .white,
-                                               backgroundColor: Color = .blue,
-                                               pressedColor: Color = .secondary,
-                                               padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)) -> some View {
-        
-        #if os(iOS) || os(visionOS)
-        self.buttonStyle(.borderedProminent)
+    @ViewBuilder func xPlatformButtonStyleBorderless() -> some View {
+        #if os(iOS) || os(macOS) || os(visionOS)
+        buttonStyle(.borderless)
         #else
-        self.buttonStyle(macOSButtonStyle(foregroundColor: foregroundColor, backgroundColor: backgroundColor, pressedColor: pressedColor, padding: padding))
+        if #available(tvOS 17.0, *) {
+            buttonStyle(.borderless)
+        } else {
+            buttonStyle(.plain)
+        }
+        #endif
+    }
+
+    func xPlatformButtonStyleBorderedProminent(
+        foregroundColor: Color = .white,
+        backgroundColor: Color = .blue,
+        pressedColor: Color = .secondary,
+        padding: EdgeInsets = EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+    ) -> some View {
+        #if os(iOS) || os(visionOS) || os(tvOS)
+        buttonStyle(.borderedProminent)
+        #else
+        buttonStyle(
+            macOSButtonStyle(
+                foregroundColor: foregroundColor,
+                backgroundColor: backgroundColor,
+                pressedColor: pressedColor,
+                padding: padding
+            )
+        )
         #endif
     }
 }

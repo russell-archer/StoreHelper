@@ -51,7 +51,7 @@ public struct ConsumableView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
-                .onTapGesture { productInfoCompletion(productId) }
+                .xPlatformOnTapGesture { productInfoCompletion(productId) }
             
             if count == 0 {
                 
@@ -61,7 +61,7 @@ public struct ConsumableView: View {
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(25)
                     .contentShape(Rectangle())
-                    .onTapGesture { productInfoCompletion(productId) }
+                    .xPlatformOnTapGesture { productInfoCompletion(productId) }
                 
             } else {
                 
@@ -72,13 +72,13 @@ public struct ConsumableView: View {
                     .cornerRadius(25)
                     .overlay(ConsumableBadgeView(count: $count))
                     .contentShape(Rectangle())
-                    .onTapGesture { productInfoCompletion(productId) }
+                    .xPlatformOnTapGesture { productInfoCompletion(productId) }
             }
             
             PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price)
 
             if purchaseState == .purchased {
-                #if os(iOS) || os(visionOS)
+                #if os(iOS) || os(tvOS) || os(visionOS)
                 PurchaseInfoView(showRefundSheet: .constant(false), refundRequestTransactionId: .constant(UInt64.min), productId: productId)
                 #else
                 PurchaseInfoView(productId: productId)
