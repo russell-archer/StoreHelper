@@ -16,6 +16,8 @@
 ---
 
 # Recent Major Changes
+- 2 April, 2024
+    - Basic support for tvOS added by Hengyu (thank you!)
 - 15 March, 2024
     - Reorganization of documentation to support DocC
 - 8 March, 2024
@@ -83,7 +85,7 @@
 ## Overview of StoreHelper
 
 `StoreHelper` is a Swift Package Manager (SPM) package that enables developers using **Xcode 13 - 15** to easily add in-app purchase 
-support to **iOS 15 - 17** and **macOS 12 - 14** SwiftUI apps.
+support to **iOS 15 - 17** and **macOS 12 - 14** SwiftUI apps. The package also provides basic support for visionOS and tvOS.
 
 `StoreHelper` is used to provide in-app purchase support in **Writerly** (iOS/macOS), which is available on the [App Store](https://apps.apple.com/app/writerly/id1143101981?ls=1).
 

@@ -45,7 +45,7 @@ public struct SheetBarView: View {
                                 .foregroundColor(.black)
                             .padding(insets)}
                     }
-                    .onTapGesture { withAnimation { showSheet.toggle() }}
+                    .xPlatformOnTapGesture { withAnimation { showSheet.toggle() }}
                     Spacer()
                 }
             }

@@ -18,12 +18,12 @@ public struct ProductListView: View {
     private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
     private var productInfoCompletion: ((ProductId) -> Void)
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     @Binding var showRefundSheet: Bool
     @Binding var refundRequestTransactionId: UInt64
     #endif
     
-    #if os(iOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     public init(showRefundSheet: Binding<Bool>,
                 refundRequestTransactionId: Binding<UInt64>,
                 signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil,
@@ -47,7 +47,7 @@ public struct ProductListView: View {
         
         if storeHelper.hasProducts {
             if storeHelper.hasNonConsumableProducts, let nonConsumables = storeHelper.nonConsumableProducts {
-                #if os(iOS) || os(visionOS)
+                #if os(iOS) || os(tvOS) || os(visionOS)
                 ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
                 #else
                 ProductListViewRow(products: nonConsumables, headerText: "Products", productInfoCompletion: productInfoCompletion)
@@ -55,7 +55,7 @@ public struct ProductListView: View {
             }
             
             if storeHelper.hasConsumableProducts, let consumables = storeHelper.consumableProducts {
-                #if os(iOS) || os(visionOS)
+                #if os(iOS) || os(tvOS) || os(visionOS)
                 ProductListViewRow(showRefundSheet: $showRefundSheet, refundRequestTransactionId: $refundRequestTransactionId, products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
                 #else
                 ProductListViewRow(products: consumables, headerText: "VIP Services", productInfoCompletion: productInfoCompletion)
