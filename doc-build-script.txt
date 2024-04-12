@@ -1,4 +1,6 @@
-This script is used to builds the DocC documentation in a static HTML format suitable for hosting on GitHub.
+This script is used to build the DocC documentation in a static HTML format suitable for hosting on
+GitHub Pages at https://russell-archer.github.io/StoreHelper/documentation/storehelper/.
+
 Run the script from the root of the StoreHelper project directory.
 
 swift package --allow-writing-to-directory docs generate-documentation --target StoreHelper --disable-indexing --transform-for-static-hosting --hosting-base-path StoreHelper --output-path docs
