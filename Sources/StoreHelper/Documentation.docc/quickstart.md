@@ -28,6 +28,7 @@ The Quick Start guide shows how to use `StoreHelper` to create a bare-bones Swif
 		- <doc:#Create-ProductView>
 		- <doc:#Modify-ContentView>
 		- <doc:#Create-the-ProductInfo-View>
+        	- <doc:#Create-SubscriptionView>
 		- <doc:#Create-SimplePurchaseView>
 		- <doc:#Add-Product-Images>
 		- <doc:#Add-Product-Configuration-Files>
@@ -85,7 +86,18 @@ See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an 
 ![](StoreHelperDemo110.png)
 
 ## Create the App struct
+- Create a folder below the main project root named **Shared**
+- Move the file `StoreHelperDemoApp.swift` into the Shared folder
 - Open `StoreHelperDemoApp.swift` and replace the existing code with the following:
+
+> Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
+> - Delete **ContentView.swift** and **Your-Project-NameApp.swift** from your project and move them to the trash
+> - Select any file in the **StoreHelper > Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
+> - In Finder, select all the files in the **Code** directory and drag them into into your project's main folder in Xcode. Select **Copy items if needed** when prompted
+> - Rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StoreHelperDemoApp` to `Your-Project-NameApp`
+> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
+> - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
+> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
 
 ```swift
 import SwiftUI
@@ -94,7 +106,7 @@ import StoreHelper
 @available(iOS 15.0, macOS 12.0, *)
 @main
 struct StoreHelperDemoApp: App {
-    @StateObject var storeHelper = StoreHelper()
+    var storeHelper = StoreHelper()
     
     var body: some Scene {
         WindowGroup {
@@ -113,18 +125,8 @@ struct StoreHelperDemoApp: App {
 - Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class and add it to the SwiftUI view hierarchy using the `.environment()` modifier 
 - We also call `storeHelper.start()` to begin listening for App Store transactions. This should be done as soon as possible during app start-up
 
-> Alternatively, you can copy everything required for the **StoreHelperDemo** app from the **StoreHelper > Samples** folder:
-> - Delete **ContentView.swift** and **StoreHelperDemoApp.swift** from your project and move them to the trash
-> - Select any file in the **StoreHelper > Samples > Code** folder in Xcode, right-click it and select **Show in Finder**
-> - In Finder, select all the files in the **Code** directory and drag them into into your project's main folder in Xcode. Select **Copy items if needed** when prompted
-> - If you've not named your project "**StoreHelperDemo**", rename **StoreHelperDemoApp.swift** to **Your-Project-NameApp.swift**, also rename the struct from `StoreHelperDemoApp` to `Your-Project-NameApp`
-> - In Finder, select all files (except the readme.md) in the **Configuration** directory and drag them into your project's main folder in Xcode. Select **Copy items if needed** when prompted
-> - Rename **SampleProducts.plist** to **Products.plist** and **SampleProducts.storekit** to **Products.storekit**
-> - In Finder, select all images in the **Images** directory and drag them into your project's **Asset Catalog** in Xcode
-
-### Create MainView
-- Create a folder named **"Shared"**, then add a new SwiftUI `View` in the new folder named `MainView`
-- Replace the existing code with the following:
+## Create MainView
+- Create a new SwiftUI `View` in the **Shared** folder named `MainView` and replace the existing code with the following:
 
 ```swift
 import SwiftUI
@@ -135,7 +137,7 @@ struct MainView: View {
     let smallFlowersId = "com.rarcher.nonconsumable.flowers.small"
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 NavigationLink(destination: ContentView()) { Text("Product List").font(.largeTitle).padding()}
                 NavigationLink(destination: ProductView(productId: largeFlowersId)) { Text("Large Flowers").font(.largeTitle).padding()}
@@ -199,7 +201,7 @@ struct ProductView: View {
             let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
             purchaseState = isPurchased ? .purchased : .notPurchased
         }
-        .onChange(of: storeHelper.purchasedProducts) { _ in
+        .onChange(of: storeHelper.purchasedProducts) {
             Task.init {
                 let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
                 purchaseState = isPurchased ? .purchased : .notPurchased
@@ -212,6 +214,7 @@ struct ProductView: View {
 - Notice that when the `VStack` appears we asynchronously call `StoreHelper.isPurchased(productId:)` to see if the user has purchased the product 
 
 ### Modify ContentView
+- Move `ContentView.swift` into the **Shared** folder
 - Open `ContentView.swift` and replace the existing code with the following:
 
 ```swift
@@ -239,6 +242,7 @@ struct ContentView: View {
         }
     }
 }
+
 ```
 
 - The above creates the `StoreHelper Products` view. This view displays a list of your configured products (we haven't configured them yet), allow the user to purchase products and see detailed information about purchases
@@ -316,7 +320,109 @@ struct ProductInfoDefault: View {
 
 - `ProductInfo` uses `StoreHelper.product(from:)` to retrieve a `StoreKit2 Product` struct, which gives localized information about the product
 
-### Create SimplePurchaseView
+### Create SubscriptionView
+- Create a new SwiftUI view in the **Shared** folder named `SubscriptionView.swift`. Replace the existing code with the following:
+
+```swift
+import SwiftUI
+import StoreHelper
+
+@available(iOS 15.0, macOS 12.0, *)
+struct SubscriptionView: View {
+    @EnvironmentObject var storeHelper: StoreHelper
+    @State private var productIds: [ProductId]?
+    
+    var body: some View {
+        VStack {
+            if let pids = productIds {
+                ForEach(pids, id: \.self) { pid in
+                    SubscriptionRow(productId: pid)
+                    Divider()
+                }
+                
+                Spacer()
+            } else {
+                if storeHelper.isRefreshingProducts {
+                    ProgressView().padding()
+                    Text("Getting subscription products...").font(.title).foregroundColor(.blue)
+                } else {
+                    Text("You don't have any subscription products").font(.title).foregroundColor(.red)
+                }
+            }
+        }
+        .padding()
+        .onAppear { productIds = storeHelper.subscriptionProductIds }
+        .onChange(of: storeHelper.products) {
+            productIds = storeHelper.subscriptionProductIds
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+struct SubscriptionRow: View {
+    @EnvironmentObject var storeHelper: StoreHelper
+    @State private var subscriptionState: PurchaseState = .unknown
+    @State private var isSubscribed = false
+    @State private var detailedSubscriptionInfo: ExtendedSubscriptionInfo?
+    var productId: ProductId
+    
+    var body: some View {
+        VStack {
+            HStack {
+                if subscriptionState == .unknown {
+                    HStack {
+                        ProgressView().padding()
+                        Text(productId).foregroundColor(.orange).padding()
+                    }
+                } else {
+                    
+                    Text("You are \(isSubscribed ? "" : "not") subscribed to \(productId)")
+                        .foregroundColor(isSubscribed ? .green : .red)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+            }
+        }
+        .task {
+            isSubscribed = await subscribed(to: productId)
+            if isSubscribed {
+                subscriptionState = .purchased
+                if let subscriptionInfo = await getSubscriptionInfo() {
+                    detailedSubscriptionInfo = await getDetailedSubscriptionInfo(for: subscriptionInfo)
+                }
+            } else {
+                subscriptionState = .notPurchased
+            }
+        }
+    }
+    
+    private func subscribed(to productId: ProductId) async -> Bool {
+        let currentlySubscribed = try? await storeHelper.isSubscribed(productId: productId)
+        return currentlySubscribed ?? false
+    }
+    
+    private func getSubscriptionInfo() async -> SubscriptionInfo? {
+        var subInfo: SubscriptionInfo?
+        
+        // Get info on all subscription groups (this demo only has one group called "VIP")
+        let subscriptionGroupInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()
+        if let vipGroup = subscriptionGroupInfo?.first, let product = vipGroup.product {
+            // Get subscription info for the subscribed product
+            subInfo = storeHelper.subscriptionHelper.subscriptionInformation(for: product, in: subscriptionGroupInfo)
+        }
+        
+        return subInfo
+    }
+    
+    private func getDetailedSubscriptionInfo(for subInfo: SubscriptionInfo) async -> ExtendedSubscriptionInfo? {
+        let viewModel = SubscriptionInfoViewModel(storeHelper: storeHelper, subscriptionInfo: subInfo)
+        return await viewModel.extendedSubscriptionInfo()
+    }
+}
+
+```
+
+## Create SimplePurchaseView
 - Create a new SwiftUI view in the **Shared** folder named `SimplePurchaseView.swift`. Replace the existing code with the following:
 
 ```swift
@@ -375,7 +481,7 @@ struct SimplePurchaseView: View {
             let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
             purchaseState = isPurchased ? .purchased : .notPurchased
         }
-        .onChange(of: storeHelper.purchasedProducts) { _ in
+        .onChange(of: storeHelper.purchasedProducts) {
             Task.init {
                 let isPurchased = (try? await storeHelper.isPurchased(productId: productId)) ?? false
                 purchaseState = isPurchased ? .purchased : .notPurchased
