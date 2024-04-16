@@ -13,7 +13,7 @@ Implementing and testing in-App purchases with `StoreKit2` and `StoreHelper` in 
 
 This document describes how to implement and test in-app purchases with **SwiftUI**, `StoreHelper`, `StoreKit2`, **Xcode 13 - 15**, **iOS 15 - 17** and **macOS 12 - 14**.
 
-- See [StoreHelper Quick Start](https://github.com/russell-archer/StoreHelper/blob/main/Documentation/quickstart.md) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS/macOS SwiftUI** app
+- See [StoreHelper Quick Start](https://russell-archer.github.io/StoreHelper/documentation/storehelper/quickstart) for a short tutorial on using `StoreHelper` to add in-app purchase support to your **iOS/macOS SwiftUI** app
 - See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example SwiftUI project using StoreHelper with Xcode and **iOS 15 - 17**
 - See [In-App Purchases with Xcode 12 and iOS 14](https://github.com/russell-archer/IAPDemo) for details of working with `StoreKit1` in **iOS 14**
 - See [StoreHelper Demo with UIKit](https://github.com/russell-archer/StoreHelperDemoUIKit) for an experimental demo project showing how to use `StoreHelper` in a UIKit project
@@ -21,6 +21,12 @@ This document describes how to implement and test in-app purchases with **SwiftU
 ---
 
 ## Recent Major Changes
+- 2 April, 2024
+    - Basic support for tvOS added by Hengyu (thank you!)
+- 15 March, 2024
+    - Reorganization of documentation to support DocC
+- 8 March, 2024
+    - Added Privacy Policy Manifest
 - 24 January, 2024
     - Added support for visionOS
 - 23 June, 2023
@@ -138,14 +144,14 @@ The latest version of `StoreHelper` is always available [on GitHub](https://gith
 ---
 
 ## References
-- https://developer.apple.com/in-app-purchase/
-- https://developer.apple.com/documentation/storekit/in-app_purchase
-- https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase
-- https://developer.apple.com/documentation/storekit/in-app_purchase/implementing_a_store_in_your_app_using_the_storekit_api
-- https://developer.apple.com/design/human-interface-guidelines/in-app-purchase/overview/introduction/
-- https://developer.apple.com/videos/play/wwdc2021/10175 
-- https://developer.apple.com/videos/play/wwdc2021/10114/
-- https://developer.apple.com/support/universal-purchase/
+- [Overview of in-app purchases](https://developer.apple.com/in-app-purchase/)
+- [StoreKit documentation](https://developer.apple.com/documentation/storekit/in-app_purchase)
+- [How to choose the right version of StoreKit](https://developer.apple.com/documentation/storekit/choosing_a_storekit_api_for_in-app_purchase)
+- [StoreKit sample code](https://developer.apple.com/documentation/storekit/in-app_purchase/implementing_a_store_in_your_app_using_the_storekit_api)
+- [HIG guidelines for in-app purchases](https://developer.apple.com/design/human-interface-guidelines/in-app-purchase/overview/introduction/)
+- [WWDC: Support customers and handle refunds](https://developer.apple.com/videos/play/wwdc2021/10175) 
+- [WWDC: Meet StoreKit 2](https://developer.apple.com/videos/play/wwdc2021/10114/)
+- [Supporting universal purchase](https://developer.apple.com/support/universal-purchase/)
 
 ---
 
@@ -376,7 +382,7 @@ These are the steps required to request localized product information from the A
 public class StoreHelper: ObservableObject { ... }
 ```
 
-- An instance of `StoreHelper` is stored in a `@StateObject` property in your demo project's app object `StoreHelperDemoApp`, and added to the SwiftUI view environment :
+- An instance of `StoreHelper` is stored in a property in your demo project's app object `StoreHelperDemoApp`, and added to the SwiftUI view environment:
 
 ```swift
 @main
@@ -395,7 +401,8 @@ struct StoreHelperDemoApp: App {
 }
 ```
 
-- When an instance of `StoreHelper` is initialized its `init()` method reads the list of `ProductId` from the `Products.plist` file and saves it in the `productIds` property. We use an Apple package named `swift-collections` (https://www.swift.org/blog/swift-collections/) to provide an `OrderedSet` type (https://github.com/apple/swift-collections/blob/main/Documentation/OrderedSet.md) for the set of product ids:
+- When an instance of `StoreHelper` is initialized its `init()` method reads the list of `ProductId` from the `Products.plist` file and saves it in the `productIds` property
+- We use an Apple package named [swift-collections](https://www.swift.org/blog/swift-collections/) to provide an [OrderedSet](https://github.com/apple/swift-collections/blob/main/Documentation/OrderedSet.md) for the set of product ids:
 
 ```swift
 /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
@@ -403,7 +410,7 @@ struct StoreHelperDemoApp: App {
 public private(set) var productIds: OrderedSet<ProductId>?
 ```
 
--  `StoreHelper` then requests localized product information from the App Store:
+- A call is made to `StoreHelper.start()` to request localized product information from the App Store:
 
 ```swift
 /// Request localized product info from the App Store for a set of ProductId.
@@ -412,13 +419,20 @@ public private(set) var productIds: OrderedSet<ProductId>?
 /// - Parameter productIds: The product ids that you want localized information for.
 /// - Returns: Returns an array of `Product`, or nil if no product information is returned by the App Store.
 @MainActor public func requestProductsFromAppStore(productIds: OrderedSet<ProductId>) async -> [Product]? {
-	guard let localizedProducts = try? await Product.products(for: productIds) else {
-		isAppStoreAvailable = false
-		return nil
-	}
-	
-	isAppStoreAvailable = true
-	return localizedProducts
+    defer { isRefreshingProducts = false }
+    
+    StoreLog.event(.requestProductsStarted)
+    isAppStoreAvailable = false
+    isRefreshingProducts = true
+    
+    guard let localizedProducts = try? await Product.products(for: productIds) else {
+        StoreLog.event(.requestProductsFailure)
+        return nil
+    }
+    
+    isAppStoreAvailable = true
+    StoreLog.event(.requestProductsSuccess)
+    return localizedProducts
 }
 ```
 
@@ -593,7 +607,7 @@ private var purchaseState: PurchaseState = .unknown
 /// - Parameter product: The `Product` to purchase.
 /// - Returns: Returns a tuple consisting of a transaction object that represents the purchase and a `PurchaseState`
 /// describing the state of the purchase.
-@MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  { ... }
+@MainActor public func purchase(_ product: Product, options: Set<Product.PurchaseOption> = []) async throws -> (transaction: Transaction?, purchaseState: PurchaseState) { ... }
 ```
 
 - A **task handle** and associated `handleTransactions()` method that enables us to listen for App Store transactions. These transactions are things like resolution of "ask-to-buy" (pending) purchases, refunds, restoring purchases, etc.:
@@ -614,7 +628,7 @@ Using `StoreHelper` to make a purchase is pretty simple:
 
 1. The user taps the `PriceView` button, which calls `PriceViewModel.purchase(product:)`, passing the `Product` to purchase:
 2. `PriceViewModel` calls `purchase(_:)` in `StoreHelper`, passing the `Product` to purchase
-3. `StoreHelper` asynchronously calls `StoreKit.purchase(_:)` and awaits the result(error handling, logging and non-essential code removed for brevity):
+3. `StoreHelper` asynchronously calls `StoreKit.purchase(_:)` and awaits the result (error handling, logging and non-essential code removed for brevity):
 
 ```swift
 @MainActor public func purchase(_ product: Product) async throws -> (transaction: Transaction?, purchaseState: PurchaseState)  {	
@@ -790,7 +804,7 @@ The main differences between `StoreKit1` and `StoreKit2` receipts are:
 	- The receipt is a **signed** and **encrypted file**
 	- Stored in the app's main bundle
 	- The location of the receipt is given by `Bundle.main.appStoreReceiptURL`
-	- See https://github.com/russell-archer/IAPHelper for details on reading and validating the receipt with `StoreKit1`
+	- See [IAPHelper](https://github.com/russell-archer/IAPHelper) for details on reading and validating the receipt with `StoreKit1`
 
 - `StoreKit2`
 	- The receipt is a **SQLite database** (`receipts.db`)
@@ -865,7 +879,7 @@ However, purchasing consumables (and checking to see if a consumable has been pr
 > Transactions for consumable products ARE NOT STORED IN THE RECEIPT!
 
 The rationale for this from Apple's perspective is that consumables are "ephemeral". 
-To quote Apple's documentation (https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements) for `Transaction.currentEntitlement(for:)`:
+To quote [Apple's documentation](https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements) for `Transaction.currentEntitlement(for:)`:
 
 > The current entitlements sequence emits the latest transaction for each product the user is currently entitled to, specifically: 
 > - A transaction for each consumable in-app purchase that you have not finished by calling `finish()`
@@ -1034,11 +1048,10 @@ Notice how we adopt the following naming convention for our subscription product
 com.{developer}.subscription.{subscriptionGroupName}.{productName}
 ```
 
-> [!note]
 > As of version 2.3 of `StoreHelper` you may either adopt the `com.{developer}.subscription.{subscriptionGroupName}.{productName}` naming
 > convention, or use the expanded format for `Products.plist` which provides a separate `Subscriptions` section.
 >  
-> See the Samples/Configuration/SampleProducts.plist file for details and examples.
+> See the **Samples/Configuration/SampleProducts.plist** file for details and examples.
 
 The **order** in which products are defined in both `Products.storekit` and `Products.plist` is important (and this is why we use an `OrderedSet<ProductId>` in `StoreHelper`). As we'll discuss shortly, we need to be able to distinguish the service level of a product *within* a subscription group. For this reason, the product with the highest service level is defined at the top of the group, with products of decreasing service level placed below it.
 
@@ -1505,13 +1518,11 @@ struct SubscriptionInfoSheet: View {
     
     var body: some View {
         VStack {
-            
-			:
-			:
-                    
-			Button(action: {
-				withAnimation { showManageSubscriptionsSheet.toggle()}
-			}) { Label("Manage Subscriptions", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)}
+		    :
+		    : 
+		    Button(action: {
+		    	withAnimation { showManageSubscriptionsSheet.toggle()}
+		    }) { Label("Manage Subscriptions", systemImage: "creditcard.circle")}.buttonStyle(.borderedProminent)}
         }
         #if os(iOS)
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptionsSheet)
@@ -1636,3 +1647,8 @@ public class AppStoreHelper: NSObject, SKPaymentTransactionObserver {
     }
 }
 ```
+
+## Working with StoreKit's StoreView, ProductView, and SubscriptionStoreView
+Xcode 15 introduced three new in-app purchase-related views: StoreView, ProductView, and SubscriptionStoreView.
+
+These views may easily be used in conjunction with `StoreHelper`. See [StoreHelperDemo](https://github.com/russell-archer/StoreHelperDemo) for an example.

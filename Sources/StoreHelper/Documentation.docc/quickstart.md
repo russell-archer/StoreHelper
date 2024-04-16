@@ -106,7 +106,7 @@ import StoreHelper
 @available(iOS 15.0, macOS 12.0, *)
 @main
 struct StoreHelperDemoApp: App {
-    var storeHelper = StoreHelper()
+    @StateObject var storeHelper = StoreHelper()
     
     var body: some Scene {
         WindowGroup {
@@ -122,7 +122,7 @@ struct StoreHelperDemoApp: App {
 }
 ```
 
-- Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class and add it to the SwiftUI view hierarchy using the `.environment()` modifier 
+- Notice how we `import StoreHelper`, create an instance of the `StoreHelper` class and add it to the SwiftUI view hierarchy using the `.environmentObject()` modifier 
 - We also call `storeHelper.start()` to begin listening for App Store transactions. This should be done as soon as possible during app start-up
 
 ## Create MainView
