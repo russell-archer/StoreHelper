@@ -71,7 +71,7 @@ public struct SubscriptionView: View {
             Divider()
         }
         .task { await purchaseState(for: productId)}
-        .onChange(of: storeHelper.purchasedProducts) { _ in
+        .onChange(of: storeHelper.purchasedProducts) {
             Task.init { await purchaseState(for: productId) }
         }
     }

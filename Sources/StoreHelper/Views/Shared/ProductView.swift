@@ -96,7 +96,7 @@ public struct ProductView: View {
             Divider()
         }
         .task { await purchaseState(for: productId)}
-        .onChange(of: storeHelper.purchasedProducts) { _ in
+        .onChange(of: storeHelper.purchasedProducts) {
             Task.init {
                 await purchaseState(for: productId)
                 #if canImport(WidgetKit)

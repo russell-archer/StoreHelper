@@ -51,7 +51,7 @@ public struct SubscriptionListViewRow: View {
             }
         }
         .task { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
-        .onChange(of: storeHelper.purchasedProducts) { _ in
+        .onChange(of: storeHelper.purchasedProducts) {
             Task.init { subscriptionInfo = await storeHelper.subscriptionHelper.groupSubscriptionInfo()}
         }
     }

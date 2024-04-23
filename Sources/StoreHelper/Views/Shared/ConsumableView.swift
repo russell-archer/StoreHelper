@@ -94,7 +94,7 @@ public struct ConsumableView: View {
             await purchaseState(for: productId)
             count = KeychainHelper.count(for: productId)
         }
-        .onChange(of: storeHelper.purchasedProducts) { _ in
+        .onChange(of: storeHelper.purchasedProducts) {
             Task.init {
                 await purchaseState(for: productId)
                 count = KeychainHelper.count(for: productId)
