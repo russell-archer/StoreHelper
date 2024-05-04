@@ -89,8 +89,8 @@ public class StoreHelper: ObservableObject {
     public private(set) var isAppStoreAvailable = false
     
     /// Subscription-related helper methods.
-    public var subscriptionHelper: SubscriptionHelper!
-    
+    public private(set) lazy var subscriptionHelper: SubscriptionHelper = .init(storeHelper: self)
+
     /// True if StoreHelper has been initialized correctly by calling start().
     public var hasStarted: Bool { transactionListener != nil && isAppStoreAvailable }
 
@@ -211,9 +211,6 @@ public class StoreHelper: ObservableObject {
         
         // Add a helper for StoreKit1-based direct purchases from the app store (IAP promotions)
         appStoreHelper = AppStoreHelper(storeHelper: self)
-        
-        // Initialize our subscription helper
-        subscriptionHelper = SubscriptionHelper(storeHelper: self)
         
         // Read our list of product ids
         productIds = storeConfiguration.readConfigFile()
