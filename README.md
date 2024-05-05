@@ -17,6 +17,8 @@
 ---
 
 # Recent Major Changes
+- 5 May, 2024
+    - Simplification of subscription display price logic to use Apple's subscriptionPeriodFormatStyle, which also supports localization. Added by Hengyu (thank you!)
 - 2 April, 2024
     - Basic support for tvOS added by Hengyu (thank you!)
 - 15 March, 2024
