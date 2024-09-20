@@ -18,10 +18,11 @@
 
 # New `SKHelper` package now available for Xcode 16
 
-`SKHelper` is a new, lightweight, and an easier-to-use refactoring of the `StoreHelper` package. It makes use of Apple's StoreKit views 
-to provide a standard and easily customizable UI.
+`SKHelper` is a new (September, 2024), lightweight Swift package that enables developers to easily add in-app purchase and subscription functionaility to their SwiftUI-based apps. 
 
-Check out the [`SKHelper` repo](https://github.com/russell-archer/SKHelper/) and [Quick Start tutorial](https://russell-archer.github.io/SKHelper/tutorials/quickstart).
+Designed to be an easier-to-use refactoring of **StoreHelper**, it makes use of Apple's **StoreKit Views** to provide a standard and easily customizable UI.
+
+Check out the `SKHelper` [Repo](https://github.com/russell-archer/SKHelper/) and [Quick Start Tutorial](https://russell-archer.github.io/SKHelper/tutorials/quickstart) to get a fast overview of how things work.
 
 ---
 
