@@ -18,7 +18,7 @@
 
 # New `SKHelper` package now available for Xcode 16
 
-![](https://russell-archer.github.io/SKHelper/images/SKHelper/skhelper-logo.png)
+![https://russell-archer.github.io/SKHelper/images/SKHelper/skhelper-logo.png](https://github.com/russell-archer/SKHelper/)
 
 `SKHelper` is a new (September, 2024), lightweight Swift package that enables developers to easily add in-app purchase and subscription functionaility to their SwiftUI-based apps. 
 
