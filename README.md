@@ -16,6 +16,15 @@
 
 ---
 
+# New `SKHelper` package now available for Xcode 16
+
+`SKHelper` is a new, lightweight, and an easier-to-use refactoring of the `StoreHelper` package. It makes use of Apple's StoreKit views 
+to provide a standard and easily customizable UI.
+
+Check out the [`SKHelper` repo](https://github.com/russell-archer/SKHelper/) and [Quick Start tutorial](https://russell-archer.github.io/SKHelper/tutorials/quickstart).
+
+---
+
 # Recent Major Changes
 - 5 May, 2024
     - Simplification of subscription display price logic to use Apple's subscriptionPeriodFormatStyle, which also supports localization. Added by Hengyu (thank you!)
