@@ -6,7 +6,7 @@
 //
 
 import StoreKit
-import Collections
+import OrderedCollections
 
 public typealias ProductId = String
 public typealias ShouldAddStorePaymentHandler = (_ payment: SKPayment, _ product: SKProduct) -> Bool
