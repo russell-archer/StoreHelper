@@ -79,6 +79,9 @@ public class StoreHelper: ObservableObject {
     ///
     /// As a workaround, we maintain `transactionUpdateCache` to keep track of subscription renewals that happen when the app's
     /// not running.
+    ///
+    /// ** This is fixed in Xcode 16 **
+    ///
     public private(set) var transactionUpdateCache = [TransactionUpdate]()
         
     /// `OrderedSet` of `ProductId` that have been read from the Product.plist configuration file. The order in which
@@ -89,7 +92,7 @@ public class StoreHelper: ObservableObject {
     public private(set) var isAppStoreAvailable = false
     
     /// Subscription-related helper methods.
-    public private(set) lazy var subscriptionHelper: SubscriptionHelper = .init(storeHelper: self)
+    public private(set) lazy var subscriptionHelper: SubscriptionHelper = SubscriptionHelper(storeHelper: self)
 
     /// True if StoreHelper has been initialized correctly by calling start().
     public var hasStarted: Bool { transactionListener != nil && isAppStoreAvailable }

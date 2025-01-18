@@ -24,11 +24,11 @@ import os.log
 /// unified logging system know it's OK to log these strings through the use of the "%{public}s"
 /// keyword. However, we don't know what the event(message:) function will be used to display,
 /// so its logs will be redacted.
+///
+/// Swift6-Concurrent changes:
+/// - Removed public static logIsPurchasedEvents property. IsPurchased events are no longer logged
 @available(iOS 15.0, macOS 12.0, *)
 public struct StoreLog {
-    /// Set to `true` if you want to log detailed events each time a product's isPurchased state is checked.
-    public static var logIsPurchasedEvents = false
-    
     private static let storeLog = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "STORE")
     
     /// Logs a StoreNotification. Note that the text (shortDescription) of the log entry will be
@@ -100,42 +100,36 @@ public struct StoreLog {
     
     private static func logEvent(_ event: StoreNotification) {
         #if DEBUG
-        var doLog = true
-        if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { print(event.shortDescription()) }
+        if event.isNotificationPurchaseState() { return }
+        print(event.shortDescription())
         #else
-        var doLog = true
-        if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { os_log("%{public}s", log: storeLog, type: .default, event.shortDescription()) }
+        if event.isNotificationPurchaseState() { return }
+        os_log("%{public}s", log: storeLog, type: .default, event.shortDescription())
         #endif
     }
     
     private static func logEvent(_ event: StoreNotification, productId: ProductId, transactionId: String? = nil) {
         #if DEBUG
-        var doLog = true
-        if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { print("\(event.shortDescription()) for product \(productId) \(transactionId == nil ? "" : "with transaction id \(transactionId!)")") }
+        if event.isNotificationPurchaseState() { return }
+        print("\(event.shortDescription()) for product \(productId) \(transactionId == nil ? "" : "with transaction id \(transactionId!)")")
         #else
-        var doLog = true
-        if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { os_log("%{public}s for product %{public}s", log: storeLog, type: .default, event.shortDescription(), productId) }
+        if event.isNotificationPurchaseState() { return }
+        os_log("%{public}s for product %{public}s", log: storeLog, type: .default, event.shortDescription(), productId)
         #endif
     }
     
     private static func logEvent(_ event: StoreNotification, productId: ProductId, webOrderLineItemId: String?, transactionId: String? = nil) {
         #if DEBUG
-        var doLog = true
-        if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { print("\(event.shortDescription()) for product \(productId) with webOrderLineItemId \(webOrderLineItemId ?? "none") \(transactionId == nil ? "" : "and transaction id \(transactionId!)")") }
+        if event.isNotificationPurchaseState() { return }
+        print("\(event.shortDescription()) for product \(productId) with webOrderLineItemId \(webOrderLineItemId ?? "none") \(transactionId == nil ? "" : "and transaction id \(transactionId!)")")
         #else
-        var doLog = true
-        if event.isNotificationPurchaseState(), !logIsPurchasedEvents { doLog = false }
-        if doLog { os_log("%{public}s for product %{public}s with webOrderLineItemId %{public}s",
-                          log: storeLog,
-                          type: .default,
-                          event.shortDescription(),
-                          productId,
-                          webOrderLineItemId ?? "none") }
+        if event.isNotificationPurchaseState() { return }
+        os_log("%{public}s for product %{public}s with webOrderLineItemId %{public}s",
+               log: storeLog,
+               type: .default,
+               event.shortDescription(),
+               productId,
+               webOrderLineItemId ?? "none")
         #endif
     }
 }
