@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-extension StoreKitError: Equatable {
+extension StoreKitError: @retroactive Equatable {
     public static func == (lhs: StoreKitError, rhs: StoreKitError) -> Bool {
         switch (lhs, rhs) {
         case (.unknown, .unknown): return true
