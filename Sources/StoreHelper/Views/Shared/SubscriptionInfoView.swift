@@ -17,9 +17,9 @@ public struct SubscriptionInfoView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var subscriptionInfoText = "Subscribed"
     @State private var showSubscriptionInfoSheet = false
-    private var subscriptionInfo: SubscriptionInfo  // Set by parents
+    private var subscriptionInfo: SubInfo  // Set by parents
     
-    public init(subscriptionInfo: SubscriptionInfo) {
+    public init(subscriptionInfo: SubInfo) {
         self.subscriptionInfo = subscriptionInfo
     }
     

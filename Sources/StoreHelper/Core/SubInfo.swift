@@ -1,5 +1,5 @@
 //
-//  SubscriptionInfo.swift
+//  SubInfo.swift
 //  StoreHelper
 //
 //  Created by Russell Archer on 07/08/2021.
@@ -8,8 +8,9 @@
 import StoreKit
 
 /// Information about the highest service level product in a subscription group a user is subscribed to.
+/// This struct has been renamed as `SubInfo` from `SubscriptionInfo` to avoid a name collision with a type alias introduced is iOS 18.4.
 @available(iOS 15.0, macOS 12.0, *)
-public struct SubscriptionInfo: Hashable {
+public struct SubInfo: Hashable {
     public init(product: Product? = nil,
                 subscriptionGroup: String? = nil,
                 latestVerifiedTransaction: Transaction? = nil,

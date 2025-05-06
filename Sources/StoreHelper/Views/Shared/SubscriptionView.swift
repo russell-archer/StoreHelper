@@ -20,7 +20,7 @@ public struct SubscriptionView: View {
     private var displayName: String
     private var description: String
     private var price: String
-    private var subscriptionInfo: SubscriptionInfo?  // If non-nil then the product is the highest service level product the user is subscribed to in the subscription group
+    private var subscriptionInfo: SubInfo?  // If non-nil then the product is the highest service level product the user is subscribed to in the subscription group
     private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?
     private var productInfoCompletion: ((ProductId) -> Void)
     
@@ -28,7 +28,7 @@ public struct SubscriptionView: View {
                 displayName: String,
                 description: String,
                 price: String,
-                subscriptionInfo: SubscriptionInfo? = nil,
+                subscriptionInfo: SubInfo? = nil,
                 signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)? = nil,
                 productInfoCompletion: @escaping ((ProductId) -> Void)) {
         

@@ -238,7 +238,7 @@ public struct SubscriptionHelper {
     /// the `product.subscription.subscriptionGroupID` property. Alternatively, use groupName(from:)
     /// to find the subscription group associated with a product. This will allow you to distinguish
     /// products by group and subscription service level.
-    @MainActor public func subscriptionInfo(for subscriptionGroup: String) async -> SubscriptionInfo? {
+    @MainActor public func subscriptionInfo(for subscriptionGroup: String) async -> SubInfo? {
         
         // Get the product ids for all the products in the subscription group.
         // Take the first id and convert it to a Product so we can access the group-common subscription.status array.
@@ -249,7 +249,7 @@ public struct SubscriptionHelper {
               let subscription = product.subscription,
               let statusCollection = try? await subscription.status else { return nil }
         
-        var subscriptionInfo = SubscriptionInfo()
+        var subscriptionInfo = SubInfo()
         var highestServiceLevel: Int = -1
         var highestValueProduct: Product?
         var highestValueTransaction: StoreKit.Transaction?
@@ -302,12 +302,12 @@ public struct SubscriptionHelper {
     /// Gets all the subscription groups from the list of subscription products.
     /// For each group, gets the highest subscription level product.
     /// - Returns: For each subscription group, returns the highest subscription level auto-renewing subscription the user is subscribed to.
-    public func groupSubscriptionInfo() async -> OrderedSet<SubscriptionInfo>? {
-        var subscriptionInfoSet = OrderedSet<SubscriptionInfo>()
+    public func groupSubscriptionInfo() async -> OrderedSet<SubInfo>? {
+        var subscriptionInfoSet = OrderedSet<SubInfo>()
         let subscriptionGroups = groups()
         
         if let groups = subscriptionGroups {
-            subscriptionInfoSet = OrderedSet<SubscriptionInfo>()
+            subscriptionInfoSet = OrderedSet<SubInfo>()
             for group in groups {
                 if let hslp = await subscriptionInfo(for: group) { subscriptionInfoSet.append(hslp) }
             }
@@ -316,12 +316,12 @@ public struct SubscriptionHelper {
         return subscriptionInfoSet
     }
     
-    /// Gets `SubscriptionInfo` for a product.
+    /// Gets `SubInfo` for a product.
     /// - Parameter product: The product.
-    /// - Returns: Returns `SubscriptionInfo` for a product if it is the highest service level product
+    /// - Returns: Returns `SubInfo` for a product if it is the highest service level product
     /// in the group the user is subscribed to. If the user is not subscribed to the product, or it's
     /// not the highest service level product in the group then nil is returned.
-    public func subscriptionInformation(for product: Product, in subscriptionInfo: OrderedSet<SubscriptionInfo>?) -> SubscriptionInfo? {
+    public func subscriptionInformation(for product: Product, in subscriptionInfo: OrderedSet<SubInfo>?) -> SubInfo? {
         if let si = subscriptionInfo {
             for subInfo in si {
                 if let p = subInfo.product, p.id == product.id { return subInfo }

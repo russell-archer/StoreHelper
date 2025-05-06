@@ -72,9 +72,9 @@ public struct ExtendedSubscriptionInfo: Hashable {
 @available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionInfoViewModel {
     @ObservedObject public var storeHelper: StoreHelper
-    public var subscriptionInfo: SubscriptionInfo
+    public var subscriptionInfo: SubInfo
     
-    public init(storeHelper: StoreHelper, subscriptionInfo: SubscriptionInfo) {
+    public init(storeHelper: StoreHelper, subscriptionInfo: SubInfo) {
         self.storeHelper = storeHelper
         self.subscriptionInfo = subscriptionInfo
     }

@@ -17,7 +17,7 @@ import OrderedCollections
 public struct SubscriptionListViewRow: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State private var subscriptionGroups: OrderedSet<String>?
-    @State private var subscriptionInfo: OrderedSet<SubscriptionInfo>?
+    @State private var subscriptionInfo: OrderedSet<SubInfo>?
     private var products: [Product]
     private var headerText: String
     private var signPromotionalOffer: ((ProductId, String) async -> Product.PurchaseOption?)?

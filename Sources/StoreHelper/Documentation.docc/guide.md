@@ -1105,16 +1105,16 @@ For example, this can happen when the user is automatically entitled to one leve
 
 Essentially, we enumerate all the statuses in order to find the subscription product that the user's subscribed to which has the highest service level. That is, we find "the best" subscription product the user's entitled to.
 
-The `StoreHelper.subscriptionInfo(for:)` method performs the required processing and returns a `SubscriptionInfo` struct the summarizes the information we need to display to the user:
+The `StoreHelper.subscriptionInfo(for:)` method performs the required processing and returns a `SubInfo` struct the summarizes the information we need to display to the user:
 
 ![](StoreHelperDemo56.png)
 
-We return the data in a `SubscriptionInfo` object that neatly packages everything required in one easy-to-use `struct`:
+We return the data in a `SubInfo` object that neatly packages everything required in one easy-to-use `struct`:
 
 ```swift
 /// Information about the highest service level product in a subscription group a user 
 /// is subscribed to.
-public struct SubscriptionInfo: Hashable {
+public struct SubInfo: Hashable {
     /// The product.
     var product: Product?
     
@@ -1134,18 +1134,18 @@ public struct SubscriptionInfo: Hashable {
 
 Of course, we could just return the highest `Product.SubscriptionInfo.Status` we find in the subscription group. However, this would mean the caller would have to re-check and unwrap the transaction and renewal information.
 
-The key objects accessible via `SubscriptionInfo` are as follows:
+The key objects accessible via `SubInfo` are as follows:
 
-- `SubscriptionInfo.subscriptionStatus.state`
+- `SubInfo.subscriptionStatus.state`
 An enum that tells you if the subscription is `.subscribed`, `.revoked`, `.expired`, etc.
 
-- `SubscriptionInfo.product.subscription`
+- `SubInfo.product.subscription`
 Provides access to `subscriptionPeriod.unit` and `subscriptionPeriod.value` which enables you to work out how often the subscription renews.
 
-- `SubscriptionInfo.verifiedSubscriptionRenewalInfo`
+- `SubInfo.verifiedSubscriptionRenewalInfo`
 Allows you to see if the subscription will auto-renew, if the current product will be renewed or the user upgraded/downgraded the product so that a different product will be renewed at the end of the current subscription period, the `expirationDate` of subscription, etc.
 
-- `SubscriptionInfo.latestVerifiedTransaction`
+- `SubInfo.latestVerifiedTransaction`
 Tells you if the product has been upgraded, the purchase date, etc. 
 
 `StoreHelper` includes `SubscriptionListViewRow`, `SubscriptionView`, `SubscriptionInfoViewModel`, `SubscriptionInfoView` and `SubscriptionInfoSheet` to manage the display of subscriptions.
