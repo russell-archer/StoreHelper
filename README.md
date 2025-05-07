@@ -16,19 +16,10 @@
 
 ---
 
-# New `SKHelper` package now available for Xcode 16
-
-![](https://russell-archer.github.io/SKHelper/images/SKHelper/skhelper-logo.png)
-
-`SKHelper` is a new (September, 2024), lightweight Swift package that enables developers to easily add in-app purchase and subscription functionaility to their SwiftUI-based apps. 
-
-Designed to be an easier-to-use refactoring of **StoreHelper**, it makes use of Apple's **StoreKit Views** to provide a standard and easily customizable UI.
-
-Check out the `SKHelper` [Repo](https://github.com/russell-archer/SKHelper/) and [Quick Start Tutorial](https://russell-archer.github.io/SKHelper/tutorials/quickstart) to get a fast overview of how things work.
-
----
-
 # Recent Major Changes
+- 6 May, 2025
+    - **Breaking Change**: Renamed the `SubscriptionInfo` struct to `SubInfo` to avoid a name collision with a `SubscriptionInfo` type alias introduced in StoreKit in iOS 18.4
+    - Updated all references, docs and tutorials to the renamed `SubInfo` struct
 - 5 May, 2024
     - Simplification of subscription display price logic to use Apple's subscriptionPeriodFormatStyle, which also supports localization. Added by Hengyu (thank you!)
 - 2 April, 2024
@@ -95,6 +86,16 @@ Check out the `SKHelper` [Repo](https://github.com/russell-archer/SKHelper/) and
 - 20 December, 2021
 	- Refactored throughout so that this non-private version of `StoreHelper` is in-sync with private `StoreHelper` code used in an app released to the App Store
     
+---
+
+# New `SKHelper` package now available for Xcode 16
+
+`SKHelper` is a new (September, 2024), lightweight Swift package that enables developers to easily add in-app purchase and subscription functionaility to their SwiftUI-based apps. 
+
+Designed to be an easier-to-use refactoring of **StoreHelper**, it makes use of Apple's **StoreKit Views** to provide a standard and easily customizable UI.
+
+Check out the `SKHelper` [Repo](https://github.com/russell-archer/SKHelper/) and [Quick Start Tutorial](https://russell-archer.github.io/SKHelper/tutorials/quickstart) to get a fast overview of how things work.
+
 ---
 
 ## Overview of StoreHelper
