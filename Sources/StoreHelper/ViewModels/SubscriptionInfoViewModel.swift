@@ -133,7 +133,7 @@ public struct SubscriptionInfoViewModel {
                 let diffComponents = Calendar.current.dateComponents([.day], from: Date(), to: renewalDate)
                 if let daysLeft = diffComponents.day {
                     if daysLeft > 1 { esi.renewsIn = "\(daysLeft) days" }
-                    else if daysLeft == 1 { esi.renewsIn! += "\(daysLeft) day" }
+                    else if daysLeft == 1 { esi.renewsIn = (esi.renewsIn ?? "") + "\(daysLeft) day" }
                     else { esi.renewsIn = "Today" }
                 }
             }
