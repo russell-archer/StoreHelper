@@ -50,8 +50,13 @@ public struct PriceView: View {
                     ForEach(purchasePriceForDisplay) { priceForDisplay in
                         Button(action: {
                             guard canMakePayments else { return }
+                            #if os(macOS)
+                            // Removed the animation for macOS as it was causing flickering of the scrollbars
+                            purchaseState = .inProgress
+                            #else
                             withAnimation { purchaseState = .inProgress }
-                            
+                            #endif
+
                             // Is it a promotional offer (an introductory or standard offer will have a promo id of nil)?
                             Task.init {
                                 if let promoId = priceForDisplay.id {
@@ -79,7 +84,13 @@ public struct PriceView: View {
             } else {
                 // Price for non-subscription product
                 Button(action: {
+                    #if os(macOS)
+                    // Removed the animation for macOS as it was causing flickering of the scrollbars
+                    purchaseState = .inProgress
+                    #else
                     withAnimation { purchaseState = .inProgress }
+                    #endif
+                    
                     Task.init { await priceViewModel.purchase(product: product) }
                 }) {
                     PriceButtonText(price: price, disabled: !canMakePayments)
