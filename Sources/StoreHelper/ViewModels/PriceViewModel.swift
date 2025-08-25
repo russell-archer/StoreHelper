@@ -28,8 +28,12 @@ public struct PriceViewModel {
             var purchaseResult: (transaction: StoreKit.Transaction?, purchaseState: PurchaseState)
             if let options { purchaseResult = try await storeHelper.purchase(product, options: options) }
             else { purchaseResult = try await storeHelper.purchase(product) }
+            #if os(macOS)
+            // Removed the animation for macOS as it was causing flickering of the scrollbars
+            purchaseState = purchaseResult.purchaseState
+            #else
             withAnimation { purchaseState = purchaseResult.purchaseState }
-
+            #endif
         } catch { purchaseState = .failed }  // The purchase or validation failed
     }
     

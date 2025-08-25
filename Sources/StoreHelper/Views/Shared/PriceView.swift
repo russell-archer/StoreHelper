@@ -65,7 +65,12 @@ public struct PriceView: View {
                                         // Complete the purchase with the signed promo offer
                                         await priceViewModel.purchase(product: product, options: [signedPromotionalOffer])
                                     } else {
+                                        #if os(macOS)
+                                        // Removed the animation for macOS as it was causing flickering of the scrollbars
+                                        purchaseState = .cancelled
+                                        #else
                                         withAnimation { purchaseState = .cancelled }
+                                        #endif
                                         showPromoSigningError = true
                                     }
                                 } else {

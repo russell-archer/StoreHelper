@@ -39,12 +39,25 @@ public struct PurchaseButton: View {
         if let product = storeHelper.product(from: productId) {
             VStack {
                 if product.type == .consumable {
-                    if purchaseState != .purchased { withAnimation { BadgeView(purchaseState: $purchaseState) }}
+                    if purchaseState != .purchased {
+                        #if os(macOS)
+                        // Removed the animation for macOS as it was causing flickering of the scrollbars
+                        BadgeView(purchaseState: $purchaseState)
+                        #else
+                        withAnimation { BadgeView(purchaseState: $purchaseState) }
+                        #endif
+                    }
+                    
                     PriceView(purchaseState: $purchaseState, productId: productId, price: price, product: product)
                     
                 } else {
-                    
+                    #if os(macOS)
+                    // Removed the animation for macOS as it was causing flickering of the scrollbars
+                    BadgeView(purchaseState: $purchaseState)
+                    #else
                     withAnimation { BadgeView(purchaseState: $purchaseState) }
+                    #endif
+                    
                     switch purchaseState {
                         case .unknown: ProgressView().padding()
                         case .purchased: EmptyView()
