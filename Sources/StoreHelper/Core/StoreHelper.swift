@@ -12,6 +12,17 @@ public typealias ProductId = String
 public typealias ShouldAddStorePaymentHandler = (_ payment: SKPayment, _ product: SKProduct) -> Bool
 public typealias TransactionNotification = (_ notification: StoreNotification, _ productId: ProductId, _ transactionId: String) -> Void
 
+/// A product that is temporarily not for sale.
+public struct NotForSale {
+    public let productId: ProductId
+    public let reason: String
+    
+    public init(productId: ProductId, reason: String) {
+        self.productId = productId
+        self.reason = reason
+    }
+}
+
 /// The state of a purchase.
 public enum PurchaseState {
     case notStarted, userCannotMakePayments, inProgress, purchased, pending, cancelled, failed, failedVerification, unknown, notPurchased
@@ -149,6 +160,13 @@ public class StoreHelper: ObservableObject {
     /// transaction check and verification. If true, the cache will always be used for non-consumables, but not
     /// for consumables and subscriptions unless there's a problem accessing the App Store.
     public var doUsePurchasedProductsFallbackCache = true
+    
+    /// A collection of `NotForSale` objects. This collection will be enumerated when StoreHelper displays a list of
+    /// products for sale. A product whose `ProductId` is contained in this collection will be displayed but the
+    /// purchase button will be disabled and the associated `reason` text displayed to show the reason why the
+    /// product is not not available for sale. For example, suppose your app has AI-related in-app purchases but
+    /// the current user's device doesn't support AI. You can disable the sale of incompatible products in this way.
+    public var notForSale = [NotForSale]()
     
     /// Set to true if we're currently waiting for a refreshed list of localized products from the App Store.
     public private(set) var isRefreshingProducts = false
