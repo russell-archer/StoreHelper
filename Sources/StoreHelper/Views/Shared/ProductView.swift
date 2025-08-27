@@ -20,7 +20,8 @@ import WidgetKit
 public struct ProductView: View {
     @EnvironmentObject var storeHelper: StoreHelper
     @State var purchaseState: PurchaseState = .unknown
-    @State var notForSale: NotForSale?
+    @State var notForSale: Bool = false
+    @State var reasonProductIsNotForSale = ""
     private var productId: ProductId
     private var displayName: String
     private var description: String
@@ -82,7 +83,9 @@ public struct ProductView: View {
                 .contentShape(Rectangle())
                 .xPlatformOnTapGesture { productInfoCompletion(productId) }
             
-            if let notForSale { SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) { Text(notForSale.reason).foregroundColor(.red).padding() }}
+            if notForSale {
+                SubHeadlineFont(scaleFactor: storeHelper.fontScaleFactor) {
+                    Text(reasonProductIsNotForSale).foregroundColor(.red).padding() }}
             else { PurchaseButton(purchaseState: $purchaseState, productId: productId, price: price) }
             
             if purchaseState == .purchased {
@@ -99,7 +102,8 @@ public struct ProductView: View {
         }
         .task {
             await purchaseState(for: productId)
-            notForSale = storeHelper.notForSale.first(where: { $0.productId == productId })
+            notForSale = storeHelper.isProductForSale(productId)
+            if notForSale { reasonProductIsNotForSale = storeHelper.reasonProductIsNotForSale(productId) ?? "" }
         }
         .onChange(of: storeHelper.purchasedProducts) { _ in
             Task.init {

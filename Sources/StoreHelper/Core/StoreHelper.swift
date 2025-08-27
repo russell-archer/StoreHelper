@@ -13,7 +13,7 @@ public typealias ShouldAddStorePaymentHandler = (_ payment: SKPayment, _ product
 public typealias TransactionNotification = (_ notification: StoreNotification, _ productId: ProductId, _ transactionId: String) -> Void
 
 /// A product that is temporarily not for sale.
-public struct NotForSale {
+internal struct NotForSale {
     public let productId: ProductId
     public let reason: String
     
@@ -161,13 +161,6 @@ public class StoreHelper: ObservableObject {
     /// for consumables and subscriptions unless there's a problem accessing the App Store.
     public var doUsePurchasedProductsFallbackCache = true
     
-    /// A collection of `NotForSale` objects. This collection will be enumerated when StoreHelper displays a list of
-    /// products for sale. A product whose `ProductId` is contained in this collection will be displayed but the
-    /// purchase button will be disabled and the associated `reason` text displayed to show the reason why the
-    /// product is not not available for sale. For example, suppose your app has AI-related in-app purchases but
-    /// the current user's device doesn't support AI. You can disable the sale of incompatible products in this way.
-    public var notForSale = [NotForSale]()
-    
     /// Set to true if we're currently waiting for a refreshed list of localized products from the App Store.
     public private(set) var isRefreshingProducts = false
     
@@ -220,6 +213,14 @@ public class StoreHelper: ObservableObject {
     
     /// Used to read the Products.plist configuration file for products and subscriptions
     private var storeConfiguration = StoreConfiguration()
+    
+    /// A collection of `NotForSale` objects. This collection will be enumerated when StoreHelper displays a list of
+    /// products for sale. A product whose `ProductId` is contained in this collection will be displayed but the
+    /// purchase button will be disabled and the associated `reason` text displayed to show the reason why the
+    /// product is not not available for sale. For example, suppose your app has AI-related in-app purchases but
+    /// the current user's device doesn't support AI. You can disable the sale of incompatible products in this way.
+    /// See `productNotForSale(_:reason:)`, `productForSale(_:)`, `isProductForSale(_:)` and `reasonProductIsNotForSale(_:)`.
+    private var notForSale = [NotForSale]()
     
     // MARK: - Initialization
     
@@ -746,6 +747,43 @@ public class StoreHelper: ObservableObject {
         if transactionUpdateCache.filter({ t in t.transactionId == transactionId && t.status == transactionStatus }).count == 0 {
             transactionUpdateCache.append(TransactionUpdate(productId: productId, date: Date(), status: transactionStatus, transactionId: transactionId))
         }
+    }
+    
+    /// Add a product to the `notForSale` collection. StoreHelper maintains a collection of `NotForSale` objects. This collection
+    /// will be enumerated when StoreHelper displays a list of products for sale. A product whose `ProductId` is contained in this
+    /// collection will be displayed but the purchase button will be disabled and the associated `reason` text displayed to show
+    /// the reason why the product is not not available for sale. For example, suppose your app has AI-related in-app purchases but
+    /// the current user's device doesn't support AI. You can disable the sale of incompatible products in this way.
+    ///
+    /// Use `productNotForSale(_:reason:)` and `productForSale(_:)` to add or remove a product to/from the `notForSale`
+    /// collection.
+    /// - Parameters:
+    ///   - productId: The `ProductId` of the product that should not be offered for sale.
+    ///   - reason: The reason the product should not be offered for sale. This value will be displayed to the user.
+    @MainActor public func productNotForSale(_ productId: ProductId, reason: String) {
+        if notForSale.contains(where: { $0.productId == productId }) { return }
+        notForSale.append(NotForSale(productId: productId, reason: reason))
+    }
+    
+    /// Add a product to the `notForSale` collection. See `productNotForSale(_:reason:)` for more details.
+    /// - Parameter productId: The `ProductId` of the product that should be removed from the `notForSale` collection.
+    @MainActor public func productForSale(_ productId: ProductId) {
+        if let index = notForSale.firstIndex(where: { $0.productId == productId }) { notForSale.remove(at: index) }
+    }
+    
+    /// Determines if the product is currently available for sale. See `productNotForSale(_:reason:)` for more details.
+    /// - Parameter productId: The `ProductId` of the product.
+    /// - Returns: Returns true if the product is currently available for sale, false otherwise.
+    @MainActor public func isProductForSale(_ productId: ProductId) -> Bool {
+        notForSale.contains(where: { $0.productId == productId })
+    }
+    
+    /// The reason a product is not available for purchase.
+    /// - Parameter productId: The `ProductId` of the product.
+    /// - Returns: Returns the reason a product is not available for purchase, or nil if the product is available for purchase.
+    @MainActor public func reasonProductIsNotForSale(_ productId: ProductId) -> String? {
+        if let notForSaleItem = notForSale.first(where: { $0.productId == productId }) { return notForSaleItem.reason }
+        return nil
     }
     
     // MARK: - Internal methods
