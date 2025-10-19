@@ -394,11 +394,13 @@ public class StoreHelper: ObservableObject {
         }
 
         // See if the App Store has revoked the user's access to the product (e.g. because of a refund).
-        // If this transaction represents a subscription, see if the user upgraded to a higher-level subscription.
-        switch product.type {
-            case .autoRenewable: purchased = result.transaction.revocationDate == nil && !result.transaction.isUpgraded
-            case .nonConsumable: purchased = result.transaction.revocationDate == nil
-            default:             throw StoreException.productTypeNotSupported
+        if result.transaction.revocationDate != nil { purchased = false }
+        else {
+            if product.type == .autoRenewable {
+                // See if the subscription has expired or the user upgraded to a higher-level subscription.
+                if let expirationDate = result.transaction.expirationDate { purchased = expirationDate < Date() && !result.transaction.isUpgraded }
+                else { purchased = !result.transaction.isUpgraded }
+            }
         }
         
         StoreLog.event(purchased ? .productIsPurchasedFromTransaction : .productIsNotPurchased, productId: productId, transactionId: String(result.transaction.id))
