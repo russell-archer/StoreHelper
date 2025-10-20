@@ -411,8 +411,13 @@ public class StoreHelper: ObservableObject {
         else {
             if product.type == .autoRenewable {
                 // See if the subscription has expired or the user upgraded to a higher-level subscription.
-                if let expirationDate = result.transaction.expirationDate { purchased = expirationDate < Date() && !result.transaction.isUpgraded }
-                else { purchased = !result.transaction.isUpgraded }
+                if let expirationDate = result.transaction.expirationDate, expirationDate < Date() {
+                    purchased = false
+                } else if result.transaction.isUpgraded {
+                    purchased = false
+                } else {
+                  purchased = true
+                }
             }
         }
         
