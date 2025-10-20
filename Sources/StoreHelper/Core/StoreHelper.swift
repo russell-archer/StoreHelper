@@ -367,8 +367,21 @@ public class StoreHelper: ObservableObject {
             return purchased
         }
 
-        // Perform a full transaction check and verification
-        guard let currentEntitlement = await Transaction.currentEntitlement(for: productId) else {
+        // We're dealing with a subscription or non-consumable product.
+        // Get the user's current entitlements and perform a full transaction check and verification.
+        var currentEntitlement: VerificationResult<Transaction>?
+        if #available(iOS 18.4, macOS 15.4, *) {
+            // As noted in Apple docs, if a ProductId is provided, the returned async sequence will contain no more than one transaction.
+            for await verificationResult in Transaction.currentEntitlements(for: productId) {
+                currentEntitlement = verificationResult
+            }
+            
+        } else {
+            // Note that use of Transaction.currentEntitlement(for:) has been deprecated with iOS 18.4 and higher.
+            currentEntitlement = await Transaction.currentEntitlement(for: productId)
+        }
+        
+        guard let currentEntitlement else {
             // There's no transaction for the product, so it hasn't been purchased. However, the App Store does sometimes return nil,
             // even if the user is entitled to access the product. For this reason we don't update the fallback cache and transaction
             // check list for a negative response
