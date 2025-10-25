@@ -371,11 +371,22 @@ public class StoreHelper: ObservableObject {
         // Get the user's current entitlements and perform a full transaction check and verification.
         var currentEntitlement: VerificationResult<Transaction>?
         if #available(iOS 18.4, macOS 15.4, *) {
-            // As noted in Apple docs, if a ProductId is provided, the returned async sequence will contain no more than one transaction.
+            // Track the latest verified entitlement found for this product.
+            var latestDate: Date?
             for await verificationResult in Transaction.currentEntitlements(for: productId) {
+                // Only consider transactions that passed StoreKit's automatic verification.
+                guard case .verified(let transaction) = verificationResult else { continue }
+
+                let purchaseDate = transaction.purchaseDate
+
+                // If we already have a newer or equal transaction, skip this one.
+                if let last = latestDate, last > purchaseDate {
+                    continue
+                }
+                // Otherwise, this is the newest valid entitlement so far.
                 currentEntitlement = verificationResult
+                latestDate = purchaseDate
             }
-            
         } else {
             // Note that use of Transaction.currentEntitlement(for:) has been deprecated with iOS 18.4 and higher.
             currentEntitlement = await Transaction.currentEntitlement(for: productId)
