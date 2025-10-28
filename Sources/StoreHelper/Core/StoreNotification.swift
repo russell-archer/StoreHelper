@@ -110,6 +110,10 @@ public enum StoreNotification: Error, Equatable {
     case appStoreNotAvailable
     case purchasedProductsCache
     
+    case subscribed
+    case notSubscribed
+    case superceeded
+    
     /// A short description of the notification.
     /// - Returns: Returns a short description of the notification.
     public func shortDescription() -> String {
@@ -165,6 +169,10 @@ public enum StoreNotification: Error, Equatable {
 
             case .appStoreNotAvailable:                 return "App Store not available"
             case .purchasedProductsCache:               return "Purchased products fallback cache valid"
+                
+            case .subscribed:                           return "The subscription is verified and current"
+            case .notSubscribed:                        return "The subscription has been cancelled or has expired"
+            case .superceeded:                          return "The subscription has been superceeded by a subscription to another product"
         }
     }
     

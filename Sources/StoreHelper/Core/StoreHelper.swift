@@ -332,12 +332,18 @@ public class StoreHelper: ObservableObject {
         return localizedProducts
     }
     
-    /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
+    /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased,
+    /// or if the user has an active subscription.
+    ///
     /// Non-consumable products may have their purchase status checked against the `purchasedProductsFallback` cache.
     /// May throw an exception of type `StoreException.transactionVerificationFailed` or `StoreException.productTypeNotSupported`.
     /// - Parameter productId: The `ProductId` of the product.
-    /// - Returns: Returns true if the product has been purchased, false otherwise.
-    @MainActor public func isPurchased(productId: ProductId) async throws -> Bool {
+    /// - Parameter checkSuperceded: Applies only to subscription products. If true, we check to see if the user has an entitlement
+    /// to a subscription of a higher-value in the same subscription group. If the user is subscribed to a higher-value product this
+    /// method returns false. By default this parameter is false (no check takes place). Note that the superceeded check only happens
+    /// if the target is iOS 16.4+ or macOS 13.3+.
+    /// - Returns: Returns true if the product has been purchased (or has an active subscription), false otherwise.
+    @MainActor public func isPurchased(productId: ProductId, checkSuperceded: Bool = false) async throws -> Bool {
         var purchased = false
         
         // For non-consumables, it's always safe to use the cache of purchased products as they're added to the cache
@@ -371,7 +377,8 @@ public class StoreHelper: ObservableObject {
         // Get the user's current entitlements and perform a full transaction check and verification.
         var currentEntitlement: VerificationResult<Transaction>?
         if #available(iOS 18.4, macOS 15.4, *) {
-            // Track the latest verified entitlement found for this product.
+            // Find the **latest** verified entitlement found for this product. If this is a non-consumable there should
+            // be 0...1 transactions. If it's a subscription there could be 0...many transactions.
             var latestDate: Date?
             for await verificationResult in Transaction.currentEntitlements(for: productId) {
                 // Only consider transactions that passed StoreKit's automatic verification.
@@ -380,9 +387,8 @@ public class StoreHelper: ObservableObject {
                 let purchaseDate = transaction.purchaseDate
 
                 // If we already have a newer or equal transaction, skip this one.
-                if let last = latestDate, last > purchaseDate {
-                    continue
-                }
+                if let last = latestDate, last > purchaseDate { continue }
+                
                 // Otherwise, this is the newest valid entitlement so far.
                 currentEntitlement = verificationResult
                 latestDate = purchaseDate
@@ -439,31 +445,73 @@ public class StoreHelper: ObservableObject {
             }
         }
         
+        if purchased, product.type == .autoRenewable, #available(iOS 16.4, macOS 13.3, *) {
+            
+            // The user DOES have an entitlement to this product and access hasn't been revoked. But as this is a subscription do
+            // they have an entitlement to a subscription product of a higher-value in the same subscription group? We check this
+            // because the user may be subscribed to one or more products in a subscription group at the same time. This is usually
+            // related to family sharing. However, we're only interested in the most high-value product the user is subscribed to
+            // in a group.
+            
+            if let group = subscriptionHelper.groupName(from: productId), let groupId = result.transaction.subscriptionGroupID {
+                var subscriptionStatus: StoreNotification = .subscribed
+                
+                if let mostValuableActiveSubscription = await subscriptionHelper.highestValueActiveSubscription(in: group, with: groupId) {
+                    // Is the highestActiveSubscription the product we were asked to check for its subscribed status?
+                    subscriptionStatus = mostValuableActiveSubscription.id == productId ? .subscribed : .superceeded
+                } else {
+                    subscriptionStatus = .notSubscribed
+                }
+                
+                purchased = subscriptionStatus == .subscribed
+                StoreLog.event(subscriptionStatus, productId: productId, transactionId: String(result.transaction.id))
+            }
+        }
+        
         StoreLog.event(purchased ? .productIsPurchasedFromTransaction : .productIsNotPurchased, productId: productId, transactionId: String(result.transaction.id))
         updatePurchasedProducts(for: productId, purchased: purchased)
         return purchased
     }
     
-    /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased.
+    /// Requests the most recent transaction for a product from the App Store and determines if it has been previously purchased,
+    /// or if the user has an active subscription.
     ///
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the product.
-    /// - Returns: Returns true if the product has been purchased, false otherwise.
-    @MainActor public func isPurchased(product: Product) async throws -> Bool { try await isPurchased(productId: product.id) }
+    /// - Parameter checkSuperceded: Applies only to subscription products. If true, we check to see if the user has an entitlement
+    /// to a subscription of a higher-value in the same subscription group. If the user is subscribed to a higher-value product this
+    /// method returns false. By default this parameter is false (no check takes place). Note that the superceeded check only happens
+    /// if the target is iOS 16.4+ or macOS 13.3+.
+    /// - Returns: Returns true if the product has been purchased (or has an active subscription), false otherwise.
+    @MainActor public func isPurchased(product: Product, checkSuperceded: Bool = false) async throws -> Bool {
+        try await isPurchased(productId: product.id, checkSuperceded: checkSuperceded)
+    }
     
     /// Determines if a product is currently subscribed to.
     ///
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter product: The `Product` representing the subscription product.
-    /// - Returns: Returns true if the product is currently subscribed to, false otherwise.
-    @MainActor public func isSubscribed(product: Product) async throws -> Bool { try await isPurchased(productId: product.id) }
+    /// - Parameter checkSuperceded: If true, we check to see if the user has an entitlement to a subscription of a higher-value
+    /// in the same subscription group. If the user is subscribed to a higher-value product this method returns false. By default,
+    /// this parameter is false (no check takes place). Note that the superceeded check only happens if the target is iOS 16.4+ or
+    /// macOS 13.3+.
+    /// - Returns: Returns true if the user has an active subscription, false otherwise.
+    @MainActor public func isSubscribed(product: Product, checkSuperceded: Bool = false) async throws -> Bool {
+        try await isPurchased(productId: product.id, checkSuperceded: checkSuperceded)
+    }
     
     /// Determines if the product is currently subscribed to.
     ///
     /// May throw an exception of type `StoreException.transactionVerificationFailed`.
     /// - Parameter productId: The `ProductId` of the subscription product.
-    /// - Returns: Returns true if the product is currently subscribed to, false otherwise.
-    @MainActor public func isSubscribed(productId: ProductId) async throws -> Bool { try await isPurchased(productId: productId) }
+    /// - Parameter checkSuperceded: If true, we check to see if the user has an entitlement to a subscription of a higher-value
+    /// in the same subscription group. If the user is subscribed to a higher-value product this method returns false. By default,
+    /// this parameter is false (no check takes place). Note that the superceeded check only happens if the target is iOS 16.4+ or
+    /// macOS 13.3+.
+    /// - Returns: Returns true if the user has an active subscription, false otherwise.
+    @MainActor public func isSubscribed(productId: ProductId, checkSuperceded: Bool = false) async throws -> Bool {
+        try await isPurchased(productId: productId, checkSuperceded: checkSuperceded)
+    }
     
     /// Returns true if the product uniquely identified by `productId` is a subscription.
     /// - Parameter productId: `ProductId` that uniquely identifies a product available in the App Store.
@@ -822,6 +870,13 @@ public class StoreHelper: ObservableObject {
     @MainActor public func reasonProductIsNotForSale(_ productId: ProductId) -> String? {
         if let notForSaleItem = notForSale.first(where: { $0.productId == productId }) { return notForSaleItem.reason }
         return nil
+    }
+    
+    /// Creates an array of `Product` given an array of `ProductId`.
+    /// - Parameter productIds: The array of `ProductId` for which `[Product` is required.
+    /// - Returns: Returns an array of `Product` given an array of `ProductId`.
+    @MainActor public func products(from productIds: [ProductId]) -> [Product] {
+        productIds.compactMap { product(from: $0) }
     }
     
     // MARK: - Internal methods

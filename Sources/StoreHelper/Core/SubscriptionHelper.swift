@@ -10,11 +10,14 @@ import OrderedCollections
 import SwiftUI
 
 /// The status of a StoreKit1 or StoreKit2 subscription
-public enum TransactionStatus { case purchased, subscribed, inGracePeriod, inBillingRetryPeriod, revoked, expired, unknown
+public enum TransactionStatus { case purchased, subscribed, notSubscribed, notVerified, superceeded, inGracePeriod, inBillingRetryPeriod, revoked, expired, unknown
     public func shortDescription() -> String {
         switch self {
             case .purchased:            return "Purchased"
             case .subscribed:           return "Subscribed"
+            case .notSubscribed:        return "Not subscribed"
+            case .notVerified:           return "Not verified"
+            case .superceeded:          return "Superceeded"
             case .inGracePeriod:        return "In grace period"
             case .inBillingRetryPeriod: return "In billing retry period"
             case .revoked:              return "Revoked"
@@ -33,7 +36,6 @@ public struct TransactionUpdate: Hashable {
 }
 
 /// Holds information on a subscription group and the associated subscription products.
-@available(iOS 15.0, macOS 12.0, *)
 public struct SubscriptionGroupInfo {
     
     public var group: String
@@ -450,5 +452,46 @@ public struct SubscriptionHelper {
         guard let mostRecent = sortedUpdates.last else { return nil }
 
         return mostRecent.status
+    }
+    
+    /// Return the highest service level auto-renewing subscription the user is subscribed to in the `subscriptionGroup`.
+    /// - Parameter groupName: The name of the subscription group.
+    /// - Returns: Returns the `Product` for the highest service level auto-renewing subscription the user is subscribed to in the `subscriptionGroup`, or nil if the user isn't subscribed to a product in the group.
+    ///
+    /// When getting information on the highest service level auto-renewing subscription the user is subscribed to we enumerate the `Product.subscription.status` array that is a property of each `Product` in the group.
+    /// This array is empty if the user has never subscribed to a product in this subscription group. If the user is subscribed to a product the `statusCollection.count` should be at least 1.
+    /// Each `Product` in a subscription group provides access to the same `Product.SubscriptionInfo.Status` array via its `product.subscription.status` property.
+    ///
+    /// Enumeration of the `SubscriptionInfo.Status` array is necessary because a user may have multiple active subscriptions to products in the same subscription group. For example, a user may have
+    /// subscribed themselves to the "Gold" product, as well as receiving an automatic subscription to the "Silver" product through family sharing. In this case, we'd need to return information on the "Gold" product.
+    ///
+    /// Also, note that even if the `Product.SubscriptionInfo.Status` collection does NOT contain a particular product `Transaction.currentEntitlements(for:)` may still report that the user has an
+    /// entitlement. This can happen when upgrading or downgrading subscriptions. Because of this we always need to search the `Product.SubscriptionInfo.Status` collection for a subscribed product with a higher-value.
+    ///
+    @available(iOS 16.4, macOS 13.3, *)
+    @MainActor public func highestValueActiveSubscription(in group: String, with groupId: String) async -> Product? {
+        // The higher the value product, the LOWER the `Product.subscription.groupLevel` value.
+        // The highest value product will have a `Product.subscription.groupLevel` value of 1.
+        
+        // Get all the subscriptions statuses for the group
+        guard let groupSubscriptionStatus = try? await Product.SubscriptionInfo.status(for: groupId) else { return nil }
+        
+        // Filter-out any subscription the user's not actively subscribed to
+        let activeSubscriptions = groupSubscriptionStatus.filter { $0.state == .subscribed }
+        guard !activeSubscriptions.isEmpty else { return nil }
+        
+        // Check the transaction for each subscription is verified and collect their products ids
+        let verifiedActiveSubscriptionProductIds = activeSubscriptions.compactMap {
+            let statusTransactionResult = storeHelper.checkVerificationResult(result: $0.transaction)
+            if statusTransactionResult.verified { return statusTransactionResult.transaction.productID as ProductId } else { return nil }
+        }
+        
+        // Get the actual `Product` objects for each active and verified subscrition
+        let subscriptionProducts = storeHelper.products(from: verifiedActiveSubscriptionProductIds)
+        
+        // Return the active subscription with the highest value (lowest group level).
+        // Important: Remember, the higher the value product, the LOWER the `Product.subscription.groupLevel` value.
+        // The highest value product will have a `Product.subscription.groupLevel` value of 1.
+        return subscriptionProducts.min { $0.subscription?.groupLevel ?? Int.max < $1.subscription?.groupLevel ?? Int.max }
     }
 }
