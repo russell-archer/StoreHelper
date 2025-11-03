@@ -109,7 +109,9 @@ public struct ProductView: View {
             Task.init {
                 await purchaseState(for: productId)
                 #if canImport(WidgetKit)
-                WidgetCenter.shared.reloadAllTimelines()
+                if #available(iOS 14.0, macOS 11.0, watchOS 9.0, visionOS 26.0, *) {
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
                 #endif
             }
         }

@@ -468,7 +468,7 @@ public struct SubscriptionHelper {
     /// Also, note that even if the `Product.SubscriptionInfo.Status` collection does NOT contain a particular product `Transaction.currentEntitlements(for:)` may still report that the user has an
     /// entitlement. This can happen when upgrading or downgrading subscriptions. Because of this we always need to search the `Product.SubscriptionInfo.Status` collection for a subscribed product with a higher-value.
     ///
-    @available(iOS 16.4, macOS 13.3, *)
+    @available(iOS 16.4, macOS 13.3, tvOS 16.4, *)
     @MainActor public func highestValueActiveSubscription(in group: String, with groupId: String) async -> Product? {
         // The higher the value product, the LOWER the `Product.subscription.groupLevel` value.
         // The highest value product will have a `Product.subscription.groupLevel` value of 1.
