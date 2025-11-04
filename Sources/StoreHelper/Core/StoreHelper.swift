@@ -345,7 +345,7 @@ public class StoreHelper: ObservableObject {
     /// - Returns: Returns true if the product has been purchased (or has an active subscription), false otherwise.
     @MainActor public func isPurchased(productId: ProductId, checkSuperceded: Bool = false) async throws -> Bool {
         var purchased = false
-        
+
         // For non-consumables, it's always safe to use the cache of purchased products as they're added to the cache
         // when purchased and will be removed (see handleTransactions()) if access to the product is revoked by the App Store.
         // We only use the cache if a product has previously had its purchase status checked against the App Store receipt.
@@ -355,7 +355,7 @@ public class StoreHelper: ObservableObject {
             updatePurchasedProducts(for: productId, purchased: purchased, updateFallbackList: false, updateTransactionCheck: false)
             return purchased
         }
-        
+
         // Make sure we're listening for transactions, the App Store is available, we have a list of localized products
         // and that we can create a `Product` from the `ProductId`. If not, we have to rely on the cache of purchased products
         guard hasStarted, isAppStoreAvailable, hasProducts, let product = product(from: productId) else {
@@ -376,7 +376,7 @@ public class StoreHelper: ObservableObject {
         // We're dealing with a subscription or non-consumable product.
         // Get the user's current entitlements and perform a full transaction check and verification.
         var currentEntitlement: VerificationResult<Transaction>?
-        if #available(iOS 18.4, macOS 15.4, *) {
+        if #available(iOS 18.4, macOS 15.4, tvOS 18.4, visionOS 2.4, *) {
             // Find the **latest** verified entitlement found for this product. If this is a non-consumable there should
             // be 0...1 transactions. If it's a subscription there could be 0...many transactions.
             var latestDate: Date?
@@ -397,7 +397,7 @@ public class StoreHelper: ObservableObject {
             // Note that use of Transaction.currentEntitlement(for:) has been deprecated with iOS 18.4 and higher.
             currentEntitlement = await Transaction.currentEntitlement(for: productId)
         }
-        
+
         guard let currentEntitlement else {
             // There's no transaction for the product, so it hasn't been purchased. However, the App Store does sometimes return nil,
             // even if the user is entitled to access the product. For this reason we don't update the fallback cache and transaction
@@ -444,9 +444,9 @@ public class StoreHelper: ObservableObject {
                 break
             }
         }
-        
-        if purchased, product.type == .autoRenewable, #available(iOS 16.4, macOS 13.3, *) {
-            
+
+        if purchased, product.type == .autoRenewable, #available(iOS 16.4, macOS 13.3, tvOS 16.4, *) {
+
             // The user DOES have an entitlement to this product and access hasn't been revoked. But as this is a subscription do
             // they have an entitlement to a subscription product of a higher-value in the same subscription group? We check this
             // because the user may be subscribed to one or more products in a subscription group at the same time. This is usually
@@ -467,7 +467,7 @@ public class StoreHelper: ObservableObject {
                 StoreLog.event(subscriptionStatus, productId: productId, transactionId: String(result.transaction.id))
             }
         }
-        
+
         StoreLog.event(purchased ? .productIsPurchasedFromTransaction : .productIsNotPurchased, productId: productId, transactionId: String(result.transaction.id))
         updatePurchasedProducts(for: productId, purchased: purchased)
         return purchased

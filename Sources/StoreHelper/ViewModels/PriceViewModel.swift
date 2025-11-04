@@ -134,7 +134,7 @@ public struct PriceViewModel {
     }
 
     private func periodUnitText(_ unit: Product.SubscriptionPeriod.Unit, product: Product) -> String {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             let format = product.subscriptionPeriodUnitFormatStyle.locale(.current)
             return unit.formatted(format)
         } else if #available(iOS 15.4, macOS 12.3, tvOS 15.4, watchOS 8.6, *) {
@@ -158,7 +158,7 @@ public struct PriceViewModel {
     }
     
     private func paymentModeDisplay(mode: Product.SubscriptionOffer.PaymentMode) -> String {
-        if #available(iOS 15.4, macOS 12.3, tvOS 15.4, watchOS 8.5, visionOS 1.0, *) {
+        if #available(iOS 15.4, macOS 12.3, tvOS 15.4, watchOS 8.5, *) {
             mode.localizedDescription
         } else {
             switch mode {

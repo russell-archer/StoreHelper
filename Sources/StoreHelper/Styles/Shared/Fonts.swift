@@ -176,7 +176,6 @@ public struct FontUtil {
     /// - Parameter dynamicTypeSize: The environment's dynamic type size.
     /// - Returns: Returns the point size of the body font for a dynamic type size.
     public static func baseDynamicTypeSize(for dynamicTypeSize: DynamicTypeSize) -> Double {
-        
         switch(dynamicTypeSize) {
             case .xSmall:           return 14
             case .small:            return 15
