@@ -1004,7 +1004,7 @@ public class StoreHelper: ObservableObject {
                     // StoreKit's attempts to validate the transaction failed
                     if let handler = transactionNotification { handler(.transactionFailure, checkResult.transaction.productID, String(checkResult.transaction.id)) }
                     StoreLog.transaction(.transactionFailure, productId: checkResult.transaction.productID, transactionId: String(checkResult.transaction.id))
-                    return
+                    continue
                 }
                 
                 // The transaction was validated by StoreKit
@@ -1021,7 +1021,7 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionRevoked, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     if let handler = transactionNotification { handler(.transactionRevoked, transaction.productID, String(transaction.id)) }
-                    return
+                    continue
                 }
                 
                 if let expirationDate = transaction.expirationDate, expirationDate < Date() {
@@ -1029,7 +1029,7 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionExpired, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: false)
                     if let handler = transactionNotification { handler(.transactionExpired, transaction.productID, String(transaction.id)) }
-                    return
+                    continue
                 }
                 
                 if transaction.isUpgraded {
@@ -1037,7 +1037,7 @@ public class StoreHelper: ObservableObject {
                     StoreLog.transaction(.transactionUpgraded, productId: transaction.productID, transactionId: String(transaction.id))
                     await self.updatePurchasedProducts(for: transaction.productID, purchased: true)
                     if let handler = transactionNotification { handler(.transactionUpgraded, transaction.productID, String(transaction.id)) }
-                    return
+                    continue
                 }
                     
                 // Update the list of products the user has access to
